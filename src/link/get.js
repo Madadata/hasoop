@@ -4,33 +4,33 @@
 
 import {setGetLinkOptions} from './setOptions'
 
-const r = require("request-promise")
+const r = require('request-promise')
 
-export function getLinkAll() {
-    const options = setGetLinkOptions('all')
-    return r(options)
+export function getLinkAll () {
+  const options = setGetLinkOptions('all')
+  return r(options)
         .then(function (repos) {
-            return repos['links']
+          return repos['links']
         })
         .catch(function (err) {
         })
 }
 
-export function getLinkByLinkName(linkName) {
-    const options = setGetLinkOptions('subName', linkName)
-    return r(options)
+export function getLinkByLinkName (linkName) {
+  const options = setGetLinkOptions('subName', linkName)
+  return r(options)
         .then(function (repos) {
-            return repos
+          return repos
         })
         .catch(function (err) {
         })
 }
 
-export function getLinkByConnectorName(connectorName) {
-    const options = setGetLinkOptions('cname', connectorName)
-    return r(options)
+export function getLinkByConnectorName (connectorName) {
+  const options = setGetLinkOptions('cname', connectorName)
+  return r(options)
         .then(function (repos) {
-            return repos
+          return repos
         })
         .catch(function (err) {
         })

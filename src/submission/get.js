@@ -4,18 +4,18 @@
 
 import {setGetSubmissionOptions} from './setOptions'
 
-const r = require("request-promise")
+const r = require('request-promise')
 
-export function getSubmissionALL() {
-    const options = setGetSubmissionOptions('all')
-    return r(options)
+export function getSubmissionALL () {
+  const options = setGetSubmissionOptions('all')
+  return r(options)
         .then(function (repos) {
-            return repos['links']
+          return repos['links']
         })
         .catch(function (err) {
         })
 }
 
-export function getSubmissionByJobName() {
+export function getSubmissionByJobName () {
 
 }

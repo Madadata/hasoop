@@ -18,12 +18,12 @@ const r = require('request-promise')
 //     'linkName': 'edf',
 // }
 
-export function createJob(jobName, fromLinkConf, toLinkConf) {
-    //TODO
-    const options = setCreateOrUpdateJobOptions(jobName, fromLinkConf, toLinkConf)
-    console.log(options['body']['jobs'])
-    return r(options)
+export function createJob (jobName, fromLinkConf, toLinkConf) {
+    // TODO
+  const options = setCreateOrUpdateJobOptions(jobName, fromLinkConf, toLinkConf)
+  console.log(options['body']['jobs'])
+  return r(options)
         .then(function (repos) {
-            return repos
+          return repos
         })
 }

@@ -4,7 +4,7 @@
 
 import {setCreateLinkOptions} from './setOptions'
 
-const r = require("request-promise");
+const r = require('request-promise')
 
 // const mysqlParam = {
 //     'uniqueLinkName': 'qwertyuio',
@@ -21,12 +21,12 @@ const r = require("request-promise");
 //     'DatabaseType': 's3'
 // }
 
-export function createLink(linkName, param) {
-    //TODO 各种参数
-    const options = setCreateLinkOptions(linkName, param)
-    return r(options)
+export function createLink (linkName, param) {
+    // TODO 各种参数
+  const options = setCreateLinkOptions(linkName, param)
+  return r(options)
         .then(function (repos) {
-            return repos
+          return repos
         })
         .catch(function (err) {
 
