@@ -6,11 +6,11 @@ import {setGetJobOptions} from './setOptions'
 
 const r = require('request-promise')
 
-export function getDriverAll() {
-    const options = setGetJobOptions('all')
-    return r(options)
+export function getDriverAll () {
+  const options = setGetJobOptions('all')
+  return r(options)
         .then(function (repos) {
-            return repos['links']
+          return repos['links']
         })
         .catch(function (err) {
         })

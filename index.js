@@ -26,22 +26,22 @@ import {getSubmissionALL, getSubmissionByJobName} from './src/submission/get'
 import {startJob, stopJob, getJobStatus} from './src/submission/status'
 
 export {
-    //version
+    // version
     getVersion,
 
-    //authorization
+    // authorization
     createRole,
     deleteRole,
     getRole,
 
-    //connecttor
+    // connecttor
     getConnectorAll,
     getConnectorByConnectorName,
 
-    //driver
+    // driver
     getDriverAll,
 
-    //job
+    // job
     createJob,
     deleteJob,
     deleteJobAll,
@@ -52,7 +52,7 @@ export {
     updateJobEnable,
     updateJobDisable,
 
-    //link
+    // link
     createLink,
     deleteLink,
     deleteLinkAll,
@@ -63,7 +63,7 @@ export {
     updateEnable,
     updateDisable,
 
-    //submission
+    // submission
     getSubmissionALL,
     getSubmissionByJobName,
     startJob,
