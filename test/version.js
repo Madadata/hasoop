@@ -3,13 +3,10 @@
  */
 
 import { expect } from 'chai'
-import { Hasoop } from '../src/index'
-
-const sqoopClient = new Hasoop('')
+import { sqoopClient } from './index'
 
 suite('utils', () => {
-  test.skip('getVersion', () => {
-    sqoopClient.getVersion()
+  test('getVersion', () => {
+    const data = sqoopClient.getVersion()
   })
-
 })
