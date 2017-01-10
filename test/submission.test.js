@@ -8,7 +8,7 @@ import { Hasoop } from '../src/index'
 const sqoopClient = new Hasoop('')
 
 suite('submission', () => {
-  test('getSubmission', () => {
+  test.skip('getSubmission', () => {
     sqoopClient.getSubmission()
   })
   

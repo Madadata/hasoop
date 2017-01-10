@@ -8,15 +8,15 @@ import { Hasoop } from '../src/index'
 const sqoopClient = new Hasoop('')
 
 suite('authorization', () => {
-  test('createRole', () => {
+  test.skip('createRole', () => {
     sqoopClient.createRole()
   })
 
-  test('deleteRole', () => {
+  test.skip('deleteRole', () => {
     sqoopClient.deleteRole()
   })
 
-  test('getRole', () => {
+  test.skip('getRole', () => {
     sqoopClient.getRole()
   })
 })
