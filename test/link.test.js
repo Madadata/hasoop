@@ -8,19 +8,19 @@ import { Hasoop } from '../src/index'
 const sqoopClient = new Hasoop('')
 
 suite('link', () => {
-  test('createLink', () => {
+  test.skip('createLink', () => {
     sqoopClient.createLink()
   })
 
-  test('updateLink', () => {
+  test.skip('updateLink', () => {
     sqoopClient.updateLink()
   })
 
-  test('deleteLink', () => {
+  test.skip('deleteLink', () => {
     sqoopClient.deleteLink()
   })
 
-  test('getLink', () => {
+  test.skip('getLink', () => {
     sqoopClient.getLink()
   })
 })

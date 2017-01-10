@@ -8,27 +8,27 @@ import { Hasoop } from '../src/index'
 const sqoopClient = new Hasoop('')
 
 suite('job', () => {
-  test('createJob', () => {
+  test.skip('createJob', () => {
     sqoopClient.createJob()
   })
 
-  test('deleteJob', () => {
+  test.skip('deleteJob', () => {
     sqoopClient.deleteJob()
   })
 
-  test('getJob', () => {
+  test.skip('getJob', () => {
     sqoopClient.getJob()
   })
 
-  test('updateJob', () => {
+  test.skip('updateJob', () => {
     sqoopClient.updateJob()
   })
 
-  test('startJob', () => {
+  test.skip('startJob', () => {
     sqoopClient.startJob()
   })
 
-  test('stopJob', () => {
+  test.skip('stopJob', () => {
     sqoopClient.stopJob()
   })
 })
