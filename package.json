@@ -1,7 +1,9 @@
 {
-  "name": "application-name",
+  "name": "hasoop",
   "version": "0.0.1",
   "main": "dist/main.js",
+  "license": "MIT",
+  "description": "a simple node.js client for Sqoop 2",
   "scripts": {
     "build": "babel -d dist src",
     "lint": "standard --verbose | snazzy",
