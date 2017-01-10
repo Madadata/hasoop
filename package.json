@@ -5,7 +5,8 @@
   "scripts": {
     "build": "babel -d dist src",
     "lint": "standard --verbose | snazzy",
-    "test": "mocha"
+    "test": "mocha",
+    "coverage": "nyc npm test && nyc report --reporter=text-lcov | coveralls"
   },
   "dependencies": {
     "isomorphic-fetch": "^2.2.1",
@@ -16,7 +17,9 @@
     "babel-core": "^6.21.0",
     "babel-preset-latest": "^6.16.0",
     "chai": "^3.5.0",
+    "coveralls": "^2.11.15",
     "mocha": "^3.2.0",
+    "nyc": "^10.0.0",
     "snazzy": "^5.0.0",
     "standard": "^8.6.0"
   }
