@@ -18,6 +18,7 @@
     "babel-cli": "^6.18.0",
     "babel-core": "^6.21.0",
     "babel-preset-latest": "^6.16.0",
+    "babel-preset-stage-0": "^6.16.0",
     "chai": "^3.5.0",
     "coveralls": "^2.11.15",
     "mocha": "^3.2.0",

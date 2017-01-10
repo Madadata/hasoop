@@ -9,4 +9,6 @@ export class Hasoop {
     this.config = config
   }
 
+  getVersion = getVersion
+
 }
