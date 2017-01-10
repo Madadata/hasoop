@@ -12,8 +12,7 @@
     "coverage": "nyc npm test && nyc report --reporter=text-lcov | coveralls"
   },
   "dependencies": {
-    "isomorphic-fetch": "^2.2.1",
-    "request-promise": "^4.1.1"
+    "isomorphic-fetch": "^2.2.1"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
@@ -23,6 +22,7 @@
     "coveralls": "^2.11.15",
     "mocha": "^3.2.0",
     "nyc": "^10.0.0",
+    "preset": "^1.0.0",
     "rimraf": "^2.5.4",
     "snazzy": "^5.0.0",
     "standard": "^8.6.0"
