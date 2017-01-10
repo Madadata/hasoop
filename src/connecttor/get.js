@@ -9,18 +9,18 @@ import {setGetConnectorOptions} from './setOptions'
 export function getConnectorAll () {
   const options = setGetConnectorOptions('all')
   return r(options)
-        .then(function (repos) {
-          return repos
-        })
-        .catch(function (err) {
-        })
+    .then(function (repos) {
+      return repos
+    })
+    .catch(function (err) {
+    })
 }
 export function getConnectorByConnectorName (connectorName) {
   const options = setGetConnectorOptions('subName', connectorName)
   return r(options)
-        .then(function (repos) {
-          return repos
-        })
-        .catch(function (err) {
-        })
+    .then(function (repos) {
+      return repos
+    })
+    .catch(function (err) {
+    })
 }

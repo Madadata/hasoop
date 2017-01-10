@@ -22,13 +22,13 @@ const r = require('request-promise')
 // }
 
 export function createLink (linkName, param) {
-    // TODO 各种参数
+  // TODO 各种参数
   const options = setCreateLinkOptions(linkName, param)
   return r(options)
-        .then(function (repos) {
-          return repos
-        })
-        .catch(function (err) {
+    .then(function (repos) {
+      return repos
+    })
+    .catch(function (err) {
 
-        })
+    })
 }

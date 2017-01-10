@@ -10,11 +10,11 @@ const r = require('request-promise')
 export function deleteJob (jobName) {
   const options = setDeleteJobOptions(jobName)
   return r(options)
-        .then(function (repos) {
-          return repos
-        })
-        .catch(function (err) {
-        })
+    .then(function (repos) {
+      return repos
+    })
+    .catch(function (err) {
+    })
 }
 
 export async function deleteJobAll () {

@@ -9,22 +9,22 @@ const r = require('request-promise')
 export function updateEnable (linkName) {
   const options = setUpdateOptions('enable', linkName)
   return r(options)
-        .then(function (repos) {
-          return repos
-        })
-        .catch(function (err) {
-        })
+    .then(function (repos) {
+      return repos
+    })
+    .catch(function (err) {
+    })
 }
 
 export function updateDisable (linkName) {
   const options = setUpdateOptions('disable', linkName)
   return r(options)
-        .then(function (repos) {
-          return repos
-        })
-        .catch(function (err) {
-        })
+    .then(function (repos) {
+      return repos
+    })
+    .catch(function (err) {
+    })
 }
 export function updateLink (linkName) {
-    // TODO
+  // TODO
 }

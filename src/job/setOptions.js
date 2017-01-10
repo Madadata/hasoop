@@ -8,35 +8,35 @@ import {setMysqlConfig, setHdfsConfig} from './setTemplate'
 const jobUri = 'v1/job'
 
 export function setGetJobOptions (tag, jobOrConnectorName = null) {
-  if (tag == 'all') {
+  if (tag === 'all') {
     return setGetOptions(tag, jobUri)
-  } else if (tag == 'jobName') {
+  } else if (tag === 'jobName') {
     return setGetOptions(tag, jobUri, jobOrConnectorName)
-  } else if (tag == 'cname') {
+  } else if (tag === 'cname') {
     return setGetOptions('cname', jobUri, jobOrConnectorName)
   }
 }
 
 export function setCreateOrUpdateJobOptions (jobName, fromLinkConf, toLinkConf) {
-    // TODO
-    // from
+  // TODO
+  // from
   let fromConfigValues
-  if (fromLinkConf['type'] == 'mysql') {
+  if (fromLinkConf['type'] === 'mysql') {
     fromConfigValues = setMysqlConfig(fromLinkConf)
     fromLinkConf['connectorName'] = 'generic-jdbc-connector'
-  } else if (fromLinkConf['type'] == 'hdfs') {
+  } else if (fromLinkConf['type'] === 'hdfs') {
     fromConfigValues = setHdfsConfig(fromLinkConf)
     fromLinkConf['connectorName'] = 'hdfs-connector'
   } else {
     throw Error()
   }
 
-    // to
+  // to
   let toConfigValues
-  if (toLinkConf['type'] == 'mysql') {
+  if (toLinkConf['type'] === 'mysql') {
     toConfigValues = setMysqlConfig(toLinkConf)
     toLinkConf['connectorName'] = 'generic-jdbc-connector'
-  } else if (toLinkConf['type'] == 'hdfs') {
+  } else if (toLinkConf['type'] === 'hdfs') {
     toConfigValues = setHdfsConfig(toLinkConf)
     toLinkConf['connectorName'] = 'hdfs-connector'
   } else {
@@ -118,7 +118,7 @@ export function setDeleteJobOptions (jobName) {
 }
 
 export function setUpdateJobOptions (tag, jobName) {
-  if (tag == 'enable' || tag == 'disable') {
+  if (tag === 'enable' || tag === 'disable') {
     return setPutOptions('enable', jobUri, jobName)
   }
 }

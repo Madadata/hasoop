@@ -10,11 +10,11 @@ const r = require('request-promise')
 export function deleteLink (linkName) {
   const options = setDeleteLinkOptions(linkName)
   return r(options)
-        .then(function (repos) {
-          return repos
-        })
-        .catch(function (err) {
-        })
+    .then(function (repos) {
+      return repos
+    })
+    .catch(function (err) {
+    })
 }
 
 export async function deleteLinkAll () {

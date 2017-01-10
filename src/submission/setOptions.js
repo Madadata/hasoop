@@ -20,7 +20,7 @@ export function setGetJobStatusOptions (jobName) {
 }
 
 export function setGetSubmissionOptions (tag = 'all') {
-  if (tag == 'all') {
+  if (tag === 'all') {
     return setGetOptions(tag, submissionUri)
   }
 }

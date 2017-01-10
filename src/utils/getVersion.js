@@ -20,10 +20,10 @@ function setGetVersionOptions () {
 export function getVersion () {
   const options = setGetVersionOptions()
   return r(options)
-        .then(function (repos) {
-          return repos
-        })
-        .catch(function (err) {
+    .then(function (repos) {
+      return repos
+    })
+    .catch(function (err) {
 
-        })
+    })
 }

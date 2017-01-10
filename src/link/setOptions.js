@@ -8,7 +8,7 @@ const linkUri = 'v1/link'
 
 export function setCreateLinkOptions (linkName, param) {
   const body = {}
-  if (param['DatabaseType'] == 'mysql') {
+  if (param['DatabaseType'] === 'mysql') {
     const uri = encodeURIComponent('jdbc:mysql://' + param['connectionHost'] + ':' + param['connectionPort'])
     body['links'] = [
       {
@@ -74,15 +74,15 @@ export function setCreateLinkOptions (linkName, param) {
                 'overrides': '',
                 'type': 'INTEGER'
               }, {
-                  'editable': 'ANY',
-                  'validators': [],
-                  'name': 'linkConfig.jdbcProperties',
-                  'id': 72,
-                  'sensitive': false,
-                  'overrides': '',
-                  'type': 'MAP',
-                  'sensitive-pattern': ''
-                }
+                'editable': 'ANY',
+                'validators': [],
+                'name': 'linkConfig.jdbcProperties',
+                'id': 72,
+                'sensitive': false,
+                'overrides': '',
+                'type': 'MAP',
+                'sensitive-pattern': ''
+              }
               ],
               'name': 'linkConfig',
               'id': 17,
@@ -112,13 +112,13 @@ export function setCreateLinkOptions (linkName, param) {
 
       }
     ]
-  } else if (param['type'] == 'hdfs') {
-        // TODO
-        // param['uri'] = 's3a://sqoop2/'
-        // param['s3'] = {}
-        // param['s3']['access'] = 'AKIAOISG3IRVOIUP2PNA'
-        // param['s3']['secret'] = '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'
-        // param['s3']['region'] = 's3.cn-north-1.amazonaws.com.cn'
+  } else if (param['type'] === 'hdfs') {
+    // TODO
+    // param['uri'] = 's3a://sqoop2/'
+    // param['s3'] = {}
+    // param['s3']['access'] = 'AKIAOISG3IRVOIUP2PNA'
+    // param['s3']['secret'] = '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'
+    // param['s3']['region'] = 's3.cn-north-1.amazonaws.com.cn'
     body['links'] = [
       {
         'id': -1,
@@ -189,17 +189,17 @@ export function setDeleteLinkOptions (linkName) {
 }
 
 export function setGetLinkOptions (tag = 'all', linkOrConnectorName = null) {
-  if (tag == 'all') {
+  if (tag === 'all') {
     return setGetOptions(tag, linkUri)
-  } else if (tag == 'subName') {
+  } else if (tag === 'subName') {
     return setGetOptions(tag, linkUri, linkOrConnectorName)
-  } else if (tag == 'cname') {
+  } else if (tag === 'cname') {
     return setGetOptions('cname', linkUri, linkOrConnectorName)
   }
 }
 
 export function setUpdateOptions (tag, linkName) {
-  if (tag == 'enable' || tag == 'disable') {
+  if (tag === 'enable' || tag === 'disable') {
     return setPutOptions('enable', linkUri, linkName)
   }
 }
