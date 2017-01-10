@@ -9,37 +9,37 @@ const r = require('request-promise')
 export function startJob (jobName) {
   const options = setStartJobOptions(jobName)
   return r(options)
-        .then(function (repos) {
-          console.log(repos)
-          return repos
-        })
-        .catch(function (err) {
+    .then(function (repos) {
+      console.log(repos)
+      return repos
+    })
+    .catch(function (err) {
 
-        })
+    })
 }
 
 export function stopJob (jobName) {
   const options = setStopJobOptions(jobName)
   return r(options)
-        .then(function (repos) {
-          console.log(repos)
-          return repos
-        })
-        .catch(function (err) {
+    .then(function (repos) {
+      console.log(repos)
+      return repos
+    })
+    .catch(function (err) {
 
-        })
+    })
 }
 
 export function getJobStatus (jobName) {
   const options = setGetJobStatusOptions(jobName)
   return r(options)
-        .then(function (repos) {
-          console.log(repos)
-          return repos
-        })
-        .catch(function (err) {
+    .then(function (repos) {
+      console.log(repos)
+      return repos
+    })
+    .catch(function (err) {
 
-        })
+    })
 }
 
 getJobStatus('movie_s3')

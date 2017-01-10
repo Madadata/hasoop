@@ -9,11 +9,11 @@ const r = require('request-promise')
 export function getSubmissionALL () {
   const options = setGetSubmissionOptions('all')
   return r(options)
-        .then(function (repos) {
-          return repos['links']
-        })
-        .catch(function (err) {
-        })
+    .then(function (repos) {
+      return repos['links']
+    })
+    .catch(function (err) {
+    })
 }
 
 export function getSubmissionByJobName () {

@@ -9,9 +9,9 @@ const r = require('request-promise')
 export function getDriverAll () {
   const options = setGetJobOptions('all')
   return r(options)
-        .then(function (repos) {
-          return repos['links']
-        })
-        .catch(function (err) {
-        })
+    .then(function (repos) {
+      return repos['links']
+    })
+    .catch(function (err) {
+    })
 }

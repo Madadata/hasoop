@@ -7,7 +7,7 @@ import {setGetOptions} from '../utils/setRequestOptions'
 const driverUri = 'v1/driver'
 
 export function setGetJobOptions (tag = 'all') {
-  if (tag == 'all') {
+  if (tag === 'all') {
     return setGetOptions(tag, driverUri)
   }
 }

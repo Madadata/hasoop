@@ -19,11 +19,11 @@ const r = require('request-promise')
 // }
 
 export function createJob (jobName, fromLinkConf, toLinkConf) {
-    // TODO
+  // TODO
   const options = setCreateOrUpdateJobOptions(jobName, fromLinkConf, toLinkConf)
   console.log(options['body']['jobs'])
   return r(options)
-        .then(function (repos) {
-          return repos
-        })
+    .then(function (repos) {
+      return repos
+    })
 }

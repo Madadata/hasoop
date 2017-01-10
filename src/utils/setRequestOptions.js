@@ -5,7 +5,7 @@
 import {userName, baseUrl} from '../constants'
 
 export function setGetOptions (tag, uri, linkOrJobOrConnectorName = null) {
-  if (tag == 'all') {
+  if (tag === 'all') {
     return {
       method: 'GET',
       uri: baseUrl + uri + '/' + tag,
@@ -14,7 +14,7 @@ export function setGetOptions (tag, uri, linkOrJobOrConnectorName = null) {
       },
       json: true
     }
-  } else if (tag == 'subName') {
+  } else if (tag === 'subName') {
     return {
       method: 'GET',
       uri: baseUrl + uri + '/' + linkOrJobOrConnectorName,
@@ -23,7 +23,7 @@ export function setGetOptions (tag, uri, linkOrJobOrConnectorName = null) {
       },
       json: true
     }
-  } else if (tag == 'lname') {
+  } else if (tag === 'lname') {
     return {
       method: 'GET',
       uri: baseUrl + uri + '/' + linkOrJobOrConnectorName,
@@ -32,7 +32,7 @@ export function setGetOptions (tag, uri, linkOrJobOrConnectorName = null) {
       },
       json: true
     }
-  } else if (tag == 'cname') {
+  } else if (tag === 'cname') {
     return {
       method: 'GET',
       uri: baseUrl + uri + '/' + linkOrJobOrConnectorName,
@@ -42,7 +42,7 @@ export function setGetOptions (tag, uri, linkOrJobOrConnectorName = null) {
       },
       json: true
     }
-  } else if (tag == 'status') {
+  } else if (tag === 'status') {
     return {
       method: 'GET',
       uri: baseUrl + uri + '/' + linkOrJobOrConnectorName + '/status',
@@ -70,7 +70,7 @@ export function setPostOptions (uri, body) {
 }
 
 export function setPutOptions (tag, uri, linkOrJobName) {
-  if (tag == 'enable' || tag == 'disable') {
+  if (tag === 'enable' || tag === 'disable') {
     return {
       method: 'PUT',
       uri: baseUrl + uri + '/' + linkOrJobName + '/' + tag,
@@ -79,7 +79,7 @@ export function setPutOptions (tag, uri, linkOrJobName) {
       },
       json: true
     }
-  } else if (tag == 'start' || tag == 'stop') {
+  } else if (tag === 'start' || tag === 'stop') {
     return {
       method: 'PUT',
       uri: baseUrl + uri + '/' + linkOrJobName + '/' + tag,
