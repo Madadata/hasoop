@@ -12,7 +12,7 @@ node_js:
   - "4"
 
 before_install:
- - docker run -d jimexist/sqoop
+ - docker run -d -p 12000:12000 jimexist/sqoop
 
 script:
   npm run coverage
