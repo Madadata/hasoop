@@ -8,15 +8,15 @@ import url from 'url'
 import path from 'path'
 import querystring from 'querystring'
 
+const versionUri = 'version'
+const driverUri = 'v1/driver'
+
 export class Hasoop {
   constructor (config) {
     this.userName = config.userName
     this.host = config.host
     this.port = config.port
     this.weapp = config.webapp
-
-    this.versionUri = 'version'
-    this.driverUri = 'v1/driver'
   }
 
   formatUrl ([basicPath, queryObject = {}], ...otherPath) {
@@ -39,12 +39,12 @@ export class Hasoop {
   }
 
   getVersion () {
-    const url = this.formatUrl([this.versionUri])
+    const url = this.formatUrl([versionUri])
     return sendGetRequest(url)
   }
 
   getDriver () {
-    const url = this.formatUrl([this.driverUri], 'all')
+    const url = this.formatUrl([driverUri], 'all')
     return sendGetRequest(url)
   }
 }
