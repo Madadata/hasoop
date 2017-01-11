@@ -25,8 +25,9 @@ before_install:
   - if [ -f ${CACHE_FILE_SQOOP} ]; then gunzip -c ${CACHE_FILE_SQOOP} | docker load; fi
 
 install:
-  - if [ ! -f ${CACHE_FILE_SQOOP} ]; then docker save jimexist/sqoop | gzip > ${CACHE_FILE_SQOOP}; fi
   - docker run -d -p 12000:12000 jimexist/sqoop
+  - if [ ! -f ${CACHE_FILE_SQOOP} ]; then docker save jimexist/sqoop | gzip > ${CACHE_FILE_SQOOP}; fi
+
 
 script:
   npm run coverage
