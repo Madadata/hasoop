@@ -22,7 +22,11 @@ export class Hasoop {
   formatUrl ([basicPath, queryObject = {}], ...otherPath) {
     queryObject['user.name'] = this.userName
     const urlQuery = querystring.stringify(queryObject)
-    const urlPath = path.join(this.weapp, basicPath, otherPath.length === 0 ? '' : path.join(otherPath))
+    const urlPath = path.join(
+      this.weapp,
+      basicPath,
+      ...otherPath
+    )
     const urlObj = {
       protocol: 'http:',
       slashes: true,
@@ -40,7 +44,7 @@ export class Hasoop {
   }
 
   getDriver () {
-    const url = this.formatUrl([this.driverUri],'all')
+    const url = this.formatUrl([this.driverUri], 'all')
     return sendGetRequest(url)
   }
 }
