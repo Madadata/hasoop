@@ -4,7 +4,7 @@
 
 import { sendGetRequest } from './utils/sendRequest'
 
-const url = require('url');
+import url from 'url'
 
 export class Hasoop {
   constructor (config) {
