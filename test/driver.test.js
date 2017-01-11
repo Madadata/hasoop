@@ -3,13 +3,12 @@
  */
 
 import { expect } from 'chai'
-import { Hasoop } from '../src/index'
-
-const sqoopClient = new Hasoop('')
+import { sqoopClient } from './index'
 
 suite('driver', () => {
-  test.skip('getDriver', () => {
-    sqoopClient.getDriver()
+  test('getDriver', async () => {
+    const data = await sqoopClient.getDriver()
+    expect(data['version']).to.equal('1')
+    expect(data['all-config-resources']['jarConfig.label']).to.equal('Classpath configuration')
   })
-
 })
