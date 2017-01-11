@@ -1,5 +1,8 @@
 sudo: required
 
+services:
+  - docker
+
 language: node_js
 
 node_js:
@@ -8,26 +11,8 @@ node_js:
   - "5"
   - "4"
 
-#env:
-#  global:
-#    - CACHE_DIR=$HOME/.cache/docker
-#    - CACHE_FILE_SQOOP=$CACHE_DIR/sqoop.tar.gz
-
-services:
-  - docker
-
-#cache:
-#  directories:
-#  - $CACHE_DIR
-
-#before_install:
-#  - mkdir -p $CACHE_DIR
-#  - if [ -f ${CACHE_FILE_SQOOP} ]; then gunzip -c ${CACHE_FILE_SQOOP} | docker load; fi
-
-install:
+before_install:
   - docker run -d -p 12000:12000 jimexist/sqoop
-#  - if [ ! -f ${CACHE_FILE_SQOOP} ]; then docker save jimexist/sqoop | gzip > ${CACHE_FILE_SQOOP}; fi
-
 
 script:
   npm run coverage
