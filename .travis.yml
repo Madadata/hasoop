@@ -13,4 +13,4 @@ node_js:
 
 script:
   npm run coverage
-  docker run -d -p 12000:12000 jimexist/sqoop
+  docker run jimexist/sqoop
