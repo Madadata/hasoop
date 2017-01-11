@@ -10,6 +10,7 @@ import querystring from 'querystring'
 
 const versionUri = 'version'
 const driverUri = 'v1/driver'
+const connectorUri = 'v1/connector'
 
 export class Hasoop {
   constructor (config) {
@@ -45,6 +46,16 @@ export class Hasoop {
 
   getDriver () {
     const url = this.formatUrl([driverUri], 'all')
+    return sendGetRequest(url)
+  }
+
+  getConnectorAll () {
+    const url = this.formatUrl([connectorUri], 'all')
+    return sendGetRequest(url)
+  }
+
+  getConnectorByConnectorName (connectorName) {
+    const url = this.formatUrl([connectorUri], connectorName)
     return sendGetRequest(url)
   }
 }

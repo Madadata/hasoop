@@ -3,13 +3,18 @@
  */
 
 import { expect } from 'chai'
-import { Hasoop } from '../src/index'
-
-const sqoopClient = new Hasoop('')
+import { sqoopClient } from './index'
 
 suite('connector', () => {
-  test.skip('getConnector', () => {
-    sqoopClient.getConnector()
+  test('getConnectorAll', async () => {
+    const data = await sqoopClient.getConnectorAll()
+    expect(data['connectors'].length).to.equal(7)
+  })
+
+  test('getConnectorByConnectorName', async () => {
+    const connectorName = 'generic-jdbc-connector'
+    const data = await sqoopClient.getConnectorByConnectorName(connectorName)
+    expect(data['connectors'][0]['name']).to.equal('generic-jdbc-connector')
   })
 
 })
