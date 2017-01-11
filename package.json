@@ -12,11 +12,13 @@
     "coverage": "nyc npm test && nyc report --reporter=text-lcov | coveralls"
   },
   "dependencies": {
-    "isomorphic-fetch": "^2.2.1"
+    "isomorphic-fetch": "^2.2.1",
+    "url": "^0.11.0"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
     "babel-core": "^6.21.0",
+    "babel-plugin-transform-runtime": "^6.15.0",
     "babel-preset-latest": "^6.16.0",
     "babel-preset-stage-0": "^6.16.0",
     "chai": "^3.5.0",

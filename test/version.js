@@ -6,7 +6,9 @@ import { expect } from 'chai'
 import { sqoopClient } from './index'
 
 suite('utils', () => {
-  test('getVersion', () => {
-    const data = sqoopClient.getVersion()
+  test('getVersion', async () => {
+    const data = await sqoopClient.getVersion()
+    expect(data).to.be.an('object')
+    expect(data['api-versions'][0]).to.equal('v1')
   })
 })
