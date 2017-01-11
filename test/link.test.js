@@ -12,15 +12,31 @@ suite('link', () => {
     sqoopClient.createLink()
   })
 
-  test.skip('updateLink', () => {
-    sqoopClient.updateLink()
+  test.skip('updateLinkConfig', () => {
+    sqoopClient.updateLinkConfig()
+  })
+
+  test.skip('updateLinkEnable', () => {
+    sqoopClient.updateLinkEnable()
+  })
+
+  test.skip('updateLinkDisable', () => {
+    sqoopClient.updateLinkDisable()
   })
 
   test.skip('deleteLink', () => {
     sqoopClient.deleteLink()
   })
 
-  test.skip('getLink', () => {
+  test.skip('getLinkAll', () => {
+    sqoopClient.getLinkAll()
+  })
+
+  test.skip('getLinkByConnectorName', () => {
+    sqoopClient.getLink()
+  })
+
+  test.skip('getLinkByLinkName', () => {
     sqoopClient.getLink()
   })
 })
