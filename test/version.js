@@ -3,13 +3,12 @@
  */
 
 import { expect } from 'chai'
-import { Hasoop } from '../src/index'
-
-const sqoopClient = new Hasoop('')
+import { sqoopClient } from './index'
 
 suite('utils', () => {
-  test.skip('getVersion', () => {
-    sqoopClient.getVersion()
+  test('getVersion', async () => {
+    const data = await sqoopClient.getVersion()
+    expect(data).to.be.an('object')
+    expect(data['api-versions'][0]).to.equal('v1')
   })
-
 })
