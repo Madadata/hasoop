@@ -8,8 +8,13 @@ import { Hasoop } from '../src/index'
 const sqoopClient = new Hasoop('')
 
 suite('connector', () => {
-  test.skip('getConnector', () => {
-    sqoopClient.getConnector()
+  test.skip('getConnectorAll', () => {
+    sqoopClient.getConnectorAll()
+  })
+
+  test.skip('getConnectorByConnectorName', () => {
+    const connectorName = 'generic-jdbc-connector'
+    sqoopClient.getConnectorByConnectorName(connectorName)
   })
 
 })
