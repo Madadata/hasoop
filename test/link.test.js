@@ -3,13 +3,27 @@
  */
 
 import { expect } from 'chai'
-import { Hasoop } from '../src/index'
-
-const sqoopClient = new Hasoop('')
+import { sqoopClient } from './index'
 
 suite('link', () => {
-  test.skip('createLink', () => {
-    sqoopClient.createLink()
+  test('getLinkAllForEmpty', async () => {
+    const data = await sqoopClient.getLinkAll()
+    expect(data).to.have.property('links')
+    expect(data['links']).to.have.lengthOf(0)
+  })
+
+  test.skip('createLinkForMysql', async () => {
+    //TODO wait for jdbc
+    // const linkName = 'test_link_1'
+    // const config = {
+    //   'linkType': 'mysql',
+    //   'host': 'mysqlhost',
+    //   'databaseName': 'testdatabase',
+    //   'username': 'root',
+    //   'password': '1234',
+    // }
+    // const data = await sqoopClient.createLink(linkName, config)
+    // console.log(JSON.stringify(data))
   })
 
   test.skip('updateLinkConfig', () => {
@@ -28,15 +42,15 @@ suite('link', () => {
     sqoopClient.deleteLink()
   })
 
-  test.skip('getLinkAll', () => {
+  test.skip('getLinkAllForEmpty', () => {
     sqoopClient.getLinkAll()
   })
 
   test.skip('getLinkByConnectorName', () => {
-    sqoopClient.getLink()
+    sqoopClient.getLinkByConnectorName()
   })
 
   test.skip('getLinkByLinkName', () => {
-    sqoopClient.getLink()
+    sqoopClient.getLinkByLinkName()
   })
 })
