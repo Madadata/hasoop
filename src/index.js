@@ -14,6 +14,7 @@ export class Hasoop {
     this.weapp = config.webapp
 
     this.versionUri = 'version'
+    this.driverUri = 'v1/driver'
   }
 
   formatUrl ([basicPath, queryString = {}], ...otherPath) {
@@ -36,6 +37,11 @@ export class Hasoop {
 
   getVersion () {
     const url = this.formatUrl([this.versionUri])
+    return sendGetRequest(url)
+  }
+
+  getDriver () {
+    const url = this.formatUrl([this.driverUri],'all')
     return sendGetRequest(url)
   }
 }
