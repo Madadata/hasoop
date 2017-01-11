@@ -4,7 +4,9 @@
 
 import { sendGetRequest } from './utils/sendRequest'
 
-const url = require('url');
+import url from 'url'
+import path from 'path'
+import querystring from 'querystring'
 
 export class Hasoop {
   constructor (config) {
@@ -17,20 +19,17 @@ export class Hasoop {
     this.driverUri = 'v1/driver'
   }
 
-  formatUrl ([basicPath, queryString = {}], ...otherPath) {
-    queryString['user.name'] = this.userName
-    const query = Object.keys(queryString)
-      .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(queryString[k]))
-      .join('&')
-    let path = [this.weapp, basicPath, otherPath].join('/')
-    path = path.substring(0, path.length - 1)
+  formatUrl ([basicPath, queryObject = {}], ...otherPath) {
+    queryObject['user.name'] = this.userName
+    const urlQuery = querystring.stringify(queryObject)
+    const urlPath = path.join(this.weapp, basicPath, otherPath.length === 0 ? '' : path.join(otherPath))
     const urlObj = {
       protocol: 'http:',
       slashes: true,
       hostname: this.host,
       port: this.port,
-      search: '?' + query,
-      pathname: path
+      search: '?' + urlQuery,
+      pathname: urlPath
     }
     return url.format(urlObj);
   }

@@ -6,7 +6,7 @@ import { Hasoop } from '../src/index'
 
 const config = {
   'userName': 'Developer',
-  'host': '54.223.17.247',
+  'host': 'localhost',
   'port': 12000,
   'webapp': 'sqoop'
 }
