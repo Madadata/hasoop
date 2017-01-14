@@ -2,7 +2,7 @@
  * Created by Chyroc on 17/1/11.
  */
 
-export function setCreateLinkRequestBody (linkName, linkConfig) {
+export function setCreateLinkRequestBody (linkConfig) {
   let connectorName
   let jdbcDriver
   let connectionString
@@ -15,12 +15,12 @@ export function setCreateLinkRequestBody (linkName, linkConfig) {
     jdbcDriver = 'com.mysql.jdbc.Driver'
     connectionString = 'jdbc:mysql://' + linkConfig['host'] + ':' + port + '/' + linkConfig['databaseName']
   } else {
-
+    throw new Error('linkType must be mysql')
   }
   return {
     'links': [{
       'id': -1,
-      'name': linkName,
+      'name': linkConfig['linkName'],
       'connector-name': connectorName,
       'enabled': true,
       'creation-date': Date.now(),
@@ -120,4 +120,8 @@ export function setCreateLinkRequestBody (linkName, linkConfig) {
       }
     }]
   }
+}
+
+export function setUpdateLinkRequestBody (linkConfig) {
+  return setCreateLinkRequestBody(linkConfig)
 }

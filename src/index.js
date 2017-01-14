@@ -2,8 +2,8 @@
  * Created by Chyroc on 17/1/10.
  */
 
-import { sendGetRequest, senPostRequest, senDeleteRequest } from './sendRequest'
-import { setCreateLinkRequestBody } from './setLinkOptions'
+import { sendGetRequest, senPostRequest, senPutRequest, senDeleteRequest } from './sendRequest'
+import { setCreateLinkRequestBody, setUpdateLinkRequestBody } from './setLinkOptions'
 
 import url from 'url'
 import path from 'path'
@@ -65,14 +65,16 @@ export class Hasoop {
   }
 
   //link
-  createLink (linkName, config) {
-    const body = setCreateLinkRequestBody(linkName, config)
+  createLink (config) {
+    const body = setCreateLinkRequestBody(config)
     const url = this.formatUrl([linkUri])
     return senPostRequest(url, JSON.stringify(body))
   }
 
-  updateLinkConfig () {
-
+  async updateLinkConfig (oldLinkName, config) {
+    const body = setUpdateLinkRequestBody(config)
+    const url = this.formatUrl([linkUri], oldLinkName)
+    return senPutRequest(url, JSON.stringify(body))
   }
 
   updateLinkEnable () {
@@ -92,8 +94,9 @@ export class Hasoop {
 
   }
 
-  getLinkByLinkName () {
-
+  getLinkByLinkName (linkName) {
+    const url = this.formatUrl([linkUri], linkName)
+    return sendGetRequest(url)
   }
 
   deleteLink (linkName) {

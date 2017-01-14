@@ -18,21 +18,33 @@ suite('link', () => {
   })
 
   test('createLinkForMysql', async () => {
-    const linkName = 'test_link_1'
     const config = {
+      'linkName': 'test_link_1',
       'linkType': 'mysql',
       'host': 'mysqlhost',
       'databaseName': 'testdatabase',
       'username': 'root',
       'password': '1234',
     }
-    const data = await sqoopClient.createLink(linkName, config)
+    const data = await sqoopClient.createLink(config)
     expect(data['name']).to.equal('test_link_1')
   })
 
-  test.skip('updateLinkConfig', () => {
-    sqoopClient.updateLinkConfig()
-  })
+  test('updateLinkForMysql and getLinkByLinkName', async () => {
+      const oldLinkName = 'test_link_1'
+      const config = {
+        'linkName': 'test_link_2',
+        'linkType': 'mysql',
+        'host': 'mysqlhost',
+        'databaseName': 'testdatabase',
+        'username': 'root',
+        'password': '12343456',
+      }
+      await sqoopClient.updateLinkConfig(oldLinkName, config)
+      const data = await sqoopClient.getLinkByLinkName('test_link_2')
+      expect(data['links'][0]['name']).to.hasOwnProperty('test_link_2')
+    }
+  )
 
   test.skip('updateLinkEnable', () => {
     sqoopClient.updateLinkEnable()
@@ -52,10 +64,6 @@ suite('link', () => {
 
   test.skip('getLinkByConnectorName', () => {
     sqoopClient.getLinkByConnectorName()
-  })
-
-  test.skip('getLinkByLinkName', () => {
-    sqoopClient.getLinkByLinkName()
   })
 
   test('deleteLinkAll', async () => {
