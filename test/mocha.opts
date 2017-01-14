@@ -1,2 +1,3 @@
 --compilers js:babel-core/register
 --ui tdd
+--timeout 10000
