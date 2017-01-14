@@ -1,6 +1,6 @@
 {
   "name": "hasoop",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "main": "dist/main.js",
   "license": "MIT",
   "description": "a simple node.js client for Sqoop 2",
