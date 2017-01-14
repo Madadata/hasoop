@@ -11,5 +11,4 @@ suite('submission', () => {
   test.skip('getSubmission', () => {
     sqoopClient.getSubmission()
   })
-  
 })

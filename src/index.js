@@ -36,7 +36,7 @@ export class Hasoop {
       search: '?' + urlQuery,
       pathname: urlPath
     }
-    return url.format(urlObj);
+    return url.format(urlObj)
   }
 
   getVersion () {

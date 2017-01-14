@@ -16,5 +16,4 @@ suite('connector', () => {
     const data = await sqoopClient.getConnectorByConnectorName(connectorName)
     expect(data['connectors'][0]['name']).to.equal('generic-jdbc-connector')
   })
-
 })
