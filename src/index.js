@@ -2,7 +2,7 @@
  * Created by Chyroc on 17/1/10.
  */
 
-import { sendGetRequest, senPostRequest } from './sendRequest'
+import { sendGetRequest, senPostRequest, senDeleteRequest } from './sendRequest'
 import { setCreateLinkRequestBody } from './setLinkOptions'
 
 import url from 'url'
@@ -67,9 +67,8 @@ export class Hasoop {
   //link
   createLink (linkName, config) {
     const body = setCreateLinkRequestBody(linkName, config)
-    // console.log(JSON.stringify(body))
     const url = this.formatUrl([linkUri])
-    return senPostRequest(url, body)
+    return senPostRequest(url, JSON.stringify(body))
   }
 
   updateLinkConfig () {
@@ -84,10 +83,6 @@ export class Hasoop {
 
   }
 
-  deleteLink () {
-
-  }
-
   getLinkAll () {
     const url = this.formatUrl([linkUri], 'all')
     return sendGetRequest(url)
@@ -99,5 +94,18 @@ export class Hasoop {
 
   getLinkByLinkName () {
 
+  }
+
+  deleteLink (linkName) {
+    const url = this.formatUrl([linkUri], linkName)
+    return senDeleteRequest(url)
+  }
+
+  async deleteLinkAll () {
+    const data = await this.getLinkAll()
+    const links = data['links']
+    for (let i = 0; i < links.length; i++) {
+      this.deleteLink(links[i]['name'])
+    }
   }
 }
