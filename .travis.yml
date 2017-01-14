@@ -13,8 +13,7 @@ node_js:
   - "4"
 
 before_install:
-  - docker run --name mysql-for-test -e MYSQL_ROOT_PASSWORD=12345678 -d mysql
-  - docker run --name sqoop-for-test --link mysql-for-test:mysql -d -p 12000:12000 jimexist/sqoop:1.99.7-2
+  - docker run -d -p 12000:12000 jimexist/sqoop:1.99.7-2
 
 script:
   - echo "USE mysql;\nUPDATE user SET password=PASSWORD('1234') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
