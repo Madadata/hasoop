@@ -14,7 +14,8 @@
     "lint": "standard --verbose | snazzy",
     "test": "mocha",
     "precommit": "npm run lint",
-    "prepush": "npm run clean && npm run build && npm test",
+    "prepush": "npm run lint",
+    "prepublish": "npm run clean && npm run build && npm run lint",
     "coverage": "nyc npm test && nyc report --reporter=text-lcov | coveralls"
   },
   "dependencies": {
