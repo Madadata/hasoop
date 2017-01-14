@@ -1,9 +1,19 @@
 {
   "name": "hasoop",
   "version": "0.1.0",
-  "main": "dist/main.js",
+  "main": "dist/index.js",
   "license": "MIT",
+  "keywords": ["sqoop", "node", "client", "restful"],
   "description": "a simple node.js client for Sqoop 2",
+  "author": {
+    "name": "Madadata",
+    "email": "hi@madadata.com",
+    "url": "https://www.madadata.com/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "Madadata/hasoop"
+  },
   "files": [
     "dist/"
   ],
