@@ -52,23 +52,25 @@ suite('link', () => {
     expect(data['links'][0]['name']).to.hasOwnProperty('test_link_2')
   })
 
-  test.skip('updateLinkEnable', () => {
-    sqoopClient.updateLinkEnable()
+  test('updateLinkDisable', async () => {
+    const linkName = 'test_link_2'
+    await sqoopClient.updateLinkDisable(linkName)
+    const data = await sqoopClient.getLinkByLinkName(linkName)
+    expect(data['links'][0]['enabled'].toString()).to.equal('false')
   })
 
-  test.skip('updateLinkDisable', () => {
-    sqoopClient.updateLinkDisable()
-  })
-
-  test.skip('deleteLink', () => {
-    sqoopClient.deleteLink()
+  test('updateLinkEnable', async () => {
+    const linkName = 'test_link_2'
+    await sqoopClient.updateLinkEnable(linkName)
+    const data = await sqoopClient.getLinkByLinkName(linkName)
+    expect(data['links'][0]['enabled'].toString()).to.equal('true')
   })
 
   test.skip('getLinkAll', () => {
     sqoopClient.getLinkAll()
   })
 
-  test('deleteLinkAll', async () => {
+  test('deleteLink and deleteLinkAll', async () => {
     await sqoopClient.deleteLinkAll()
     const data = await sqoopClient.getLinkAll()
     expect(data).to.have.property('links')

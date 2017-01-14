@@ -77,12 +77,14 @@ export class Hasoop {
     return senPutRequest(url, JSON.stringify(body))
   }
 
-  updateLinkEnable () {
-
+  updateLinkEnable (linkName) {
+    const url = this.formatUrl([linkUri], linkName, 'enable')
+    return senPutRequest(url)
   }
 
-  updateLinkDisable () {
-
+  updateLinkDisable (linkName) {
+    const url = this.formatUrl([linkUri], linkName, 'disable')
+    return senPutRequest(url)
   }
 
   getLinkAll () {
@@ -91,7 +93,7 @@ export class Hasoop {
   }
 
   getLinkByConnectorName (connectorName) {
-    const url = this.formatUrl([linkUri, {'cname': connectorName}],'all')
+    const url = this.formatUrl([linkUri, {'cname': connectorName}], 'all')
     return sendGetRequest(url)
   }
 
