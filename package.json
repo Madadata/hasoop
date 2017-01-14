@@ -6,9 +6,12 @@
   "description": "a simple node.js client for Sqoop 2",
   "scripts": {
     "clean": "rimraf .nyc_output coverage dist",
+    "prebuild": "npm run lint",
     "build": "babel -d dist src",
     "lint": "standard --verbose | snazzy",
     "test": "mocha",
+    "precommit": "npm run lint",
+    "prepush": "npm run clean && npm run build && npm test",
     "coverage": "nyc npm test && nyc report --reporter=text-lcov | coveralls"
   },
   "dependencies": {
@@ -21,6 +24,7 @@
     "babel-preset-latest": "^6.16.0",
     "chai": "^3.5.0",
     "coveralls": "^2.11.15",
+    "husky": "^0.12.0",
     "mocha": "^3.2.0",
     "nyc": "^10.0.0",
     "preset": "^1.0.0",
