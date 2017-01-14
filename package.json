@@ -27,11 +27,12 @@
     "prebuild": "npm run lint",
     "build": "babel -d dist src",
     "lint": "standard --verbose | snazzy",
-    "test": "mocha",
+    "test": "npm run pre-test-mysql && mocha",
     "precommit": "npm run lint",
     "prepush": "npm run lint",
     "prepublish": "npm run clean && npm run build && npm run lint",
-    "coverage": "nyc npm test && nyc report --reporter=text-lcov | coveralls"
+    "coverage": "nyc npm test && nyc report --reporter=text-lcov | coveralls",
+    "pre-test-mysql": "mysql -uroot -p1234 < test/init.sql"
   },
   "dependencies": {
     "isomorphic-fetch": "^2.2.1"
