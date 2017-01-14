@@ -66,8 +66,10 @@ suite('link', () => {
     expect(data['links'][0]['enabled'].toString()).to.equal('true')
   })
 
-  test.skip('getLinkAll', () => {
-    sqoopClient.getLinkAll()
+  test('getLinkAll', async () => {
+    const data = await sqoopClient.getLinkAll()
+    expect(data['links']).to.have.lengthOf(1)
+    expect(data['links'][0]['name']).to.equal('test_link_2')
   })
 
   test('deleteLink and deleteLinkAll', async () => {
