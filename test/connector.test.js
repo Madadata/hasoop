@@ -1,7 +1,4 @@
-/**
- * Created by Chyroc on 17/1/10.
- */
-
+/* eslint-env mocha */
 import { expect } from 'chai'
 import { sqoopClient } from './index'
 
@@ -16,5 +13,4 @@ suite('connector', () => {
     const data = await sqoopClient.getConnectorByConnectorName(connectorName)
     expect(data['connectors'][0]['name']).to.equal('generic-jdbc-connector')
   })
-
 })

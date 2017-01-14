@@ -1,7 +1,4 @@
-/**
- * Created by Chyroc on 17/1/10.
- */
-
+/* eslint-env mocha */
 import { Hasoop } from '../src/index'
 
 const config = {
