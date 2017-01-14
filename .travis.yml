@@ -13,7 +13,7 @@ node_js:
   - "4"
 
 before_install:
-  - docker run -d -p 12000:12000 jimexist/sqoop:1.99.7-2
+  - docker run -d --add-host=mysqlhost:$(ip addr show docker0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1) -p 12000:12000 jimexist/sqoop:1.99.7-2
 
 script:
   - echo "USE mysql;\nUPDATE user SET password=PASSWORD('1234') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root

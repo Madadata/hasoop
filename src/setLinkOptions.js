@@ -11,7 +11,6 @@ export function setCreateLinkRequestBody (linkConfig) {
     const connectorName = 'generic-jdbc-connector'
     const jdbcDriver = 'com.mysql.jdbc.Driver'
     const connectionString = `jdbc:mysql://${linkConfig.host}:${port}/${linkConfig.databaseName}`
-
     return {
       'links': [{
         'id': -1,
