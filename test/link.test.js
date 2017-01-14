@@ -17,10 +17,10 @@ suite('link', () => {
     const config = {
       'linkName': 'test_link_1',
       'linkType': 'mysql',
-      'host': 'mysqlhost',
+      'host': 'localhost',
       'databaseName': 'testdatabase',
       'username': 'root',
-      'password': '1234',
+      'password': '12345678',
     }
     const data = await sqoopClient.createLink(config)
     expect(data['name']).to.equal('test_link_1')
@@ -31,10 +31,10 @@ suite('link', () => {
       const config = {
         'linkName': 'test_link_2',
         'linkType': 'mysql',
-        'host': 'mysqlhost',
+        'host': 'localhost',
         'databaseName': 'testdatabase',
         'username': 'root',
-        'password': '12343456',
+        'password': '12345678',
       }
       const updateData = await sqoopClient.updateLinkConfig(oldLinkName, config)
       const data = await sqoopClient.getLinkByLinkName('test_link_2')
