@@ -32,7 +32,7 @@
     "prepush": "npm run lint",
     "prepublish": "npm run clean && npm run build && npm run lint",
     "coverage": "nyc npm test && nyc report --reporter=text-lcov | coveralls",
-    "pre-test-mysql": "mysql -uroot -p1234 < test/init.sql"
+    "pre-test-mysql": "docker exec -i test-mysql mysql -uroot -p1234 < test/init.sql"
   },
   "dependencies": {
     "isomorphic-fetch": "^2.2.1"
