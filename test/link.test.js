@@ -56,14 +56,14 @@ suite('link', () => {
     const linkName = 'test_link_2'
     await sqoopClient.updateLinkDisable(linkName)
     const data = await sqoopClient.getLinkByLinkName(linkName)
-    expect(data['links'][0]['enabled'].toString()).to.equal('false')
+    expect(data['links'][0]['enabled']).to.equal(false)
   })
 
   test('updateLinkEnable', async () => {
     const linkName = 'test_link_2'
     await sqoopClient.updateLinkEnable(linkName)
     const data = await sqoopClient.getLinkByLinkName(linkName)
-    expect(data['links'][0]['enabled'].toString()).to.equal('true')
+    expect(data['links'][0]['enabled']).to.equal(true)
   })
 
   test('getLinkAll', async () => {

@@ -71,7 +71,7 @@ export class Hasoop {
     return senPostRequest(url, JSON.stringify(body))
   }
 
-  async updateLinkConfig (oldLinkName, config) {
+  updateLinkConfig (oldLinkName, config) {
     const body = setUpdateLinkRequestBody(config)
     const url = this.formatUrl([linkUri], oldLinkName)
     return senPutRequest(url, JSON.stringify(body))
