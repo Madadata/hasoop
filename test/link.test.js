@@ -12,18 +12,17 @@ suite('link', () => {
     expect(data['links']).to.have.lengthOf(0)
   })
 
-  test.skip('createLinkForMysql', async () => {
-    //TODO wait for jdbc
-    // const linkName = 'test_link_1'
-    // const config = {
-    //   'linkType': 'mysql',
-    //   'host': 'mysqlhost',
-    //   'databaseName': 'testdatabase',
-    //   'username': 'root',
-    //   'password': '1234',
-    // }
-    // const data = await sqoopClient.createLink(linkName, config)
-    // console.log(JSON.stringify(data))
+  test('createLinkForMysql', async () => {
+    const linkName = 'test_link_1'
+    const config = {
+      'linkType': 'mysql',
+      'host': 'mysqlhost',
+      'databaseName': 'testdatabase',
+      'username': 'root',
+      'password': '1234',
+    }
+    const data = await sqoopClient.createLink(linkName, config)
+    console.log(JSON.stringify(data))
   })
 
   test.skip('updateLinkConfig', () => {
