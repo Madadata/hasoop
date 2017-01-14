@@ -38,7 +38,7 @@ export class Hasoop {
       search: '?' + urlQuery,
       pathname: urlPath
     }
-    return url.format(urlObj);
+    return url.format(urlObj)
   }
 
   //version
@@ -63,6 +63,7 @@ export class Hasoop {
     const url = this.formatUrl([connectorUri], connectorName)
     return sendGetRequest(url)
   }
+<<<<<<< HEAD
 
   //link
   createLink (config) {
@@ -115,3 +116,6 @@ export class Hasoop {
     }
   }
 }
+=======
+}
+>>>>>>> master
