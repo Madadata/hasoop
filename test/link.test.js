@@ -1,16 +1,5 @@
-<<<<<<< HEAD
-/**
- * Created by Chyroc on 17/1/10.
- */
-
 import { expect } from 'chai'
 import { sqoopClient } from './index'
-=======
-/* eslint-env mocha */
-import { Hasoop } from '../src/index'
-
-const sqoopClient = new Hasoop('')
->>>>>>> master
 
 suite('link', () => {
 
@@ -47,7 +36,7 @@ suite('link', () => {
         'username': 'root',
         'password': '12343456',
       }
-      await sqoopClient.updateLinkConfig(oldLinkName, config)
+      const updateData = await sqoopClient.updateLinkConfig(oldLinkName, config)
       const data = await sqoopClient.getLinkByLinkName('test_link_2')
       expect(data['links'][0]['name']).to.hasOwnProperty('test_link_2')
     }
@@ -78,7 +67,6 @@ suite('link', () => {
     expect(data['links']).to.have.lengthOf(1)
     expect(data['links'][0]['name']).to.equal('test_link_2')
   })
-<<<<<<< HEAD
 
   test('deleteLink and deleteLinkAll', async () => {
     await sqoopClient.deleteLinkAll()
@@ -88,6 +76,3 @@ suite('link', () => {
   })
 
 })
-=======
-})
->>>>>>> master

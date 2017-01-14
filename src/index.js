@@ -63,7 +63,6 @@ export class Hasoop {
     const url = this.formatUrl([connectorUri], connectorName)
     return sendGetRequest(url)
   }
-<<<<<<< HEAD
 
   //link
   createLink (config) {
@@ -116,6 +115,3 @@ export class Hasoop {
     }
   }
 }
-=======
-}
->>>>>>> master
