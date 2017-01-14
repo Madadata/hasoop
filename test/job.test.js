@@ -6,12 +6,12 @@ import { expect } from 'chai'
 import { sqoopClient } from './index'
 
 suite('job', () => {
-  test.skip('createJob', () => {
-    sqoopClient.createJob()
+  before(async () => {
+    //create link for job test
   })
 
-  test.skip('deleteJob', () => {
-    sqoopClient.deleteJob()
+  test.skip('createJob', () => {
+    sqoopClient.createJob()
   })
 
   test.skip('getJob', () => {
@@ -20,6 +20,10 @@ suite('job', () => {
 
   test.skip('updateJob', () => {
     sqoopClient.updateJob()
+  })
+
+  test.skip('deleteJob', () => {
+    sqoopClient.deleteJob()
   })
 
   test.skip('startJob', () => {
