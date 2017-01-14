@@ -90,8 +90,9 @@ export class Hasoop {
     return sendGetRequest(url)
   }
 
-  getLinkByConnectorName () {
-
+  getLinkByConnectorName (connectorName) {
+    const url = this.formatUrl([linkUri, {'cname': connectorName}],'all')
+    return sendGetRequest(url)
   }
 
   getLinkByLinkName (linkName) {

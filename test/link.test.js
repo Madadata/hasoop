@@ -46,6 +46,12 @@ suite('link', () => {
     }
   )
 
+  test('getLinkByConnectorName', async () => {
+    const connectorName = 'generic-jdbc-connector'
+    const data = await sqoopClient.getLinkByConnectorName(connectorName)
+    expect(data['links'][0]['name']).to.hasOwnProperty('test_link_2')
+  })
+
   test.skip('updateLinkEnable', () => {
     sqoopClient.updateLinkEnable()
   })
@@ -60,10 +66,6 @@ suite('link', () => {
 
   test.skip('getLinkAll', () => {
     sqoopClient.getLinkAll()
-  })
-
-  test.skip('getLinkByConnectorName', () => {
-    sqoopClient.getLinkByConnectorName()
   })
 
   test('deleteLinkAll', async () => {
