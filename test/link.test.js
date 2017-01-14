@@ -1,8 +1,9 @@
+/* eslint-env mocha */
+
 import { expect } from 'chai'
 import { sqoopClient } from './index'
 
 suite('link', () => {
-
   before(async () => {
     await sqoopClient.deleteLinkAll()
   })
@@ -20,7 +21,7 @@ suite('link', () => {
       'host': 'mysqlhost',
       'databaseName': 'same',
       'username': 'root',
-      'password': '1234',
+      'password': '1234'
     }
     const data = await sqoopClient.createLink(config)
     console.log(JSON.stringify(data))
@@ -28,20 +29,20 @@ suite('link', () => {
   })
 
   test('updateLinkForMysql and getLinkByLinkName', async () => {
-      const oldLinkName = 'test_link_1'
-      const config = {
-        'linkName': 'test_link_2',
-        'linkType': 'mysql',
-        'host': 'mysqlhost',
-        'databaseName': 'same',
-        'username': 'root',
-        'password': '1234',
-      }
-      const updateData = await sqoopClient.updateLinkConfig(oldLinkName, config)
-      console.log(JSON.stringify(updateData))
-      const data = await sqoopClient.getLinkByLinkName('test_link_2')
-      expect(data['links'][0]['name']).to.hasOwnProperty('test_link_2')
+    const oldLinkName = 'test_link_1'
+    const config = {
+      'linkName': 'test_link_2',
+      'linkType': 'mysql',
+      'host': 'mysqlhost',
+      'databaseName': 'same',
+      'username': 'root',
+      'password': '1234'
     }
+    const updateData = await sqoopClient.updateLinkConfig(oldLinkName, config)
+    console.log(JSON.stringify(updateData))
+    const data = await sqoopClient.getLinkByLinkName('test_link_2')
+    expect(data['links'][0]['name']).to.hasOwnProperty('test_link_2')
+  }
   )
 
   test('getLinkByConnectorName', async () => {
@@ -76,5 +77,4 @@ suite('link', () => {
     expect(data).to.have.property('links')
     expect(data['links']).to.have.lengthOf(0)
   })
-
 })

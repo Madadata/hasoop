@@ -1,4 +1,4 @@
-import { expect } from 'chai'
+/* eslint-env mocha */
 import { sqoopClient } from './index'
 
 suite('job', () => {

@@ -115,11 +115,10 @@ export function setCreateLinkRequestBody (linkConfig) {
       }]
     }
   } else if (linkConfig['linkType'] === 'hdfs') {
-
+    // TODO
   } else {
     throw new Error('linkType must be mysql or hdfs')
   }
-
 }
 
 export function setUpdateLinkRequestBody (linkConfig) {

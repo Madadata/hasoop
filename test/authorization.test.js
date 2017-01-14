@@ -1,5 +1,7 @@
-import { expect } from 'chai'
+/* eslint-env mocha */
+
 import { sqoopClient } from './index'
+import { suite } from 'mocha'
 
 suite('authorization', () => {
   test.skip('createRole', () => {

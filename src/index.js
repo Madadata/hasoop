@@ -41,19 +41,19 @@ export class Hasoop {
     return url.format(urlObj)
   }
 
-  //version
+  // version
   getVersion () {
     const url = this.formatUrl([versionUri])
     return sendGetRequest(url)
   }
 
-  //driver
+  // driver
   getDriver () {
     const url = this.formatUrl([driverUri], 'all')
     return sendGetRequest(url)
   }
 
-  //connector
+  // connector
   getConnectorAll () {
     const url = this.formatUrl([connectorUri], 'all')
     return sendGetRequest(url)
@@ -64,7 +64,7 @@ export class Hasoop {
     return sendGetRequest(url)
   }
 
-  //link
+  // link
   createLink (config) {
     const body = setCreateLinkRequestBody(config)
     const url = this.formatUrl([linkUri])
