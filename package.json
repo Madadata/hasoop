@@ -45,6 +45,7 @@
     "babel-preset-latest": "^6.16.0",
     "chai": "^3.5.0",
     "coveralls": "^2.11.15",
+    "faker": "^3.1.0",
     "husky": "^0.12.0",
     "lodash": "^4.17.4",
     "mocha": "^3.2.0",
