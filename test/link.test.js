@@ -1,6 +1,7 @@
 /* eslint-env mocha */
 
 import { expect } from 'chai'
+import { _ } from 'lodash'
 import { sqoopClient } from './index'
 
 suite('link', () => {
@@ -10,8 +11,7 @@ suite('link', () => {
 
   test('getLinkAllForEmpty', async () => {
     const data = await sqoopClient.getLinkAll()
-    expect(data).to.have.property('links')
-    expect(data['links']).to.be.empty
+    expect(_.get(data, 'links')).to.be.empty
   })
 
   test('createLinkForMysql', async () => {
@@ -24,8 +24,8 @@ suite('link', () => {
       'password': '1234'
     }
     const data = await sqoopClient.createLink(config)
-    expect(data['name']).to.equal('test_link_1')
-    expect(JSON.stringify(data['validation-result'])).to.equal('[{}]')
+    expect(_.get(data, 'name')).to.equal('test_link_1')
+    expect(_.get(data, 'validation-result[0]')).to.be.empty
   })
 
   test('updateLinkForMysql and getLinkByLinkName', async () => {
@@ -39,42 +39,41 @@ suite('link', () => {
       'password': '1234'
     }
     const updateData = await sqoopClient.updateLinkConfig(oldLinkName, config)
-    expect(JSON.stringify(updateData['validation-result'])).to.equal('[{}]')
+    expect(_.get(updateData, 'validation-result[0]')).to.be.empty
     const data = await sqoopClient.getLinkByLinkName('test_link_2')
-    expect(data['links'][0]['name']).to.hasOwnProperty('test_link_2')
+    expect(_.get(data, 'links[0].name')).to.equal('test_link_2')
   }
   )
 
   test('getLinkByConnectorName', async () => {
     const connectorName = 'generic-jdbc-connector'
     const data = await sqoopClient.getLinkByConnectorName(connectorName)
-    expect(data['links'][0]['name']).to.hasOwnProperty('test_link_2')
+    expect(_.get(data, 'links[0].name')).to.equal('test_link_2')
   })
 
   test('updateLinkDisable', async () => {
     const linkName = 'test_link_2'
     await sqoopClient.updateLinkDisable(linkName)
     const data = await sqoopClient.getLinkByLinkName(linkName)
-    expect(data['links'][0]['enabled']).to.be.false
+    expect(_.get(data, 'links[0].enabled')).to.be.false
   })
 
   test('updateLinkEnable', async () => {
     const linkName = 'test_link_2'
     await sqoopClient.updateLinkEnable(linkName)
     const data = await sqoopClient.getLinkByLinkName(linkName)
-    expect(data['links'][0]['enabled']).to.be.true
+    expect(_.get(data, 'links[0].enabled')).to.be.true
   })
 
   test('getLinkAll', async () => {
     const data = await sqoopClient.getLinkAll()
-    expect(data['links']).to.have.lengthOf(1)
-    expect(data['links'][0]['name']).to.equal('test_link_2')
+    expect(_.get(data, 'links')).to.have.lengthOf(1)
+    expect(_.get(data, 'links[0].name')).to.equal('test_link_2')
   })
 
   test('deleteLink and deleteLinkAll', async () => {
     await sqoopClient.deleteLinkAll()
     const data = await sqoopClient.getLinkAll()
-    expect(data).to.have.property('links')
-    expect(data['links']).to.be.empty
+    expect(_.get(data, 'links')).to.be.empty
   })
 })
