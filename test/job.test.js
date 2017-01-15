@@ -35,8 +35,11 @@ suite('job', () => {
     })
   })
 
-  test.skip('getJob', () => {
-    sqoopClient.getJob()
+  test('getJobAll', async () => {
+    const data = await sqoopClient.getJobAll()
+    const jobNames = []
+    data['jobs'].map((job) => jobNames.push(job['name']))
+    expect(firstJobName).to.be.oneOf(jobNames)
   })
 
   test.skip('updateJob', () => {
