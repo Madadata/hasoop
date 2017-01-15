@@ -4,8 +4,7 @@
 
 export function setCreateLinkRequestBody (linkConfig) {
   if (linkConfig['linkType'] === 'mysql') {
-    let fetchSize = linkConfig['fetchSize'] || 1000
-    fetchSize = fetchSize.toString()
+    const fetchSize = linkConfig['fetchSize'] || 1000
     const identifierEnclose = linkConfig['identifierEnclose'] || '`'
     const port = linkConfig['port'] || 3306
     const connectorName = 'generic-jdbc-connector'
@@ -75,7 +74,7 @@ export function setCreateLinkRequestBody (linkConfig) {
                     'sensitive': false,
                     'overrides': '',
                     'type': 'INTEGER',
-                    'value': fetchSize
+                    'value': `${fetchSize}`
                   }, {
                     'editable': 'ANY',
                     'validators': [],

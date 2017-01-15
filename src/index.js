@@ -9,10 +9,11 @@ import url from 'url'
 import path from 'path'
 import querystring from 'querystring'
 
+export const version = 'v1'
 const versionUri = 'version'
-const driverUri = 'v1/driver'
-const connectorUri = 'v1/connector'
-const linkUri = 'v1/link'
+const driverUri = `${version}/driver`
+const connectorUri = `${version}/connector`
+const linkUri = `${version}/link`
 
 export class Hasoop {
   constructor (config) {

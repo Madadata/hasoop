@@ -11,7 +11,7 @@ suite('link', () => {
 
   test('getLinkAllForEmpty', async () => {
     const data = await sqoopClient.getLinkAll()
-    expect(_.get(data, 'links')).to.be.empty
+    expect(data.links).to.be.empty
   })
 
   test('createLinkForMysql', async () => {
@@ -24,7 +24,7 @@ suite('link', () => {
       'password': '1234'
     }
     const data = await sqoopClient.createLink(config)
-    expect(_.get(data, 'name')).to.equal('test_link_1')
+    expect(data.name).to.equal('test_link_1')
     expect(_.get(data, 'validation-result[0]')).to.be.empty
   })
 
@@ -35,7 +35,7 @@ suite('link', () => {
       'uri': 'hdfs://localhost'
     }
     const data = await sqoopClient.createLink(config)
-    expect(_.get(data, 'name')).to.equal('test_link_hdfs')
+    expect(data.name).to.equal('test_link_hdfs')
     expect(_.get(data, 'validation-result[0]')).to.be.empty
   })
 
@@ -78,7 +78,7 @@ suite('link', () => {
 
   test('getLinkAll', async () => {
     const data = await sqoopClient.getLinkAll()
-    expect(_.get(data, 'links')).to.have.lengthOf(2)
+    expect(data.links).to.have.lengthOf(2)
     expect(_.get(data, 'links[0].name')).to.equal('test_link_hdfs')
     expect(_.get(data, 'links[1].name')).to.equal('test_link_2')
   })
@@ -86,6 +86,6 @@ suite('link', () => {
   test('deleteLink and deleteLinkAll', async () => {
     await sqoopClient.deleteLinkAll()
     const data = await sqoopClient.getLinkAll()
-    expect(_.get(data, 'links')).to.be.empty
+    expect(data.links).to.be.empty
   })
 })

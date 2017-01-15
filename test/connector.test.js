@@ -7,7 +7,7 @@ import { sqoopClient } from './index'
 suite('connector', () => {
   test('getConnectorAll', async () => {
     const data = await sqoopClient.getConnectorAll()
-    expect(_.get(data, 'connectors').length).to.equal(7)
+    expect(data.connectors.length).to.equal(7)
   })
 
   test('getConnectorByConnectorName', async () => {

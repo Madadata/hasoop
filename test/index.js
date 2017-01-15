@@ -1,5 +1,5 @@
 /* eslint-env mocha */
-import { Hasoop } from '../src/index'
+import { Hasoop, version } from '../src/index'
 
 const config = {
   'userName': 'Developer',
@@ -7,4 +7,10 @@ const config = {
   'port': 12000,
   'webapp': 'sqoop'
 }
-export const sqoopClient = new Hasoop(config)
+
+const sqoopClient = new Hasoop(config)
+
+export {
+  sqoopClient,
+  version
+}
