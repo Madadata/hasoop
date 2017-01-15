@@ -124,8 +124,6 @@ export class Hasoop {
   }
 
   async createJob (config) {
-    console.log(this)
-    console.log(await this.getLinkAll())
     const fromLinkInfo = await this.getLinkByLinkName(config['fromLinkName'])
     console.log(fromLinkInfo)
     // const toLinkInfo = await this.getLinkByLinkName(config['toLinkName'])

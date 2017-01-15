@@ -5,6 +5,7 @@ import faker from 'faker'
 import { sqoopClient, generateMysqlConfig, generateHdfsConfig, generateFromMysqlToHdfsConfig } from './index'
 
 suite('job', () => {
+  let firstJobName
   let firstMysqlLinkName
   let secondMysqlLinkName
   let firstHdfsLinkName
@@ -21,6 +22,8 @@ suite('job', () => {
     firstHdfsLinkName = faker.name.findName()
     const firstHdfsLinkConfig = generateHdfsConfig(firstHdfsLinkName)
     await sqoopClient.createLink(firstHdfsLinkConfig)
+
+    firstJobName = faker.name.findName()
   })
 
   test('getJobForEmpty', async () => {
@@ -29,7 +32,7 @@ suite('job', () => {
   })
 
   test('createJobFromMysqlToJob', async () => {
-    const config = generateFromMysqlToHdfsConfig()
+    const config = generateFromMysqlToHdfsConfig(firstJobName, firstMysqlLinkName, firstHdfsLinkName)
     const data = await sqoopClient.createJob(config)
     console.log(data)
   })
