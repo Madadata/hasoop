@@ -5,7 +5,7 @@
 // import { connectorType } from './index'
 import { splitMysqlLinkConfig, splitHdfsLinkConfig } from './utils'
 
-function setMysqlJobConfig (config) {
+function setMysqlJobConfig (linkConfig, jobConfig) {
   return {
     'configs': [{
       'validators': [],
@@ -18,7 +18,7 @@ function setMysqlJobConfig (config) {
         'sensitive': false,
         'overrides': '',
         'type': 'STRING',
-        'value': 'same'
+        'value': jobConfig.schemaName
       }, {
         'size': 50,
         'editable': 'ANY',
@@ -28,7 +28,7 @@ function setMysqlJobConfig (config) {
         'sensitive': false,
         'overrides': '',
         'type': 'STRING',
-        'value': 'sense'
+        'value': jobConfig.tableName
       }, {
         'size': 2000,
         'editable': 'ANY',
@@ -105,7 +105,7 @@ function setMysqlJobConfig (config) {
   }
 }
 
-function setHdfsJobConfig (config) {
+function setHdfsJobConfig (linkConfig, jobConfig) {
   return {
     'configs': [{
       'validators': [],
@@ -164,7 +164,7 @@ function setHdfsJobConfig (config) {
         'sensitive': false,
         'overrides': '',
         'type': 'STRING',
-        'value': 'hdfs%3A%2F%2Flocal006%3A9000%2Fcvbn'
+        'value': encodeURIComponent(jobConfig.outputDirectory)
       }, {
         'editable': 'ANY',
         'validators': [],
@@ -182,7 +182,7 @@ function setHdfsJobConfig (config) {
   }
 }
 
-function setJobConfig (config) {
+function setJobConfig (jobConfig) {
   return {
     'configs': [{
       'validators': [],
@@ -228,7 +228,6 @@ function setJobConfig (config) {
 export function setCreateJobRequestBody (jobName, jobConfig, fromLinkInfo, toLinkInfo) {
   const fromLinkConfig = splitMysqlLinkConfig(fromLinkInfo)
   const toLinkConfig = splitHdfsLinkConfig(toLinkInfo)
-
   return {
     'jobs': [{
       'id': -1,
@@ -242,8 +241,8 @@ export function setCreateJobRequestBody (jobName, jobConfig, fromLinkInfo, toLin
       'from-connector-name': fromLinkConfig.connectorName,
       'to-link-name': toLinkConfig.name,
       'to-connector-name': toLinkConfig.connectorName,
-      'to-config-values': setHdfsJobConfig(toLinkConfig),
-      'from-config-values': setMysqlJobConfig(fromLinkConfig),
+      'to-config-values': setHdfsJobConfig(toLinkConfig, jobConfig),
+      'from-config-values': setMysqlJobConfig(fromLinkConfig, jobConfig),
       'driver-config-values': setJobConfig(jobConfig)
     }]
   }

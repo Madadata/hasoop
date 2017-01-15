@@ -6,8 +6,8 @@ import { sqoopClient, generateMysqlConfig, generateHdfsConfig, generateFromMysql
 
 suite('job', () => {
   let firstJobName
+  let secondJobName
   let firstMysqlLinkName
-  let secondMysqlLinkName
   let firstHdfsLinkName
 
   before(async () => {
@@ -15,15 +15,12 @@ suite('job', () => {
     const firstMysqlLinkConfig = generateMysqlConfig(firstMysqlLinkName)
     await sqoopClient.createLink(firstMysqlLinkConfig)
 
-    secondMysqlLinkName = faker.name.findName()
-    const secondMysqlLinkConfig = generateMysqlConfig(secondMysqlLinkName)
-    await sqoopClient.createLink(secondMysqlLinkConfig)
-
     firstHdfsLinkName = faker.name.findName()
     const firstHdfsLinkConfig = generateHdfsConfig(firstHdfsLinkName)
     await sqoopClient.createLink(firstHdfsLinkConfig)
 
     firstJobName = faker.name.findName()
+    secondJobName = faker.name.findName()
   })
 
   test('createJobFromMysqlToJob', async () => {
@@ -33,6 +30,17 @@ suite('job', () => {
       'name': firstJobName,
       'validation-result': [{}, {}, {}]
     })
+  })
+
+  test.skip('updateJobFromMysqlToJob and getJobByJobName', async () => {
+    const config = generateFromMysqlToHdfsConfig(secondJobName, firstMysqlLinkName, firstHdfsLinkName)
+    // console.log(config)
+    const updateData = await sqoopClient.updateJobConfig(secondJobName, config)
+    // console.log(secondJobName)
+    console.log(updateData)
+    // expect(_.get(updateData, 'validation-result[0]')).to.be.empty
+    // const data = await sqoopClient.getLinkByLinkName(secondMysqlLinkName)
+    // expect(_.get(data, 'links[0].name')).to.equal(secondMysqlLinkName)
   })
 
   test('getJobAll', async () => {

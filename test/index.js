@@ -33,7 +33,15 @@ function generateFromMysqlToHdfsConfig (jobName, fromLinkName, toLinkName) {
     'jobName': jobName,
     'fromLinkName': fromLinkName,
     'toLinkName': toLinkName,
-    'jobConfig': {}
+    'jobConfig': {
+      // for mysql
+      'schemaName': 'harry',
+      'tableName': 'characters',
+      // 'partitionColumn':'id' TODO
+
+      // for hdfs
+      'outputDirectory': 'hdfs://localhotst/data'
+    }
   }
 }
 

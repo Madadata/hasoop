@@ -143,6 +143,14 @@ export class Hasoop {
     return senPostRequest(url, JSON.stringify(body))
   }
 
+  async updateJobConfig (oldJobName, config) {
+    const fromLinkInfo = await this.getLinkByLinkName(config['fromLinkName'])
+    const toLinkInfo = await this.getLinkByLinkName(config['toLinkName'])
+    const body = setCreateJobRequestBody(config.jobName, config.jobConfig, fromLinkInfo, toLinkInfo)
+    const url = this.formatUrl([jobUri], oldJobName)
+    return senPutRequest(url, JSON.stringify(body))
+  }
+
   getJobAll () {
     const url = this.formatUrl([jobUri], 'all')
     return sendGetRequest(url)
