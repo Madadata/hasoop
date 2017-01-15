@@ -161,26 +161,33 @@ function setCreateLinkRequestHdfsBody (linkConfig) {
   }
 }
 
+function setCreateMysqlLinkRequestBody (linkConfig) {
+  const fetchSize = linkConfig['fetchSize'] || 1000
+  const identifierEnclose = linkConfig['identifierEnclose'] || '`'
+  const port = linkConfig['port'] || 3306
+  const connectorName = 'generic-jdbc-connector'
+  const jdbcDriver = 'com.mysql.jdbc.Driver'
+  const connectionString = `jdbc:mysql://${linkConfig.host}:${port}/${linkConfig.databaseName}`
+  const mainBody = setCreateLinkRequestMainBody(linkConfig.linkName, connectorName)
+  const mysqlBody = setCreateLinkRequestMysqlBody(jdbcDriver, connectionString, fetchSize, identifierEnclose, linkConfig)
+  return {'links': [merge(mainBody, mysqlBody)]}
+}
+
+function setCreateHdfsLinkRequestBody (linkConfig) {
+  const connectorName = 'hdfs-connector'
+  const mainBody = setCreateLinkRequestMainBody(linkConfig.linkName, connectorName)
+  const hdfsBody = setCreateLinkRequestHdfsBody(linkConfig)
+  const createHdfsLinkBody = {'links': [merge(mainBody, hdfsBody)]}
+  if (linkConfig['hadoopConfDir']) {
+    _.set(createHdfsLinkBody, 'links[0].link-config-values.configs[0].inputs[1].value', encodeURIComponent(linkConfig['hadoopConfDir']))
+  }
+  return createHdfsLinkBody
+}
 export function setCreateLinkRequestBody (linkConfig) {
   if (linkConfig['linkType'] === linkType.mysql) {
-    const fetchSize = linkConfig['fetchSize'] || 1000
-    const identifierEnclose = linkConfig['identifierEnclose'] || '`'
-    const port = linkConfig['port'] || 3306
-    const connectorName = 'generic-jdbc-connector'
-    const jdbcDriver = 'com.mysql.jdbc.Driver'
-    const connectionString = `jdbc:mysql://${linkConfig.host}:${port}/${linkConfig.databaseName}`
-    const mainBody = setCreateLinkRequestMainBody(linkConfig.linkName, connectorName)
-    const mysqlBody = setCreateLinkRequestMysqlBody(jdbcDriver, connectionString, fetchSize, identifierEnclose, linkConfig)
-    return {'links': [merge(mainBody, mysqlBody)]}
+    return setCreateMysqlLinkRequestBody(linkConfig)
   } else if (linkConfig['linkType'] === linkType.hdfs) {
-    const connectorName = 'hdfs-connector'
-    const mainBody = setCreateLinkRequestMainBody(linkConfig.linkName, connectorName)
-    const hdfsBody = setCreateLinkRequestHdfsBody(linkConfig)
-    const createHdfsLinkBody = {'links': [merge(mainBody, hdfsBody)]}
-    if (linkConfig['hadoopConfDir']) {
-      _.set(createHdfsLinkBody, 'links[0].link-config-values.configs[0].inputs[1].value', encodeURIComponent(linkConfig['hadoopConfDir']))
-    }
-    return createHdfsLinkBody
+    return setCreateHdfsLinkRequestBody(linkConfig)
   } else {
     throw new Error('linkType must be mysql or hdfs')
   }
