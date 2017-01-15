@@ -83,7 +83,7 @@ suite('link', () => {
     expect(_.get(data, 'links[1].name')).to.equal('test_link_2')
   })
 
-  test('deleteLink and deleteLinkAll', async () => {
+  test.skip('deleteLink and deleteLinkAll', async () => {
     await sqoopClient.deleteLinkAll()
     const data = await sqoopClient.getLinkAll()
     expect(data.links).to.be.empty

@@ -4,6 +4,7 @@
 
 import { sendGetRequest, senPostRequest, senPutRequest, senDeleteRequest } from './sendRequest'
 import { setCreateLinkRequestBody, setUpdateLinkRequestBody } from './setLinkOptions'
+// import { setCreateJobRequestBody } from './setJobOptions'
 
 import url from 'url'
 import path from 'path'
@@ -14,6 +15,7 @@ const versionUri = 'version'
 const driverUri = `${version}/driver`
 const connectorUri = `${version}/connector`
 const linkUri = `${version}/link`
+const jobUri = `${version}/job`
 
 export class Hasoop {
   constructor (config) {
@@ -110,7 +112,25 @@ export class Hasoop {
 
   async deleteLinkAll () {
     const data = await this.getLinkAll()
+    data['links'].map(link => console.log(link['name']))
     const deleteList = data['links'].map(link => this.deleteLink(link['name']))
     return Promise.all(deleteList)
+  }
+
+  // job
+  getJobAll () {
+    const url = this.formatUrl([jobUri], 'all')
+    return sendGetRequest(url)
+  }
+
+  async createJob (config) {
+    console.log(this)
+    console.log(await this.getLinkAll())
+    const fromLinkInfo = await this.getLinkByLinkName(config['fromLinkName'])
+    console.log(fromLinkInfo)
+    // const toLinkInfo = await this.getLinkByLinkName(config['toLinkName'])
+    // const body = setCreateJobRequestBody(config, fromLinkInfo, toLinkInfo)
+    // const url = this.formatUrl([jobUri])
+    // return senPostRequest(url, JSON.stringify(body))
   }
 }
