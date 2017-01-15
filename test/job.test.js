@@ -1,27 +1,26 @@
 /* eslint-env mocha */
 
 import { expect } from 'chai'
-import { sqoopClient } from './index'
+import faker from 'faker'
+import { sqoopClient, generateMysqlConfig, generateHdfsConfig, generateFromMysqlToHdfsConfig } from './index'
 
 suite('job', () => {
-  before(async () => {
-    const mysqlLinkConfig = {
-      'linkName': 'test_job_link_mysql',
-      'linkType': 'mysql',
-      'host': 'mysql',
-      'databaseName': 'harry',
-      'username': 'root',
-      'password': '1234'
-    }
-    const hdfsLinkConfig = {
-      'linkName': 'test_job_link_hdfs',
-      'linkType': 'hdfs',
-      'uri': 'hdfs://localhost'
-    }
-    await sqoopClient.createLink(mysqlLinkConfig)
-    await sqoopClient.createLink(hdfsLinkConfig)
+  let firstMysqlLinkName
+  let secondMysqlLinkName
+  let firstHdfsLinkName
 
-    console.log(await sqoopClient.getLinkAll())
+  before(async () => {
+    firstMysqlLinkName = faker.name.findName()
+    const firstMysqlLinkConfig = generateMysqlConfig(firstMysqlLinkName)
+    await sqoopClient.createLink(firstMysqlLinkConfig)
+
+    secondMysqlLinkName = faker.name.findName()
+    const secondMysqlLinkConfig = generateMysqlConfig(secondMysqlLinkName)
+    await sqoopClient.createLink(secondMysqlLinkConfig)
+
+    firstHdfsLinkName = faker.name.findName()
+    const firstHdfsLinkConfig = generateHdfsConfig(firstHdfsLinkName)
+    await sqoopClient.createLink(firstHdfsLinkConfig)
   })
 
   test('getJobForEmpty', async () => {
@@ -30,15 +29,9 @@ suite('job', () => {
   })
 
   test('createJobFromMysqlToJob', async () => {
-    // data.links.map((link)=>console.log(link.name)) // delete
-    console.log(await sqoopClient.getLinkAll())
-    // const config = {
-    //   'jobName': 'test_job_f_mysql_t_hdfs',
-    //   'fromLinkName': 'test_job_link_mysql',
-    //   'toLinkName': 'test_job_link_hdfs',
-    //   'jobConfig': {}
-    // }
-    // const data = await sqoopClient.createJob(config)
+    const config = generateFromMysqlToHdfsConfig()
+    const data = await sqoopClient.createJob(config)
+    console.log(data)
   })
 
   test.skip('getJob', () => {

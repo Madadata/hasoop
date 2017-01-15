@@ -28,9 +28,19 @@ function generateHdfsConfig (linkName) {
   }
 }
 
+function generateFromMysqlToHdfsConfig (jobName, fromLinkName, toLinkName) {
+  return {
+    'jobName': jobName,
+    'fromLinkName': fromLinkName,
+    'toLinkName': toLinkName,
+    'jobConfig': {}
+  }
+}
+
 export {
   sqoopClient,
   version,
   generateMysqlConfig,
-  generateHdfsConfig
+  generateHdfsConfig,
+  generateFromMysqlToHdfsConfig
 }
