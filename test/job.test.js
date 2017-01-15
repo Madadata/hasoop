@@ -33,8 +33,7 @@ suite('job', () => {
 
   test('createJobFromMysqlToJob', async () => {
     const config = generateFromMysqlToHdfsConfig(firstJobName, firstMysqlLinkName, firstHdfsLinkName)
-    const data = await sqoopClient.createJob(config)
-    console.log(data)
+    await sqoopClient.createJob(config)
   })
 
   test.skip('getJob', () => {

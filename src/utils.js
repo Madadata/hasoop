@@ -16,6 +16,7 @@ function splitMain (linkInfo) {
     updateDate: _.get(linkInfo, 'update-date')
   }
 }
+
 function splitLinkConfig (linkInfo) {
   const linkConfig = {}
   for (let input of linkInfo) {
@@ -26,6 +27,7 @@ function splitLinkConfig (linkInfo) {
   }
   return linkConfig
 }
+
 function splitDialect (linkInfo) {
   const linkConfig = {}
   for (let input of linkInfo) {
@@ -36,6 +38,7 @@ function splitDialect (linkInfo) {
   }
   return linkConfig
 }
+
 export function splitMysqlLinkConfig (linkInfo) {
   const mainInfo = splitMain(_.get(linkInfo, 'links[0]'))
   const linkConfigInfo = splitLinkConfig(_.get(linkInfo, 'links[0].link-config-values.configs[0].inputs'))
@@ -47,5 +50,4 @@ export function splitHdfsLinkConfig (linkInfo) {
   const mainInfo = splitMain(_.get(linkInfo, 'links[0]'))
   const linkConfigInfo = splitLinkConfig(_.get(linkInfo, 'links[0].link-config-values.configs[0].inputs'))
   return merge(mainInfo, linkConfigInfo)
-
 }

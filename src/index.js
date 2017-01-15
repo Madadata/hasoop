@@ -4,11 +4,24 @@
 
 import { sendGetRequest, senPostRequest, senPutRequest, senDeleteRequest } from './sendRequest'
 import { setCreateLinkRequestBody, setUpdateLinkRequestBody } from './setLinkOptions'
-// import { setCreateJobRequestBody } from './setJobOptions'
+import { setCreateJobRequestBody } from './setJobOptions'
 
 import url from 'url'
 import path from 'path'
 import querystring from 'querystring'
+
+export const connectorType = {
+  generic: 'generic',
+  hdfs: 'hdfs',
+  oracle: 'oracle',
+  ftp: 'ftp',
+  sftp: 'sftp',
+  kite: 'kite',
+  kafka: 'kafka'
+}
+export const genericType = {
+  mysql: 'mysql'
+}
 
 export const linkType = {
   mysql: 'mysql',
@@ -130,9 +143,9 @@ export class Hasoop {
 
   async createJob (config) {
     const fromLinkInfo = await this.getLinkByLinkName(config['fromLinkName'])
-    console.log(fromLinkInfo)
-    // const toLinkInfo = await this.getLinkByLinkName(config['toLinkName'])
-    // const body = setCreateJobRequestBody(config, fromLinkInfo, toLinkInfo)
+    const toLinkInfo = await this.getLinkByLinkName(config['toLinkName'])
+    const body = setCreateJobRequestBody(config.jobName, config.jobConfig, fromLinkInfo, toLinkInfo)
+    console.log(JSON.stringify(body))
     // const url = this.formatUrl([jobUri])
     // return senPostRequest(url, JSON.stringify(body))
   }
