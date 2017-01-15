@@ -1,8 +1,5 @@
-/**
- * Created by Chyroc on 17/1/10.
- */
+/* eslint-env mocha */
 
-import { expect } from 'chai'
 import { sqoopClient } from './index'
 
 suite('authorization', () => {

@@ -11,6 +11,7 @@
         "regenerator": true,
         "moduleName": "babel-runtime"
       }
-    ]
+    ],
+    ["transform-export-extensions"]
   ]
 }

@@ -9,10 +9,11 @@ import url from 'url'
 import path from 'path'
 import querystring from 'querystring'
 
+export const version = 'v1'
 const versionUri = 'version'
-const driverUri = 'v1/driver'
-const connectorUri = 'v1/connector'
-const linkUri = 'v1/link'
+const driverUri = `${version}/driver`
+const connectorUri = `${version}/connector`
+const linkUri = `${version}/link`
 
 export class Hasoop {
   constructor (config) {
@@ -38,22 +39,22 @@ export class Hasoop {
       search: '?' + urlQuery,
       pathname: urlPath
     }
-    return url.format(urlObj);
+    return url.format(urlObj)
   }
 
-  //version
+  // version
   getVersion () {
     const url = this.formatUrl([versionUri])
     return sendGetRequest(url)
   }
 
-  //driver
+  // driver
   getDriver () {
     const url = this.formatUrl([driverUri], 'all')
     return sendGetRequest(url)
   }
 
-  //connector
+  // connector
   getConnectorAll () {
     const url = this.formatUrl([connectorUri], 'all')
     return sendGetRequest(url)
@@ -64,14 +65,14 @@ export class Hasoop {
     return sendGetRequest(url)
   }
 
-  //link
+  // link
   createLink (config) {
     const body = setCreateLinkRequestBody(config)
     const url = this.formatUrl([linkUri])
     return senPostRequest(url, JSON.stringify(body))
   }
 
-  async updateLinkConfig (oldLinkName, config) {
+  updateLinkConfig (oldLinkName, config) {
     const body = setUpdateLinkRequestBody(config)
     const url = this.formatUrl([linkUri], oldLinkName)
     return senPutRequest(url, JSON.stringify(body))
@@ -109,9 +110,7 @@ export class Hasoop {
 
   async deleteLinkAll () {
     const data = await this.getLinkAll()
-    const links = data['links']
-    for (let i = 0; i < links.length; i++) {
-      await this.deleteLink(links[i]['name'])
-    }
+    const deleteList = data['links'].map(link => this.deleteLink(link['name']))
+    return Promise.all(deleteList)
   }
 }

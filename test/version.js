@@ -1,14 +1,11 @@
-/**
- * Created by Chyroc on 17/1/10.
- */
-
+/* eslint-env mocha */
 import { expect } from 'chai'
-import { sqoopClient } from './index'
+import _ from 'lodash'
+import { sqoopClient, version } from './index'
 
 suite('utils', () => {
   test('getVersion', async () => {
     const data = await sqoopClient.getVersion()
-    expect(data).to.be.an('object')
-    expect(data['api-versions'][0]).to.equal('v1')
+    expect(_.get(data, 'api-versions[0]')).to.equal(version)
   })
 })
