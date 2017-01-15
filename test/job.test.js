@@ -26,14 +26,13 @@ suite('job', () => {
     firstJobName = faker.name.findName()
   })
 
-  test('getJobForEmpty', async () => {
-    const data = await sqoopClient.getJobAll()
-    expect(data.jobs).to.be.empty
-  })
-
   test('createJobFromMysqlToJob', async () => {
     const config = generateFromMysqlToHdfsConfig(firstJobName, firstMysqlLinkName, firstHdfsLinkName)
-    await sqoopClient.createJob(config)
+    const data = await sqoopClient.createJob(config)
+    expect(data).to.deep.equal({
+      'name': firstJobName,
+      'validation-result': [{}, {}, {}]
+    })
   })
 
   test.skip('getJob', () => {

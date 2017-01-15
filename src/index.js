@@ -130,7 +130,6 @@ export class Hasoop {
 
   async deleteLinkAll () {
     const data = await this.getLinkAll()
-    data['links'].map(link => console.log(link['name']))
     const deleteList = data['links'].map(link => this.deleteLink(link['name']))
     return await Promise.all(deleteList)
   }
@@ -145,8 +144,7 @@ export class Hasoop {
     const fromLinkInfo = await this.getLinkByLinkName(config['fromLinkName'])
     const toLinkInfo = await this.getLinkByLinkName(config['toLinkName'])
     const body = setCreateJobRequestBody(config.jobName, config.jobConfig, fromLinkInfo, toLinkInfo)
-    console.log(JSON.stringify(body))
-    // const url = this.formatUrl([jobUri])
-    // return senPostRequest(url, JSON.stringify(body))
+    const url = this.formatUrl([jobUri])
+    return senPostRequest(url, JSON.stringify(body))
   }
 }
