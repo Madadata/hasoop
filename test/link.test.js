@@ -28,6 +28,17 @@ suite('link', () => {
     expect(_.get(data, 'validation-result[0]')).to.be.empty
   })
 
+  test('createLinkForHdfs', async () => {
+    const config = {
+      'linkName': 'test_link_hdfs',
+      'linkType': 'hdfs',
+      'uri': 'hdfs://localhost'
+    }
+    const data = await sqoopClient.createLink(config)
+    expect(_.get(data, 'name')).to.equal('test_link_hdfs')
+    expect(_.get(data, 'validation-result[0]')).to.be.empty
+  })
+
   test('updateLinkForMysql and getLinkByLinkName', async () => {
     const oldLinkName = 'test_link_1'
     const config = {
@@ -67,8 +78,9 @@ suite('link', () => {
 
   test('getLinkAll', async () => {
     const data = await sqoopClient.getLinkAll()
-    expect(_.get(data, 'links')).to.have.lengthOf(1)
-    expect(_.get(data, 'links[0].name')).to.equal('test_link_2')
+    expect(_.get(data, 'links')).to.have.lengthOf(2)
+    expect(_.get(data, 'links[0].name')).to.equal('test_link_hdfs')
+    expect(_.get(data, 'links[1].name')).to.equal('test_link_2')
   })
 
   test('deleteLink and deleteLinkAll', async () => {
