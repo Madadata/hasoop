@@ -1,9 +1,10 @@
 /**
  * Created by Chyroc on 17/1/11.
  */
+import { linkType } from './index'
 
 export function setCreateLinkRequestBody (linkConfig) {
-  if (linkConfig['linkType'] === 'mysql') {
+  if (linkConfig['linkType'] === linkType.mysql) {
     const fetchSize = linkConfig['fetchSize'] || 1000
     const identifierEnclose = linkConfig['identifierEnclose'] || '`'
     const port = linkConfig['port'] || 3306
@@ -115,7 +116,7 @@ export function setCreateLinkRequestBody (linkConfig) {
         }
       ]
     }
-  } else if (linkConfig['linkType'] === 'hdfs') {
+  } else if (linkConfig['linkType'] === linkType.hdfs) {
     const connectorName = 'hdfs-connector'
     const createHdfsLinkBody = {
       'links': [{
