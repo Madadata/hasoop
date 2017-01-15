@@ -1,5 +1,5 @@
 /* eslint-env mocha */
-import { Hasoop, version } from '../src/index'
+import { Hasoop, version, linkType } from '../src/index'
 
 const config = {
   'userName': 'Developer',
@@ -12,7 +12,7 @@ const sqoopClient = new Hasoop(config)
 function generateMysqlConfig (linkName) {
   return {
     'linkName': linkName,
-    'linkType': 'mysql',
+    'linkType': linkType.mysql,
     'host': 'mysql',
     'databaseName': 'harry',
     'username': 'root',
@@ -23,7 +23,7 @@ function generateMysqlConfig (linkName) {
 function generateHdfsConfig (linkName) {
   return {
     'linkName': linkName,
-    'linkType': 'hdfs',
+    'linkType': linkType.hdfs,
     'uri': 'hdfs://localhost'
   }
 }

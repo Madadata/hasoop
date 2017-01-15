@@ -10,6 +10,11 @@ import url from 'url'
 import path from 'path'
 import querystring from 'querystring'
 
+export const linkType = {
+  mysql: 'mysql',
+  hdfs: 'hdfs'
+}
+
 export const version = 'v1'
 const versionUri = 'version'
 const driverUri = `${version}/driver`
@@ -114,7 +119,7 @@ export class Hasoop {
     const data = await this.getLinkAll()
     data['links'].map(link => console.log(link['name']))
     const deleteList = data['links'].map(link => this.deleteLink(link['name']))
-    return await deleteList
+    return await Promise.all(deleteList)
   }
 
   // job
