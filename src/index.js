@@ -109,11 +109,7 @@ export class Hasoop {
 
   async deleteLinkAll () {
     const data = await this.getLinkAll()
-    const linkNames = []
-    data['links'].forEach((link) => {
-      linkNames.push(link['name'])
-    })
-    const deleteList = linkNames.map(linkName => this.deleteLink(linkName))
+    const deleteList = data['links'].map(link => this.deleteLink(link['name']))
     return Promise.all(deleteList)
   }
 }
