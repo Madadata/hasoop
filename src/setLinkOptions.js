@@ -169,14 +169,14 @@ function setCreateMysqlLinkRequestBody (linkConfig) {
   const connectionString = `jdbc:mysql://${linkConfig.host}:${port}/${linkConfig.databaseName}`
   const mainBody = setCreateLinkRequestMainBody(linkConfig.linkName, connectorName)
   const mysqlBody = setCreateLinkRequestMysqlBody(jdbcDriver, connectionString, fetchSize, identifierEnclose, linkConfig)
-  return {'links': [Object.assign(mainBody, mysqlBody)]}
+  return {'links': [{...mainBody, ...mysqlBody}]}
 }
 
 function setCreateHdfsLinkRequestBody (linkConfig) {
   const connectorName = 'hdfs-connector'
   const mainBody = setCreateLinkRequestMainBody(linkConfig.linkName, connectorName)
   const hdfsBody = setCreateLinkRequestHdfsBody(linkConfig)
-  const createHdfsLinkBody = {'links': [Object.assign(mainBody, hdfsBody)]}
+  const createHdfsLinkBody = {'links': [{...mainBody, ...hdfsBody}]}
   if (linkConfig['hadoopConfDir']) {
     _.set(createHdfsLinkBody, 'links[0].link-config-values.configs[0].inputs[1].value', encodeURIComponent(linkConfig['hadoopConfDir']))
   }
