@@ -170,6 +170,16 @@ export class Hasoop {
     return senPutRequest(url, JSON.stringify(body))
   }
 
+  updateJobEnable (jobName) {
+    const url = this.formatUrl([jobUri], jobName, 'enable')
+    return senPutRequest(url)
+  }
+
+  updateJobDisable (jobName) {
+    const url = this.formatUrl([jobUri], jobName, 'disable')
+    return senPutRequest(url)
+  }
+
   deleteJob (jobName) {
     const url = this.formatUrl([jobUri], jobName)
     return senDeleteRequest(url)

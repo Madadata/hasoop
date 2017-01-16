@@ -55,12 +55,6 @@ export {
 }
 
 /**
- /v1/jobs/ - [GET] Get all jobs
- /v1/jobs?cname=[cname] - [GET] Get all jobs by connector
- /v1/job/[jname] - [GET] - Get Job
- /v1/job - [POST] - Create Job
- /v1/job/[jname] - [PUT] - Update Job
- /v1/job/[jname] - [DELETE] - Delete Job
  /v1/job/[jname]/enable - [PUT] - Enable Job
  /v1/job/[jname]/disable - [PUT] - Disable Job
  /v1/job/[jname]/start - [PUT]- Start Job

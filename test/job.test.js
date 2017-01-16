@@ -64,6 +64,18 @@ suite('job', () => {
     expect(secondJobName).to.be.oneOf(jobNames)
   })
 
+  test('updateJobDisable', async () => {
+    await sqoopClient.updateJobDisable(secondJobName)
+    const data = await sqoopClient.getJobByJobName(secondJobName)
+    expect(_.get(data, 'jobs[0].enabled')).to.be.false
+  })
+
+  test('updateJobEnable', async () => {
+    await sqoopClient.updateJobEnable(secondJobName)
+    const data = await sqoopClient.getJobByJobName(secondJobName)
+    expect(_.get(data, 'jobs[0].enabled')).to.be.true
+  })
+
   test('deleteJob', async () => {
     const data = await sqoopClient.deleteJob(secondJobName)
     expect(data).to.be.empty
