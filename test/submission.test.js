@@ -1,7 +1,6 @@
 /* eslint-env mocha */
-import { Hasoop } from '../src/index'
 
-const sqoopClient = new Hasoop('')
+import { sqoopClient } from './index'
 
 suite('submission', () => {
   test.skip('getSubmission', () => {

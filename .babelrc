@@ -11,6 +11,12 @@
         "regenerator": true,
         "moduleName": "babel-runtime"
       }
+    ],
+    [
+      "transform-object-rest-spread"
+    ],
+    [
+      "transform-export-extensions"
     ]
   ]
 }
