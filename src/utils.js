@@ -34,6 +34,7 @@ export function splitLinkConfig (linkInfo) {
 }
 
 export function splitJobConfig (jobInfo) {
+  console.log()
   const topConfig = splitTopConfig(_.get(jobInfo, 'jobs[0]'))
   const fromLinkConfig = splitInputsConfig(_.get(jobInfo, 'jobs[0].from-config-values.configs'))
   const toLinkConfig = splitInputsConfig(_.get(jobInfo, 'jobs[0].to-config-values.configs'))
