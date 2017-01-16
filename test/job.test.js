@@ -39,22 +39,17 @@ suite('job', () => {
     expect(_.get(data, 'jobs[0].name')).to.equal(firstJobName)
   })
 
-  test.skip('updateJobFromMysqlToJob and getJobByJobName', async () => {
+  test('updateJobFromMysqlToJob', async () => {
     const config = generateFromMysqlToHdfsConfig(secondJobName, firstMysqlLinkName, firstHdfsLinkName)
-    // console.log(config)
-    const updateData = await sqoopClient.updateJobConfig(secondJobName, config)
-    // console.log(secondJobName)
-    console.log(updateData)
-    // expect(_.get(updateData, 'validation-result[0]')).to.be.empty
-    // const data = await sqoopClient.getLinkByLinkName(secondMysqlLinkName)
-    // expect(_.get(data, 'links[0].name')).to.equal(secondMysqlLinkName)
+    const data = await sqoopClient.updateJobConfig(firstJobName, config)
+    expect(data).to.deep.equal({'validation-result': [{}, {}, {}]})
   })
 
-  test.skip('getJobAll', async () => {
+  test('getJobAll', async () => {
     const data = await sqoopClient.getJobAll()
     const jobNames = []
     data['jobs'].map((job) => jobNames.push(job['name']))
-    expect(firstJobName).to.be.oneOf(jobNames)
+    expect(secondJobName).to.be.oneOf(jobNames)
   })
 
   test.skip('updateJob', () => {

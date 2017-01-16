@@ -225,12 +225,12 @@ function setJobConfig (jobConfig) {
   }
 }
 
-export function setCreateJobRequestBody (jobName, jobConfig, fromLinkInfo, toLinkInfo) {
+export function setCreateJobRequestBody (jobName, jobConfig, fromLinkInfo, toLinkInfo, jobId = -1) {
   const fromLinkConfig = splitLinkConfig(fromLinkInfo)
   const toLinkConfig = splitLinkConfig(toLinkInfo)
   return {
     'jobs': [{
-      'id': -1,
+      'id': jobId,
       'name': jobName,
       'creation-date': Date.now(),
       'creation-user': null,
@@ -246,4 +246,7 @@ export function setCreateJobRequestBody (jobName, jobConfig, fromLinkInfo, toLin
       'driver-config-values': setJobConfig(jobConfig)
     }]
   }
+}
+export function setUpdateJobRequestBody (jobName, jobConfig, fromLinkInfo, toLinkInfo, jobId) {
+  return setCreateJobRequestBody(jobName, jobConfig, fromLinkInfo, toLinkInfo, jobId)
 }

@@ -9,7 +9,8 @@ import querystring from 'querystring'
 
 import { sendGetRequest, senPostRequest, senPutRequest, senDeleteRequest } from './sendRequest'
 import { setCreateLinkRequestBody, setUpdateLinkRequestBody } from './setLinkOptions'
-import { setCreateJobRequestBody } from './setJobOptions'
+import { setCreateJobRequestBody, setUpdateJobRequestBody } from './setJobOptions'
+import { splitJobConfig } from './utils'
 
 export const connectorType = {
   generic: 'generic',
@@ -145,9 +146,10 @@ export class Hasoop {
   }
 
   async updateJobConfig (oldJobName, config) {
+    const oldJobConfig = splitJobConfig(await this.getJobByJobName(oldJobName))
     const fromLinkInfo = await this.getLinkByLinkName(config['fromLinkName'])
     const toLinkInfo = await this.getLinkByLinkName(config['toLinkName'])
-    const body = setCreateJobRequestBody(config.jobName, config.jobConfig, fromLinkInfo, toLinkInfo)
+    const body = setUpdateJobRequestBody(config.jobName, config.jobConfig, fromLinkInfo, toLinkInfo, oldJobConfig.id)
     const url = this.formatUrl([jobUri], oldJobName)
     return senPutRequest(url, JSON.stringify(body))
   }
