@@ -22,7 +22,7 @@ export function senPostRequest (url, body) {
   return sendRequest('POST', url, body)
 }
 
-export function senPutRequest (url, body) {
+export function senPutRequest (url, body = null) {
   return sendRequest('PUT', url, body)
 }
 

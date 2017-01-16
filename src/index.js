@@ -21,6 +21,7 @@ export const connectorType = {
   kite: 'kite',
   kafka: 'kafka'
 }
+
 export const genericType = {
   mysql: 'mysql'
 }
@@ -173,5 +174,10 @@ export class Hasoop {
     const data = await this.getJobAll()
     const deleteList = data.jobs.map(job => this.deleteJob(job.name))
     return await Promise.all(deleteList)
+  }
+
+  startJob (jobName) {
+    const url = this.formatUrl([jobUri], jobName, 'start')
+    return senPutRequest(url)
   }
 }

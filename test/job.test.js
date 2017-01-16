@@ -9,6 +9,7 @@ import { sqoopClient, generateMysqlConfig, generateHdfsConfig, generateFromMysql
 suite('job', () => {
   let firstJobName
   let secondJobName
+  let thirdJobName
   let firstMysqlLinkName
   let firstHdfsLinkName
 
@@ -23,6 +24,10 @@ suite('job', () => {
 
     firstJobName = faker.name.findName()
     secondJobName = faker.name.findName()
+
+    thirdJobName = faker.name.findName()
+    const config = generateFromMysqlToHdfsConfig(thirdJobName, firstMysqlLinkName, firstHdfsLinkName)
+    await sqoopClient.createJob(config)
   })
 
   test('createJobFromMysqlToJob', async () => {
@@ -57,8 +62,9 @@ suite('job', () => {
     expect(data).to.be.empty
   })
 
-  test.skip('startJob', () => {
-    sqoopClient.startJob()
+  test.skip('startJob', async () => {
+    const data = await sqoopClient.startJob(thirdJobName)
+    console.log(_.get(data, 'cause.message'))
   })
 
   test.skip('stopJob', () => {

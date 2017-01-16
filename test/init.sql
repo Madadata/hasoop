@@ -35,7 +35,6 @@ insert into characters (name, sex) values ('Hermione Jean Granger', 2);
 insert into characters (name, sex) values ('Harry James Potter', 1);
 insert into characters (name, sex) values ('Ronald Bilius Weasley(Ron)', 1);
 
-
 show databases;
 use harry;
 select * from books;
