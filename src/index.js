@@ -89,6 +89,21 @@ export class Hasoop {
   }
 
   // link
+  getLinkAll () {
+    const url = this.formatUrl([linkUri], 'all')
+    return sendGetRequest(url)
+  }
+
+  getLinkByConnectorName (connectorName) {
+    const url = this.formatUrl([linkUri, {'cname': connectorName}], 'all')
+    return sendGetRequest(url)
+  }
+
+  getLinkByLinkName (linkName) {
+    const url = this.formatUrl([linkUri], linkName)
+    return sendGetRequest(url)
+  }
+
   createLink (config) {
     const body = setCreateLinkRequestBody(config)
     const url = this.formatUrl([linkUri])
@@ -111,21 +126,6 @@ export class Hasoop {
     return senPutRequest(url)
   }
 
-  getLinkAll () {
-    const url = this.formatUrl([linkUri], 'all')
-    return sendGetRequest(url)
-  }
-
-  getLinkByConnectorName (connectorName) {
-    const url = this.formatUrl([linkUri, {'cname': connectorName}], 'all')
-    return sendGetRequest(url)
-  }
-
-  getLinkByLinkName (linkName) {
-    const url = this.formatUrl([linkUri], linkName)
-    return sendGetRequest(url)
-  }
-
   deleteLink (linkName) {
     const url = this.formatUrl([linkUri], linkName)
     return senDeleteRequest(url)
@@ -138,6 +138,21 @@ export class Hasoop {
   }
 
   // job
+  getJobAll () {
+    const url = this.formatUrl([jobUri], 'all')
+    return sendGetRequest(url)
+  }
+
+  getJobByJobName (JobName) {
+    const url = this.formatUrl([jobUri], JobName)
+    return sendGetRequest(url)
+  }
+
+  getJobByConnectorName (connectorName) {
+    const url = this.formatUrl([jobUri, {'cname': connectorName}], 'all')
+    return sendGetRequest(url)
+  }
+
   async createJob (config) {
     const fromLinkInfo = await this.getLinkByLinkName(config['fromLinkName'])
     const toLinkInfo = await this.getLinkByLinkName(config['toLinkName'])
@@ -155,18 +170,8 @@ export class Hasoop {
     return senPutRequest(url, JSON.stringify(body))
   }
 
-  getJobAll () {
-    const url = this.formatUrl([jobUri], 'all')
-    return sendGetRequest(url)
-  }
-
-  getJobByJobName (JobName) {
-    const url = this.formatUrl([jobUri], JobName)
-    return sendGetRequest(url)
-  }
-
-  deleteJob (JobName) {
-    const url = this.formatUrl([jobUri], JobName)
+  deleteJob (jobName) {
+    const url = this.formatUrl([jobUri], jobName)
     return senDeleteRequest(url)
   }
 

@@ -44,6 +44,13 @@ suite('job', () => {
     expect(_.get(data, 'jobs[0].name')).to.equal(firstJobName)
   })
 
+  test('getJobByConnectorName', async () => {
+    const data = await sqoopClient.getJobByConnectorName('hdfs-connector')
+    const jobNames = []
+    data['jobs'].map((job) => jobNames.push(job['name']))
+    expect(firstJobName).to.be.oneOf(jobNames)
+  })
+
   test('updateJobFromMysqlToJob', async () => {
     const config = generateFromMysqlToHdfsConfig(secondJobName, firstMysqlLinkName, firstHdfsLinkName)
     const data = await sqoopClient.updateJobConfig(firstJobName, config)
