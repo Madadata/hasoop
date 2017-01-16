@@ -2,6 +2,7 @@
 
 import { expect } from 'chai'
 import _ from 'lodash'
+
 import { sqoopClient } from './index'
 
 suite('connector', () => {

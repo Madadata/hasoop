@@ -3,6 +3,7 @@
 import { expect } from 'chai'
 import _ from 'lodash'
 import faker from 'faker'
+
 import { sqoopClient, generateMysqlConfig, generateHdfsConfig } from './index'
 
 suite('link', () => {
@@ -42,7 +43,7 @@ suite('link', () => {
     const connectorName = 'generic-jdbc-connector'
     const data = await sqoopClient.getLinkByConnectorName(connectorName)
     const linkNames = []
-    data['links'].map((link) => linkNames.push(link['name']))
+    data.links.map((link) => linkNames.push(link.name))
     expect(secondMysqlLinkName).to.be.oneOf(linkNames)
   })
 
@@ -61,7 +62,7 @@ suite('link', () => {
   test('getLinkAll', async () => {
     const data = await sqoopClient.getLinkAll()
     const linkNames = []
-    data['links'].map((link) => linkNames.push(link['name']))
+    data.links.map((link) => linkNames.push(link.name))
     expect(firstHdfsLinkName).to.be.oneOf(linkNames)
     expect(secondMysqlLinkName).to.be.oneOf(linkNames)
   })

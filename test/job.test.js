@@ -2,6 +2,7 @@
 
 import { expect } from 'chai'
 import faker from 'faker'
+
 import { sqoopClient, generateMysqlConfig, generateHdfsConfig, generateFromMysqlToHdfsConfig } from './index'
 
 suite('job', () => {
