@@ -52,12 +52,9 @@ suite('job', () => {
     expect(secondJobName).to.be.oneOf(jobNames)
   })
 
-  test.skip('updateJob', () => {
-    sqoopClient.updateJob()
-  })
-
-  test.skip('deleteJob', () => {
-    sqoopClient.deleteJob()
+  test('deleteJob', async () => {
+    const data = await sqoopClient.deleteJob(secondJobName)
+    expect(data).to.be.empty
   })
 
   test.skip('startJob', () => {

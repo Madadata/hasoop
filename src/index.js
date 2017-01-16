@@ -163,4 +163,15 @@ export class Hasoop {
     const url = this.formatUrl([jobUri], JobName)
     return sendGetRequest(url)
   }
+
+  deleteJob (JobName) {
+    const url = this.formatUrl([jobUri], JobName)
+    return senDeleteRequest(url)
+  }
+
+  async deleteJobAll () {
+    const data = await this.getJobAll()
+    const deleteList = data.jobs.map(job => this.deleteJob(job.name))
+    return await Promise.all(deleteList)
+  }
 }
