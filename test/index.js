@@ -55,10 +55,6 @@ export {
 }
 
 /**
-
- /v1/submissions? - [GET] - Get all job Submissions
- /v1/submissions?jname=[jname] - [GET] - Get Submissions by Job
-
  /v1/authorization/roles/create - [POST] - Create Role
  /v1/authorization/role/[role-name] - [DELETE] - Delete Role
  /v1/authorization/roles?principal_type=[principal-type]&principal_name=[principal-name] - [GET] Get all Roles by Principal

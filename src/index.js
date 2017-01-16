@@ -37,6 +37,7 @@ const driverUri = `${version}/driver`
 const connectorUri = `${version}/connector`
 const linkUri = `${version}/link`
 const jobUri = `${version}/job`
+const submissionsUri = `${version}/submissions`
 
 export class Hasoop {
   constructor (config) {
@@ -203,6 +204,17 @@ export class Hasoop {
 
   jobStatus (jobName) {
     const url = this.formatUrl([jobUri], jobName, 'status')
+    return sendGetRequest(url)
+  }
+
+  // submission
+  getSubmissionAll () {
+    const url = this.formatUrl([submissionsUri], 'all')
+    return sendGetRequest(url)
+  }
+
+  getSubmissionByJobName (jobName) {
+    const url = this.formatUrl([submissionsUri, {'jname': jobName}], 'all')
     return sendGetRequest(url)
   }
 }
