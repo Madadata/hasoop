@@ -2,7 +2,6 @@
  * Created by Chyroc on 17/1/15.
  */
 import _ from 'lodash'
-import merge from 'merge'
 
 function splitMain (linkInfo) {
   return {
@@ -43,11 +42,11 @@ export function splitMysqlLinkConfig (linkInfo) {
   const mainInfo = splitMain(_.get(linkInfo, 'links[0]'))
   const linkConfigInfo = splitLinkConfig(_.get(linkInfo, 'links[0].link-config-values.configs[0].inputs'))
   const dialectInfo = splitDialect(_.get(linkInfo, 'links[0].link-config-values.configs[1].inputs'))
-  return merge(mainInfo, linkConfigInfo, dialectInfo)
+  return Object.assign(mainInfo, linkConfigInfo, dialectInfo)
 }
 
 export function splitHdfsLinkConfig (linkInfo) {
   const mainInfo = splitMain(_.get(linkInfo, 'links[0]'))
   const linkConfigInfo = splitLinkConfig(_.get(linkInfo, 'links[0].link-config-values.configs[0].inputs'))
-  return merge(mainInfo, linkConfigInfo)
+  return Object.assign(mainInfo, linkConfigInfo)
 }

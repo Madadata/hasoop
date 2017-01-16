@@ -1,7 +1,6 @@
 /**
  * Created by Chyroc on 17/1/11.
  */
-import merge from 'merge'
 import _ from 'lodash'
 import { linkType } from './index'
 
@@ -170,14 +169,14 @@ function setCreateMysqlLinkRequestBody (linkConfig) {
   const connectionString = `jdbc:mysql://${linkConfig.host}:${port}/${linkConfig.databaseName}`
   const mainBody = setCreateLinkRequestMainBody(linkConfig.linkName, connectorName)
   const mysqlBody = setCreateLinkRequestMysqlBody(jdbcDriver, connectionString, fetchSize, identifierEnclose, linkConfig)
-  return {'links': [merge(mainBody, mysqlBody)]}
+  return {'links': [Object.assign(mainBody, mysqlBody)]}
 }
 
 function setCreateHdfsLinkRequestBody (linkConfig) {
   const connectorName = 'hdfs-connector'
   const mainBody = setCreateLinkRequestMainBody(linkConfig.linkName, connectorName)
   const hdfsBody = setCreateLinkRequestHdfsBody(linkConfig)
-  const createHdfsLinkBody = {'links': [merge(mainBody, hdfsBody)]}
+  const createHdfsLinkBody = {'links': [Object.assign(mainBody, hdfsBody)]}
   if (linkConfig['hadoopConfDir']) {
     _.set(createHdfsLinkBody, 'links[0].link-config-values.configs[0].inputs[1].value', encodeURIComponent(linkConfig['hadoopConfDir']))
   }
