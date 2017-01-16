@@ -156,4 +156,9 @@ export class Hasoop {
     const url = this.formatUrl([jobUri], 'all')
     return sendGetRequest(url)
   }
+
+  getJobByJobName (JobName) {
+    const url = this.formatUrl([jobUri], JobName)
+    return sendGetRequest(url)
+  }
 }

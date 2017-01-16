@@ -1,6 +1,7 @@
 /* eslint-env mocha */
 
 import { expect } from 'chai'
+import _ from 'lodash'
 import faker from 'faker'
 
 import { sqoopClient, generateMysqlConfig, generateHdfsConfig, generateFromMysqlToHdfsConfig } from './index'
@@ -33,6 +34,11 @@ suite('job', () => {
     })
   })
 
+  test('getJobByJobName', async () => {
+    const data = await sqoopClient.getJobByJobName(firstJobName)
+    expect(_.get(data, 'jobs[0].name')).to.equal(firstJobName)
+  })
+
   test.skip('updateJobFromMysqlToJob and getJobByJobName', async () => {
     const config = generateFromMysqlToHdfsConfig(secondJobName, firstMysqlLinkName, firstHdfsLinkName)
     // console.log(config)
@@ -44,7 +50,7 @@ suite('job', () => {
     // expect(_.get(data, 'links[0].name')).to.equal(secondMysqlLinkName)
   })
 
-  test('getJobAll', async () => {
+  test.skip('getJobAll', async () => {
     const data = await sqoopClient.getJobAll()
     const jobNames = []
     data['jobs'].map((job) => jobNames.push(job['name']))

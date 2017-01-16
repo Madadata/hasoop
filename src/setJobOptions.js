@@ -3,7 +3,7 @@
  */
 
 // import { connectorType } from './index'
-import { splitMysqlLinkConfig, splitHdfsLinkConfig } from './utils'
+import { splitLinkConfig } from './utils'
 
 function setMysqlJobConfig (linkConfig, jobConfig) {
   return {
@@ -226,8 +226,8 @@ function setJobConfig (jobConfig) {
 }
 
 export function setCreateJobRequestBody (jobName, jobConfig, fromLinkInfo, toLinkInfo) {
-  const fromLinkConfig = splitMysqlLinkConfig(fromLinkInfo)
-  const toLinkConfig = splitHdfsLinkConfig(toLinkInfo)
+  const fromLinkConfig = splitLinkConfig(fromLinkInfo)
+  const toLinkConfig = splitLinkConfig(toLinkInfo)
   return {
     'jobs': [{
       'id': -1,

@@ -3,57 +3,45 @@
  */
 import _ from 'lodash'
 
-function splitMain (linkInfo) {
-  return {
-    id: _.get(linkInfo, 'id'),
-    name: _.get(linkInfo, 'name'),
-    enabled: _.get(linkInfo, 'enabled'),
-    connectorName: _.get(linkInfo, 'connector-name'),
-    creationUser: _.get(linkInfo, 'creation-user'),
-    creationDate: _.get(linkInfo, 'creation-date'),
-    updateUser: _.get(linkInfo, 'update-user'),
-    updateDate: _.get(linkInfo, 'update-date')
-  }
+function splitTopConfig (config) {
+  const topConfig = {}
+  _.map(config, (value, key) => {
+    if (!_.isArray(value) && !_.isObject(value)) {
+      _.set(topConfig, key, value)
+    }
+  })
+  return topConfig
 }
 
-function splitLinkConfig (linkInfo) {
-  const linkConfig = {}
-  for (let input of linkInfo) {
-    if (input.hasOwnProperty('value')) {
+function splitInputsConfig (configs) {
+  const inputConfig = {}
+  for (let config of configs) {
+    for (let input of config.inputs) {
       const nameSplit = input.name.split('.')
-      linkConfig[nameSplit[1]] = decodeURIComponent(input.value)
+      inputConfig[nameSplit[1]] = input.value ? decodeURIComponent(input.value) : null
     }
   }
-  return linkConfig
+  return inputConfig
 }
 
-function splitDialect (linkInfo) {
-  const linkConfig = {}
-  for (let input of linkInfo) {
-    if (input.hasOwnProperty('value')) {
-      const nameSplit = input.name.split('.')
-      linkConfig[nameSplit[1]] = decodeURIComponent(input.value)
-    }
-  }
-  return linkConfig
+export function splitLinkConfig (linkInfo) {
+  const topConfig = splitTopConfig(_.get(linkInfo, 'links[0]'))
+  const otherConfig = splitInputsConfig(_.get(linkInfo, 'links[0].link-config-values.configs'))
+  return _.mapKeys({
+    ...topConfig,
+    ...otherConfig
+  }, (value, key) => _.camelCase(key))
 }
 
-export function splitMysqlLinkConfig (linkInfo) {
-  const mainInfo = splitMain(_.get(linkInfo, 'links[0]'))
-  const linkConfigInfo = splitLinkConfig(_.get(linkInfo, 'links[0].link-config-values.configs[0].inputs'))
-  const dialectInfo = splitDialect(_.get(linkInfo, 'links[0].link-config-values.configs[1].inputs'))
-  return {
-    ...mainInfo,
-    ...linkConfigInfo,
-    ...dialectInfo
-  }
-}
-
-export function splitHdfsLinkConfig (linkInfo) {
-  const mainInfo = splitMain(_.get(linkInfo, 'links[0]'))
-  const linkConfigInfo = splitLinkConfig(_.get(linkInfo, 'links[0].link-config-values.configs[0].inputs'))
-  return {
-    ...mainInfo,
-    ...linkConfigInfo
-  }
+export function splitJobConfig (jobInfo) {
+  const topConfig = splitTopConfig(_.get(jobInfo, 'jobs[0]'))
+  const fromLinkConfig = splitInputsConfig(_.get(jobInfo, 'jobs[0].from-config-values.configs'))
+  const toLinkConfig = splitInputsConfig(_.get(jobInfo, 'jobs[0].to-config-values.configs'))
+  const driverConfig = splitInputsConfig(_.get(jobInfo, 'jobs[0].driver-config-values.configs'))
+  return _.mapKeys({
+    top: topConfig,
+    driver: driverConfig,
+    from: fromLinkConfig,
+    to: toLinkConfig
+  }, (value, key) => _.camelCase(key))
 }
