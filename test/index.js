@@ -1,4 +1,5 @@
 /* eslint-env mocha */
+
 import { Hasoop, version, linkType } from '../src/index'
 
 const config = {

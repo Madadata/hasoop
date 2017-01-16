@@ -1,7 +1,9 @@
 /**
  * Created by Chyroc on 17/1/11.
  */
+
 import _ from 'lodash'
+
 import { linkType } from './index'
 
 function setCreateLinkRequestMainBody (linkName, connectorName) {
@@ -52,7 +54,7 @@ function setCreateLinkRequestMysqlBody (jdbcDriver, connectionString, fetchSize,
               'sensitive': false,
               'overrides': '',
               'type': 'STRING',
-              'value': linkConfig['username']
+              'value': linkConfig.username
             }, {
               'size': 40,
               'editable': 'ANY',
@@ -62,7 +64,7 @@ function setCreateLinkRequestMysqlBody (jdbcDriver, connectionString, fetchSize,
               'sensitive': true,
               'overrides': '',
               'type': 'STRING',
-              'value': linkConfig['password']
+              'value': linkConfig.password
             }, {
               'editable': 'ANY',
               'validators': [],
@@ -128,7 +130,7 @@ function setCreateLinkRequestHdfsBody (linkConfig) {
               'sensitive': false,
               'overrides': '',
               'type': 'STRING',
-              'value': encodeURIComponent(linkConfig['uri'])
+              'value': encodeURIComponent(linkConfig.uri)
             }, {
               'size': 255,
               'editable': 'ANY',
@@ -161,9 +163,9 @@ function setCreateLinkRequestHdfsBody (linkConfig) {
 }
 
 function setCreateMysqlLinkRequestBody (linkConfig) {
-  const fetchSize = linkConfig['fetchSize'] || 1000
-  const identifierEnclose = linkConfig['identifierEnclose'] || '`'
-  const port = linkConfig['port'] || 3306
+  const fetchSize = linkConfig.fetchSize || 1000
+  const identifierEnclose = linkConfig.identifierEnclose || '`'
+  const port = linkConfig.port || 3306
   const connectorName = 'generic-jdbc-connector'
   const jdbcDriver = 'com.mysql.jdbc.Driver'
   const connectionString = `jdbc:mysql://${linkConfig.host}:${port}/${linkConfig.databaseName}`
@@ -177,15 +179,15 @@ function setCreateHdfsLinkRequestBody (linkConfig) {
   const mainBody = setCreateLinkRequestMainBody(linkConfig.linkName, connectorName)
   const hdfsBody = setCreateLinkRequestHdfsBody(linkConfig)
   const createHdfsLinkBody = {'links': [{...mainBody, ...hdfsBody}]}
-  if (linkConfig['hadoopConfDir']) {
-    _.set(createHdfsLinkBody, 'links[0].link-config-values.configs[0].inputs[1].value', encodeURIComponent(linkConfig['hadoopConfDir']))
+  if (linkConfig.hadoopConfDir) {
+    _.set(createHdfsLinkBody, 'links[0].link-config-values.configs[0].inputs[1].value', encodeURIComponent(linkConfig.hadoopConfDir))
   }
   return createHdfsLinkBody
 }
 export function setCreateLinkRequestBody (linkConfig) {
-  if (linkConfig['linkType'] === linkType.mysql) {
+  if (linkConfig.linkType === linkType.mysql) {
     return setCreateMysqlLinkRequestBody(linkConfig)
-  } else if (linkConfig['linkType'] === linkType.hdfs) {
+  } else if (linkConfig.linkType === linkType.hdfs) {
     return setCreateHdfsLinkRequestBody(linkConfig)
   } else {
     throw new Error('linkType must be mysql or hdfs')

@@ -2,12 +2,13 @@
  * Created by Chyroc on 17/1/10.
  */
 
-import { sendGetRequest, senPostRequest, senPutRequest, senDeleteRequest } from './sendRequest'
-import { setCreateLinkRequestBody, setUpdateLinkRequestBody } from './setLinkOptions'
-
 import url from 'url'
+import _ from 'lodash'
 import path from 'path'
 import querystring from 'querystring'
+
+import { sendGetRequest, senPostRequest, senPutRequest, senDeleteRequest } from './sendRequest'
+import { setCreateLinkRequestBody, setUpdateLinkRequestBody } from './setLinkOptions'
 
 export const linkType = {
   mysql: 'mysql',
@@ -29,7 +30,7 @@ export class Hasoop {
   }
 
   formatUrl ([basicPath, queryObject = {}], ...otherPath) {
-    queryObject['user.name'] = this.userName
+    _.set(queryObject, ['user.name'], this.userName)
     const urlQuery = querystring.stringify(queryObject)
     const urlPath = path.join(
       this.weapp,
@@ -115,7 +116,7 @@ export class Hasoop {
 
   async deleteLinkAll () {
     const data = await this.getLinkAll()
-    const deleteList = data['links'].map(link => this.deleteLink(link['name']))
+    const deleteList = data.links.map(link => this.deleteLink(link.name))
     return await Promise.all(deleteList)
   }
 }

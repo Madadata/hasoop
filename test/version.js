@@ -1,6 +1,7 @@
 /* eslint-env mocha */
 import { expect } from 'chai'
 import _ from 'lodash'
+
 import { sqoopClient, version } from './index'
 
 suite('utils', () => {
