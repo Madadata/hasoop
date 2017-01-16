@@ -195,4 +195,14 @@ export class Hasoop {
     const url = this.formatUrl([jobUri], jobName, 'start')
     return senPutRequest(url)
   }
+
+  stopJob (jobName) {
+    const url = this.formatUrl([jobUri], jobName, 'stop')
+    return senPutRequest(url)
+  }
+
+  jobStatus (jobName) {
+    const url = this.formatUrl([jobUri], jobName, 'status')
+    return sendGetRequest(url)
+  }
 }

@@ -81,12 +81,26 @@ suite('job', () => {
     expect(data).to.be.empty
   })
 
+  test('jobStatus When not start', async () => {
+    const data = await sqoopClient.jobStatus(thirdJobName)
+    expect(_.get(data, 'submissions[0].job-name')).to.equal(thirdJobName)
+    expect(_.get(data, 'submissions[0].status')).to.equal('NEVER_EXECUTED')
+  })
+
   test.skip('startJob', async () => {
     const data = await sqoopClient.startJob(thirdJobName)
     console.log(_.get(data, 'cause.message'))
   })
 
+  test.skip('jobStatus When start', () => {
+
+  })
+
   test.skip('stopJob', () => {
     sqoopClient.stopJob()
+  })
+
+  test.skip('jobStatus When stop', () => {
+
   })
 })

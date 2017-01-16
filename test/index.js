@@ -55,11 +55,6 @@ export {
 }
 
 /**
- /v1/job/[jname]/enable - [PUT] - Enable Job
- /v1/job/[jname]/disable - [PUT] - Disable Job
- /v1/job/[jname]/start - [PUT]- Start Job
- /v1/job/[jname]/stop - [PUT]- Stop Job
- /v1/job/[jname]/status - [GET]- Get Job Status
 
  /v1/submissions? - [GET] - Get all job Submissions
  /v1/submissions?jname=[jname] - [GET] - Get Submissions by Job
