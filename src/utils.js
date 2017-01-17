@@ -4,13 +4,7 @@
 import _ from 'lodash'
 
 function splitTopConfig (config) {
-  const topConfig = {}
-  _.map(config, (value, key) => {
-    if (!_.isArray(value) && !_.isObject(value)) {
-      _.set(topConfig, key, value)
-    }
-  })
-  return topConfig
+  return _.omitBy(config, _.isObject)
 }
 
 function splitInputsConfig (configs) {
@@ -18,7 +12,7 @@ function splitInputsConfig (configs) {
   for (let config of configs) {
     for (let input of config.inputs) {
       const nameSplit = input.name.split('.')
-      inputConfig[nameSplit[1]] = input.value ? decodeURIComponent(input.value) : null
+      inputConfig[nameSplit[1]] = input.value || null
     }
   }
   return inputConfig
@@ -27,22 +21,26 @@ function splitInputsConfig (configs) {
 export function splitLinkConfig (linkInfo) {
   const topConfig = splitTopConfig(_.get(linkInfo, 'links[0]'))
   const otherConfig = splitInputsConfig(_.get(linkInfo, 'links[0].link-config-values.configs'))
-  return _.mapKeys({
+  const linkConfig = {}
+  _.map({
     ...topConfig,
     ...otherConfig
-  }, (value, key) => _.camelCase(key))
+  }, (value, key) => _.set(linkConfig, _.camelCase(key), _.isString(value) ? decodeURIComponent(value) : value))
+  return linkConfig
 }
 
 export function splitJobConfig (jobInfo) {
-  console.log()
   const topConfig = splitTopConfig(_.get(jobInfo, 'jobs[0]'))
   const fromLinkConfig = splitInputsConfig(_.get(jobInfo, 'jobs[0].from-config-values.configs'))
   const toLinkConfig = splitInputsConfig(_.get(jobInfo, 'jobs[0].to-config-values.configs'))
   const driverConfig = splitInputsConfig(_.get(jobInfo, 'jobs[0].driver-config-values.configs'))
-  return _.mapKeys({
-    top: topConfig,
-    driver: driverConfig,
-    from: fromLinkConfig,
-    to: toLinkConfig
-  }, (value, key) => _.camelCase(key))
+  const jobConfig = {}
+  _.map({
+    ..._.mapKeys(topConfig, (value, key) => `top_${key}`),
+    ..._.mapKeys(driverConfig, (value, key) => `driver_${key}`),
+    ..._.mapKeys(fromLinkConfig, (value, key) => `from_${key}`),
+    ..._.mapKeys(toLinkConfig, (value, key) => `to_${key}`)
+  }, (value, key) => _.set(jobConfig, _.camelCase(key), _.isString(value) ? decodeURIComponent(value) : value))
+  console.log(jobConfig)
+  return jobConfig
 }

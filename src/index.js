@@ -166,7 +166,7 @@ export class Hasoop {
     const oldJobConfig = splitJobConfig(await this.getJobByJobName(oldJobName))
     const fromLinkInfo = await this.getLinkByLinkName(config['fromLinkName'])
     const toLinkInfo = await this.getLinkByLinkName(config['toLinkName'])
-    const body = setUpdateJobRequestBody(config.jobName, config.jobConfig, fromLinkInfo, toLinkInfo, oldJobConfig.id)
+    const body = setUpdateJobRequestBody(config.jobName, config.jobConfig, fromLinkInfo, toLinkInfo, oldJobConfig.topId)
     const url = this.formatUrl([jobUri], oldJobName)
     return senPutRequest(url, JSON.stringify(body))
   }

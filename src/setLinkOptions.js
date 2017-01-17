@@ -184,6 +184,7 @@ function setCreateHdfsLinkRequestBody (linkConfig) {
   }
   return createHdfsLinkBody
 }
+
 export function setCreateLinkRequestBody (linkConfig) {
   if (linkConfig.linkType === linkType.mysql) {
     return setCreateMysqlLinkRequestBody(linkConfig)
