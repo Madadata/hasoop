@@ -14,18 +14,18 @@ suite('job', () => {
   let firstHdfsLinkName
 
   before(async () => {
-    firstMysqlLinkName = faker.name.findName()
+    firstMysqlLinkName = faker.name.firstName()
     const firstMysqlLinkConfig = generateMysqlConfig(firstMysqlLinkName)
     await sqoopClient.createLink(firstMysqlLinkConfig)
 
-    firstHdfsLinkName = faker.name.findName()
+    firstHdfsLinkName = faker.name.firstName()
     const firstHdfsLinkConfig = generateHdfsConfig(firstHdfsLinkName)
     await sqoopClient.createLink(firstHdfsLinkConfig)
 
-    firstJobName = faker.name.findName()
-    secondJobName = faker.name.findName()
+    firstJobName = faker.name.firstName()
+    secondJobName = faker.name.firstName()
 
-    thirdJobName = faker.name.findName()
+    thirdJobName = faker.name.firstName()
     const config = generateFromMysqlToHdfsConfig(thirdJobName, firstMysqlLinkName, firstHdfsLinkName)
     await sqoopClient.createJob(config)
   })
@@ -85,14 +85,17 @@ suite('job', () => {
     expect(_.get(data, 'submissions[0].status')).to.equal('NEVER_EXECUTED')
   })
 
-  test('startJob', async () => {
+  test.skip('startJob', async () => {
     const data = await sqoopClient.startJob(thirdJobName)
     console.log(_.get(data, 'cause.message'))
     console.log(data)
   })
 
-  test.skip('jobStatus When start', () => {
-
+  test.skip('jobStatus When start', async () => {
+    const data = await sqoopClient.jobStatus(thirdJobName)
+    // expect(_.get(data, 'submissions[0].job-name')).to.equal(thirdJobName)
+    console.log(_.get(data, 'submissions[0].job-name'), _.get(data, 'submissions[0].status'))
+    // expect(_.get(data, 'submissions[0].status')).to.equal('NEVER_EXECUTED')
   })
 
   test.skip('stopJob', () => {

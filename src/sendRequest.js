@@ -18,7 +18,7 @@ export function sendGetRequest (url, body = null) {
   return sendRequest('GET', url, body)
 }
 
-export function senPostRequest (url, body) {
+export function senPostRequest (url, body = null) {
   return sendRequest('POST', url, body)
 }
 
