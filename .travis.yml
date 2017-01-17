@@ -13,7 +13,7 @@ node_js:
 
 before_install:
   - docker run --name test-mysql -e MYSQL_ROOT_PASSWORD=1234 -d mysql
-  - docker run --name test-sqoop --link test-mysql:mysql -d -p 12000:12000 jimexist/sqoop:1.99.7-2
+  - docker run --name test-sqoop --link test-mysql:mysql -d -p 12000:12000 jimexist/sqoop:1.99.7-3
 
 script:
   - npm run coverage
