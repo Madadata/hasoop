@@ -25,7 +25,7 @@ function generateHdfsConfig (linkName) {
   return {
     'linkName': linkName,
     'linkType': linkType.hdfs,
-    'uri': 'hdfs://localhost:9000'
+    'uri': 'hdfs://0f7fd1ca7bf8:9000'
   }
 }
 
@@ -41,7 +41,7 @@ function generateFromMysqlToHdfsConfig (jobName, fromLinkName, toLinkName) {
       // 'partitionColumn':'id' TODO
 
       // for hdfs
-      'outputDirectory': 'hdfs://localhost:9000/output/data'
+      'outputDirectory': 'hdfs://0f7fd1ca7bf8:9000/output/data'
     }
   }
 }

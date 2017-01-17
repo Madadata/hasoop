@@ -85,9 +85,10 @@ suite('job', () => {
     expect(_.get(data, 'submissions[0].status')).to.equal('NEVER_EXECUTED')
   })
 
-  test.skip('startJob', async () => {
+  test('startJob', async () => {
     const data = await sqoopClient.startJob(thirdJobName)
     console.log(_.get(data, 'cause.message'))
+    console.log(data)
   })
 
   test.skip('jobStatus When start', () => {
