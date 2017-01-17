@@ -41,6 +41,5 @@ export function splitJobConfig (jobInfo) {
     ..._.mapKeys(fromLinkConfig, (value, key) => `from_${key}`),
     ..._.mapKeys(toLinkConfig, (value, key) => `to_${key}`)
   }, (value, key) => _.set(jobConfig, _.camelCase(key), _.isString(value) ? decodeURIComponent(value) : value))
-  console.log(jobConfig)
   return jobConfig
 }

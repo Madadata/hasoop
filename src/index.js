@@ -31,6 +31,19 @@ export const linkType = {
   hdfs: 'hdfs'
 }
 
+const sqoopAction = {
+  start: 'start',
+  stop: 'stop',
+  status: 'status',
+
+  all: 'all',
+  jname: 'jname',
+  cname: 'cname',
+
+  enable: 'enable',
+  disable: 'disable'
+}
+
 export const version = 'v1'
 const versionUri = 'version'
 const driverUri = `${version}/driver`
@@ -74,13 +87,13 @@ export class Hasoop {
 
   // driver
   getDriver () {
-    const url = this.formatUrl([driverUri], 'all')
+    const url = this.formatUrl([driverUri], sqoopAction.all)
     return sendGetRequest(url)
   }
 
   // connector
   getConnectorAll () {
-    const url = this.formatUrl([connectorUri], 'all')
+    const url = this.formatUrl([connectorUri], sqoopAction.all)
     return sendGetRequest(url)
   }
 
@@ -91,12 +104,12 @@ export class Hasoop {
 
   // link
   getLinkAll () {
-    const url = this.formatUrl([linkUri], 'all')
+    const url = this.formatUrl([linkUri], sqoopAction.all)
     return sendGetRequest(url)
   }
 
   getLinkByConnectorName (connectorName) {
-    const url = this.formatUrl([linkUri, {'cname': connectorName}], 'all')
+    const url = this.formatUrl([linkUri, {[sqoopAction.cname]: connectorName}], sqoopAction.all)
     return sendGetRequest(url)
   }
 
@@ -118,12 +131,12 @@ export class Hasoop {
   }
 
   updateLinkEnable (linkName) {
-    const url = this.formatUrl([linkUri], linkName, 'enable')
+    const url = this.formatUrl([linkUri], linkName, sqoopAction.enable)
     return senPutRequest(url)
   }
 
   updateLinkDisable (linkName) {
-    const url = this.formatUrl([linkUri], linkName, 'disable')
+    const url = this.formatUrl([linkUri], linkName, sqoopAction.disable)
     return senPutRequest(url)
   }
 
@@ -140,7 +153,7 @@ export class Hasoop {
 
   // job
   getJobAll () {
-    const url = this.formatUrl([jobUri], 'all')
+    const url = this.formatUrl([jobUri], sqoopAction.all)
     return sendGetRequest(url)
   }
 
@@ -150,7 +163,11 @@ export class Hasoop {
   }
 
   getJobByConnectorName (connectorName) {
-    const url = this.formatUrl([jobUri, {'cname': connectorName}], 'all')
+    const url = this.formatUrl([jobUri, {
+      [sqoopAction.cname]: connectorName
+    }],
+      sqoopAction.all
+    )
     return sendGetRequest(url)
   }
 
@@ -172,12 +189,12 @@ export class Hasoop {
   }
 
   updateJobEnable (jobName) {
-    const url = this.formatUrl([jobUri], jobName, 'enable')
+    const url = this.formatUrl([jobUri], jobName, sqoopAction.enable)
     return senPutRequest(url)
   }
 
   updateJobDisable (jobName) {
-    const url = this.formatUrl([jobUri], jobName, 'disable')
+    const url = this.formatUrl([jobUri], jobName, sqoopAction.disable)
     return senPutRequest(url)
   }
 
@@ -193,28 +210,28 @@ export class Hasoop {
   }
 
   startJob (jobName) {
-    const url = this.formatUrl([jobUri], jobName, 'start')
+    const url = this.formatUrl([jobUri], jobName, sqoopAction.start)
     return senPutRequest(url)
   }
 
   stopJob (jobName) {
-    const url = this.formatUrl([jobUri], jobName, 'stop')
+    const url = this.formatUrl([jobUri], jobName, sqoopAction.stop)
     return senPutRequest(url)
   }
 
   jobStatus (jobName) {
-    const url = this.formatUrl([jobUri], jobName, 'status')
+    const url = this.formatUrl([jobUri], jobName, sqoopAction.status)
     return sendGetRequest(url)
   }
 
   // submission
   getSubmissionAll () {
-    const url = this.formatUrl([submissionsUri], 'all')
+    const url = this.formatUrl([submissionsUri], sqoopAction.all)
     return sendGetRequest(url)
   }
 
   getSubmissionByJobName (jobName) {
-    const url = this.formatUrl([submissionsUri, {'jname': jobName}], 'all')
+    const url = this.formatUrl([submissionsUri, {[sqoopAction.jname]: jobName}], sqoopAction.all)
     return sendGetRequest(url)
   }
 }
