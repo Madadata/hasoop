@@ -9,12 +9,12 @@ function splitTopConfig (config) {
 
 function splitInputsConfig (configs) {
   const inputConfig = {}
-  for (let config of configs) {
-    for (let input of config.inputs) {
+  _.map(configs, (config) => {
+    _.map(config.inputs, (input) => {
       const nameSplit = input.name.split('.')
-      inputConfig[nameSplit[1]] = input.value || null
-    }
-  }
+      _.set(inputConfig, nameSplit[1], input.value || null)
+    })
+  })
   return inputConfig
 }
 
