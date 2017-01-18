@@ -27,13 +27,12 @@
     "prebuild": "npm run lint",
     "build": "babel -d dist src",
     "lint": "standard --verbose | snazzy",
-    "test": "npm run pre-test-mysql && npm run pre-test-sqoophost && mocha",
+    "test": "npm run pre-test-mysql && SQOOPHOST=$(docker exec -i test-sqoop hostname) mocha",
     "precommit": "npm run lint",
     "prepush": "npm run lint",
     "prepublish": "npm run clean && npm run build && npm run lint",
     "coverage": "nyc npm test && nyc report --reporter=text-lcov | coveralls",
-    "pre-test-mysql": "docker exec -i test-mysql mysql -uroot -p1234 < test/init.sql",
-    "pre-test-sqoophost": "export sqoophost=$(docker exec -i test-sqoop hostname)"
+    "pre-test-mysql": "docker exec -i test-mysql mysql -uroot -p1234 < test/init.sql"
   },
   "dependencies": {
     "isomorphic-fetch": "^2.2.1"

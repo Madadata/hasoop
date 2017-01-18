@@ -9,7 +9,8 @@ const config = {
   'webapp': 'sqoop'
 }
 const sqoopClient = new Hasoop(config)
-const sqoopHost = process.env.sqoophost
+
+const SQOOPHOST = process.env.SQOOPHOST
 
 function generateMysqlConfig (linkName) {
   return {
@@ -26,7 +27,7 @@ function generateHdfsConfig (linkName) {
   return {
     'linkName': linkName,
     'linkType': linkType.hdfs,
-    'uri': `hdfs://${sqoopHost}:9000`
+    'uri': `hdfs://${SQOOPHOST}:9000`
   }
 }
 
@@ -42,7 +43,7 @@ function generateFromMysqlToHdfsConfig (jobName, fromLinkName, toLinkName) {
       // 'partitionColumn':'id' TODO
 
       // for hdfs
-      'outputDirectory': `hdfs://${sqoopHost}:9000/data`
+      'outputDirectory': `hdfs://${SQOOPHOST}:9000/data`
     }
   }
 }
