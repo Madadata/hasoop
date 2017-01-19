@@ -15,17 +15,17 @@ function sendRequest (method, url, body = null) {
 }
 
 export function sendGetRequest (url, body = null) {
-  return sendRequest('GET', url, body)
+  return body ? sendRequest('GET', url, body) : sendRequest('GET', url)
 }
 
 export function senPostRequest (url, body = null) {
-  return sendRequest('POST', url, body)
+  return body ? sendRequest('POST', url, body) : sendRequest('POST', url)
 }
 
 export function senPutRequest (url, body = null) {
-  return sendRequest('PUT', url, body)
+  return body ? sendRequest('PUT', url, body) : sendRequest('PUT', url)
 }
 
 export function senDeleteRequest (url, body = null) {
-  return sendRequest('DELETE', url, body)
+  return body ? sendRequest('DELETE', url, body) : sendRequest('DELETE', url)
 }

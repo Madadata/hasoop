@@ -14,12 +14,7 @@ import { splitJobConfig } from './utils'
 
 export const connectorType = {
   generic: 'generic',
-  hdfs: 'hdfs',
-  oracle: 'oracle',
-  ftp: 'ftp',
-  sftp: 'sftp',
-  kite: 'kite',
-  kafka: 'kafka'
+  hdfs: 'hdfs'
 }
 
 export const genericType = {
