@@ -5,7 +5,7 @@
 import url from 'url'
 import _ from 'lodash'
 import path from 'path'
-import keyMirror from 'keyMirror'
+import keyMirror from 'keymirror'
 import querystring from 'querystring'
 
 import { sendGetRequest, senPostRequest, senPutRequest, senDeleteRequest } from './sendRequest'
