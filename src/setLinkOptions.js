@@ -115,7 +115,7 @@ function setCreateLinkRequestMysqlBody (jdbcDriver, connectionString, fetchSize,
 }
 
 function setCreateLinkRequestHdfsBody (linkConfig) {
-  return {
+  const body = {
     'link-config-values': {
       'configs': [
         {
@@ -160,6 +160,10 @@ function setCreateLinkRequestHdfsBody (linkConfig) {
       'validators': []
     }
   }
+  if (linkConfig.maps) {
+    _.set(body, 'link-config-values.configs[0].inputs[2].value', linkConfig.maps)
+  }
+  return body
 }
 
 function setCreateMysqlLinkRequestBody (linkConfig) {
@@ -184,6 +188,7 @@ function setCreateHdfsLinkRequestBody (linkConfig) {
   }
   return createHdfsLinkBody
 }
+
 export function setCreateLinkRequestBody (linkConfig) {
   if (linkConfig.linkType === linkType.mysql) {
     return setCreateMysqlLinkRequestBody(linkConfig)

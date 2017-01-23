@@ -3,7 +3,11 @@
 import { sqoopClient } from './index'
 
 suite('submission', () => {
-  test.skip('getSubmission', () => {
-    sqoopClient.getSubmission()
+  test.skip('getSubmissionAll', () => {
+    sqoopClient.getSubmissionAll()
+  })
+
+  test.skip('getSubmissionByJobName', () => {
+    sqoopClient.getSubmissionByJobName()
   })
 })

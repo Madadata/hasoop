@@ -4,7 +4,7 @@ import _ from 'lodash'
 
 import { sqoopClient, version } from './index'
 
-suite('utils', () => {
+suite('version', () => {
   test('getVersion', async () => {
     const data = await sqoopClient.getVersion()
     expect(_.get(data, 'api-versions[0]')).to.equal(version)

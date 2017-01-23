@@ -42,8 +42,7 @@ suite('link', () => {
   test('getLinkByConnectorName', async () => {
     const connectorName = 'generic-jdbc-connector'
     const data = await sqoopClient.getLinkByConnectorName(connectorName)
-    const linkNames = []
-    data.links.map((link) => linkNames.push(link.name))
+    const linkNames = _.map(data.links, 'name')
     expect(secondMysqlLinkName).to.be.oneOf(linkNames)
   })
 
@@ -61,8 +60,7 @@ suite('link', () => {
 
   test('getLinkAll', async () => {
     const data = await sqoopClient.getLinkAll()
-    const linkNames = []
-    data.links.map((link) => linkNames.push(link.name))
+    const linkNames = _.map(data.links, 'name')
     expect(firstHdfsLinkName).to.be.oneOf(linkNames)
     expect(secondMysqlLinkName).to.be.oneOf(linkNames)
   })
