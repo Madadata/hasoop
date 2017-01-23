@@ -5,6 +5,7 @@
 import url from 'url'
 import _ from 'lodash'
 import path from 'path'
+import keyMirror from 'keyMirror'
 import querystring from 'querystring'
 
 import { sendGetRequest, senPostRequest, senPutRequest, senDeleteRequest } from './sendRequest'
@@ -12,32 +13,32 @@ import { setCreateLinkRequestBody, setUpdateLinkRequestBody } from './setLinkOpt
 import { setCreateJobRequestBody, setUpdateJobRequestBody } from './setJobOptions'
 import { splitJobConfig } from './utils'
 
-export const connectorType = {
-  generic: 'generic',
-  hdfs: 'hdfs'
-}
+export const connectorType = keyMirror({
+  generic: null,
+  hdfs: null
+})
 
-export const genericType = {
-  mysql: 'mysql'
-}
+export const genericType = keyMirror({
+  mysql: null
+})
 
-export const linkType = {
-  mysql: 'mysql',
-  hdfs: 'hdfs'
-}
+export const linkType = keyMirror({
+  mysql: null,
+  hdfs: null
+})
 
-const sqoopAction = {
-  start: 'start',
-  stop: 'stop',
-  status: 'status',
+const sqoopAction = keyMirror({
+  start: null,
+  stop: null,
+  status: null,
 
-  all: 'all',
-  jname: 'jname',
-  cname: 'cname',
+  all: null,
+  jname: null,
+  cname: null,
 
-  enable: 'enable',
-  disable: 'disable'
-}
+  enable: null,
+  disable: null
+})
 
 export const version = 'v1'
 const versionUri = 'version'
