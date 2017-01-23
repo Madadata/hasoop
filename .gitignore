@@ -41,3 +41,4 @@ test.js
 test/test_flow.js
 
 dist
+test/s3test.js

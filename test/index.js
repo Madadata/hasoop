@@ -11,7 +11,6 @@ const config = {
 const sqoopClient = new Hasoop(config)
 
 const SQOOPHOST = process.env.SQOOPHOST
-console.log(SQOOPHOST)
 
 function generateMysqlConfig (linkName) {
   return {
@@ -44,7 +43,7 @@ function generateFromMysqlToHdfsConfig (jobName, fromLinkName, toLinkName) {
       // 'partitionColumn':'id' TODO
 
       // for hdfs
-      'outputDirectory': `hdfs://${SQOOPHOST}:9000/vvv`
+      'outputDirectory': `hdfs://${SQOOPHOST}:9000/data`
     }
   }
 }
