@@ -13,6 +13,8 @@ import { setCreateLinkRequestBody, setUpdateLinkRequestBody } from './setLinkOpt
 import { setCreateJobRequestBody, setUpdateJobRequestBody } from './setJobOptions'
 import { splitJobConfig } from './utils'
 
+export * from './utils'
+
 export const connectorType = keyMirror({
   generic: null,
   hdfs: null
