@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 
-import { Hasoop, version, linkType } from '../src/index'
+import Hasoop, { version, linkType } from '../src/index'
 
 const config = {
   'userName': 'Developer',
