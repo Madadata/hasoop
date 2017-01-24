@@ -48,7 +48,7 @@ const linkUri = `${version}/link`
 const jobUri = `${version}/job`
 const submissionsUri = `${version}/submissions`
 
-export class Hasoop {
+export default class Hasoop {
   constructor (config) {
     this.userName = config.userName
     this.host = config.host
