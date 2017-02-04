@@ -2,7 +2,7 @@
  * Created by Chyroc on 17/1/10.
  */
 
-const fetch = require('isomorphic-fetch')
+import fetch from 'isomorphic-fetch'
 
 function sendRequest (method, url, body = null) {
   return fetch(url, {method: method, body: body})
