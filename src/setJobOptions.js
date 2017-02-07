@@ -5,6 +5,9 @@
 // import { connectorType } from './index'
 import { splitLinkConfig } from './utils'
 
+/**
+ * @ignore
+ */
 function setMysqlJobConfig (linkConfig, jobConfig) {
   return {
     'configs': [{
@@ -105,6 +108,9 @@ function setMysqlJobConfig (linkConfig, jobConfig) {
   }
 }
 
+/**
+ * @ignore
+ */
 function setHdfsJobConfig (linkConfig, jobConfig) {
   return {
     'configs': [{
@@ -182,6 +188,9 @@ function setHdfsJobConfig (linkConfig, jobConfig) {
   }
 }
 
+/**
+ * @ignore
+ */
 function setJobConfig (jobConfig) {
   return {
     'configs': [{
@@ -225,6 +234,9 @@ function setJobConfig (jobConfig) {
   }
 }
 
+/**
+ * @ignore
+ */
 export function setCreateJobRequestBody (jobName, jobConfig, fromLinkInfo, toLinkInfo, jobId = -1) {
   const fromLinkConfig = splitLinkConfig(fromLinkInfo)
   const toLinkConfig = splitLinkConfig(toLinkInfo)
@@ -247,6 +259,10 @@ export function setCreateJobRequestBody (jobName, jobConfig, fromLinkInfo, toLin
     }]
   }
 }
+
+/**
+ * @ignore
+ */
 export function setUpdateJobRequestBody (jobName, jobConfig, fromLinkInfo, toLinkInfo, jobId) {
   return setCreateJobRequestBody(jobName, jobConfig, fromLinkInfo, toLinkInfo, jobId)
 }

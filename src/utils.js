@@ -3,10 +3,16 @@
  */
 import _ from 'lodash'
 
+/**
+ * @ignore
+ */
 function splitTopConfig (config) {
   return _.omitBy(config, _.isObject)
 }
 
+/**
+ * @ignore
+ */
 function splitInputsConfig (configs) {
   const inputConfig = {}
   _.map(configs, (config) => {
@@ -19,7 +25,8 @@ function splitInputsConfig (configs) {
 }
 
 /**
- * @public
+ * split link config.
+ *
  * @param linkInfo
  * @returns {{}}
  */
@@ -35,7 +42,8 @@ export function splitLinkConfig (linkInfo) {
 }
 
 /**
- * @public
+ * split job config.
+ *
  * @param jobInfo
  * @returns {{}}
  */

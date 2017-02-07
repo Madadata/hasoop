@@ -4,6 +4,9 @@
 
 import fetch from 'isomorphic-fetch'
 
+/**
+ * @ignore
+ */
 function sendRequest (method, url, body = null) {
   return fetch(url, {method: method, body: body})
     .then(function (res) {
@@ -14,18 +17,30 @@ function sendRequest (method, url, body = null) {
     })
 }
 
+/**
+ * @ignore
+ */
 export function sendGetRequest (url, body = null) {
   return body ? sendRequest('GET', url, body) : sendRequest('GET', url)
 }
 
+/**
+ * @ignore
+ */
 export function senPostRequest (url, body = null) {
   return body ? sendRequest('POST', url, body) : sendRequest('POST', url)
 }
 
+/**
+ * @ignore
+ */
 export function senPutRequest (url, body = null) {
   return body ? sendRequest('PUT', url, body) : sendRequest('PUT', url)
 }
 
+/**
+ * @ignore
+ */
 export function senDeleteRequest (url, body = null) {
   return body ? sendRequest('DELETE', url, body) : sendRequest('DELETE', url)
 }

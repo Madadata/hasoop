@@ -26,11 +26,17 @@ export const genericType = keyMirror({
   mysql: null
 })
 
+/**
+ * type of all links, currently supporting mysql and hdfs.
+ */
 export const linkType = keyMirror({
   mysql: null,
   hdfs: null
 })
 
+/**
+ *  * action of sqoop, used in sqoop rest api querySting / params / body.
+ */
 const sqoopAction = keyMirror({
   start: null,
   stop: null,
@@ -53,7 +59,6 @@ const jobUri = `${version}/job`
 const submissionsUri = `${version}/submissions`
 
 /**
- * @public
  * Hasoop client, get your own instance by creating an instance.
  */
 export default class Hasoop {
@@ -64,6 +69,14 @@ export default class Hasoop {
     this.weapp = config.webapp
   }
 
+  /**
+   * use some param to create a sqoop rest api url.
+   *
+   * @param basicPath
+   * @param queryObject
+   * @param otherPath
+   * @returns {*}
+   */
   formatUrl ([basicPath, queryObject = {}], ...otherPath) {
     _.set(queryObject, ['user.name'], this.userName)
     const urlQuery = querystring.stringify(queryObject)
@@ -83,89 +96,175 @@ export default class Hasoop {
     return url.format(urlObj)
   }
 
-  /** version */
+  /**
+   * get sqoop server version.
+   *
+   * @returns {*}
+   */
   getVersion () {
     const url = this.formatUrl([versionUri])
     return sendGetRequest(url)
   }
 
-  /** driver */
+  /**
+   * get infos of all drivers.
+   *
+   * @returns {*}
+   */
   getDriver () {
     const url = this.formatUrl([driverUri], sqoopAction.all)
     return sendGetRequest(url)
   }
 
-  /**  connector */
+  /**
+   * get infos of all connectors.
+   *
+   * @returns {*}
+   */
   getConnectorAll () {
     const url = this.formatUrl([connectorUri], sqoopAction.all)
     return sendGetRequest(url)
   }
 
+  /**
+   * get info of connector by connector name.
+   *
+   * @param connectorName
+   * @returns {*}
+   */
   getConnectorByConnectorName (connectorName) {
     const url = this.formatUrl([connectorUri], connectorName)
     return sendGetRequest(url)
   }
 
-  /** link */
+  /**
+   * get infos of all links.
+   *
+   * @returns {*}
+   */
   getLinkAll () {
     const url = this.formatUrl([linkUri], sqoopAction.all)
     return sendGetRequest(url)
   }
 
+  /**
+   * get info of link by connector name.
+   *
+   * @param connectorName
+   * @returns {*}
+   */
   getLinkByConnectorName (connectorName) {
     const url = this.formatUrl([linkUri, {[sqoopAction.cname]: connectorName}], sqoopAction.all)
     return sendGetRequest(url)
   }
 
+  /**
+   * get info of link by link name.
+   *
+   * @param linkName
+   * @returns {*}
+   */
   getLinkByLinkName (linkName) {
     const url = this.formatUrl([linkUri], linkName)
     return sendGetRequest(url)
   }
 
+  /**
+   * create link.
+   *
+   * @param config
+   * @returns {*}
+   */
   createLink (config) {
     const body = setCreateLinkRequestBody(config)
     const url = this.formatUrl([linkUri])
     return senPostRequest(url, JSON.stringify(body))
   }
 
+  /**
+   * update link config.
+   *
+   * @param oldLinkName
+   * @param config
+   * @returns {*}
+   */
   updateLinkConfig (oldLinkName, config) {
     const body = setUpdateLinkRequestBody(config)
     const url = this.formatUrl([linkUri], oldLinkName)
     return senPutRequest(url, JSON.stringify(body))
   }
 
+  /**
+   * change link to enable by link name.
+   *
+   * @param linkName
+   * @returns {*}
+   */
   updateLinkEnable (linkName) {
     const url = this.formatUrl([linkUri], linkName, sqoopAction.enable)
     return senPutRequest(url)
   }
 
+  /**
+   * change link to disable by link name.
+   *
+   * @param linkName
+   * @returns {*}
+   */
   updateLinkDisable (linkName) {
     const url = this.formatUrl([linkUri], linkName, sqoopAction.disable)
     return senPutRequest(url)
   }
 
+  /**
+   * delete link by link name.
+   *
+   * @param linkName
+   * @returns {*}
+   */
   deleteLink (linkName) {
     const url = this.formatUrl([linkUri], linkName)
     return senDeleteRequest(url)
   }
 
+  /**
+   * delete all links on sqoop server.
+   *
+   * @returns {*}
+   */
   async deleteLinkAll () {
     const data = await this.getLinkAll()
     const deleteList = data.links.map(link => this.deleteLink(link.name))
     return await Promise.all(deleteList)
   }
 
-  // job
+  /**
+   * get infos of all jobs.
+   *
+   * @returns {*}
+   */
   getJobAll () {
     const url = this.formatUrl([jobUri], sqoopAction.all)
     return sendGetRequest(url)
   }
 
+  /**
+   * get info of job by job name.
+   *
+   * @param JobName
+   * @returns {*}
+   */
   getJobByJobName (JobName) {
     const url = this.formatUrl([jobUri], JobName)
     return sendGetRequest(url)
   }
 
+  /**
+   * get info of job by connector name.
+   *
+   * @param connectorName
+   * @returns {*}
+   */
   getJobByConnectorName (connectorName) {
     const url = this.formatUrl([jobUri, {
       [sqoopAction.cname]: connectorName
@@ -175,6 +274,12 @@ export default class Hasoop {
     return sendGetRequest(url)
   }
 
+  /**
+   * create job.
+   *
+   * @param config
+   * @returns {*}
+   */
   async createJob (config) {
     const fromLinkInfo = await this.getLinkByLinkName(config['fromLinkName'])
     const toLinkInfo = await this.getLinkByLinkName(config['toLinkName'])
@@ -183,6 +288,13 @@ export default class Hasoop {
     return senPostRequest(url, JSON.stringify(body))
   }
 
+  /**
+   * update job config.
+   *
+   * @param oldJobName
+   * @param config
+   * @returns {*}
+   */
   async updateJobConfig (oldJobName, config) {
     const oldJobConfig = splitJobConfig(await this.getJobByJobName(oldJobName))
     const fromLinkInfo = await this.getLinkByLinkName(config['fromLinkName'])
@@ -192,48 +304,99 @@ export default class Hasoop {
     return senPutRequest(url, JSON.stringify(body))
   }
 
+  /**
+   * change job to enable by job name.
+   *
+   * @param jobName
+   * @returns {*}
+   */
   updateJobEnable (jobName) {
     const url = this.formatUrl([jobUri], jobName, sqoopAction.enable)
     return senPutRequest(url)
   }
 
+  /**
+   * change job to disable by job name.
+   *
+   * @param jobName
+   * @returns {*}
+   */
   updateJobDisable (jobName) {
     const url = this.formatUrl([jobUri], jobName, sqoopAction.disable)
     return senPutRequest(url)
   }
 
+  /**
+   * delete job by job name.
+   *
+   * @param jobName
+   * @returns {*}
+   */
   deleteJob (jobName) {
     const url = this.formatUrl([jobUri], jobName)
     return senDeleteRequest(url)
   }
 
+  /**
+   * delete all jobs on sqoop server.
+   *
+   * @returns {*}
+   */
   async deleteJobAll () {
     const data = await this.getJobAll()
     const deleteList = data.jobs.map(job => this.deleteJob(job.name))
     return await Promise.all(deleteList)
   }
 
+  /**
+   * start job by job name.
+   *
+   * @param jobName
+   * @returns {*}
+   */
   startJob (jobName) {
     const url = this.formatUrl([jobUri], jobName, sqoopAction.start)
     return senPutRequest(url)
   }
 
+  /**
+   * stop job by job name.
+   *
+   * @param jobName
+   * @returns {*}
+   */
   stopJob (jobName) {
     const url = this.formatUrl([jobUri], jobName, sqoopAction.stop)
     return senPutRequest(url)
   }
 
+  /**
+   * get status of job by job name.
+   *
+   * @param jobName
+   * @returns {*}
+   */
   jobStatus (jobName) {
     const url = this.formatUrl([jobUri], jobName, sqoopAction.status)
     return sendGetRequest(url)
   }
 
-  // submission
+  /**
+   * get infos of all submissions.
+   *
+   * @returns {*}
+   */
   getSubmissionAll () {
     const url = this.formatUrl([submissionsUri], sqoopAction.all)
     return sendGetRequest(url)
   }
 
+  /**
+   * get info of submission by job name.
+   *
+   * @param jobName
+   * @returns {*}
+   */
   getSubmissionByJobName (jobName) {
     const url = this.formatUrl([submissionsUri, {[sqoopAction.jname]: jobName}], sqoopAction.all)
     return sendGetRequest(url)
