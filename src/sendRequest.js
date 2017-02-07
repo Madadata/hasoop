@@ -27,20 +27,20 @@ export function sendGetRequest (url, body = null) {
 /**
  * @ignore
  */
-export function senPostRequest (url, body = null) {
+export function sendPostRequest (url, body = null) {
   return body ? sendRequest('POST', url, body) : sendRequest('POST', url)
 }
 
 /**
  * @ignore
  */
-export function senPutRequest (url, body = null) {
+export function sendPutRequest (url, body = null) {
   return body ? sendRequest('PUT', url, body) : sendRequest('PUT', url)
 }
 
 /**
  * @ignore
  */
-export function senDeleteRequest (url, body = null) {
+export function sendDeleteRequest (url, body = null) {
   return body ? sendRequest('DELETE', url, body) : sendRequest('DELETE', url)
 }

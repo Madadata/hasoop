@@ -4,7 +4,7 @@ import path from 'path'
 import keyMirror from 'keymirror'
 import querystring from 'querystring'
 
-import { sendGetRequest, senPostRequest, senPutRequest, senDeleteRequest } from './sendRequest'
+import { sendGetRequest, sendPostRequest, sendPutRequest, sendDeleteRequest } from './sendRequest'
 import { setCreateLinkRequestBody, setUpdateLinkRequestBody } from './setLinkOptions'
 import { setCreateJobRequestBody, setUpdateJobRequestBody } from './setJobOptions'
 import { splitJobConfig } from './utils'
@@ -178,7 +178,7 @@ export default class Hasoop {
   createLink (config) {
     const body = setCreateLinkRequestBody(config)
     const url = this.formatUrl([linkUri])
-    return senPostRequest(url, JSON.stringify(body))
+    return sendPostRequest(url, JSON.stringify(body))
   }
 
   /**
@@ -191,7 +191,7 @@ export default class Hasoop {
   updateLinkConfig (oldLinkName, config) {
     const body = setUpdateLinkRequestBody(config)
     const url = this.formatUrl([linkUri], oldLinkName)
-    return senPutRequest(url, JSON.stringify(body))
+    return sendPutRequest(url, JSON.stringify(body))
   }
 
   /**
@@ -202,7 +202,7 @@ export default class Hasoop {
    */
   updateLinkEnable (linkName) {
     const url = this.formatUrl([linkUri], linkName, sqoopAction.enable)
-    return senPutRequest(url)
+    return sendPutRequest(url)
   }
 
   /**
@@ -213,7 +213,7 @@ export default class Hasoop {
    */
   updateLinkDisable (linkName) {
     const url = this.formatUrl([linkUri], linkName, sqoopAction.disable)
-    return senPutRequest(url)
+    return sendPutRequest(url)
   }
 
   /**
@@ -224,7 +224,7 @@ export default class Hasoop {
    */
   deleteLink (linkName) {
     const url = this.formatUrl([linkUri], linkName)
-    return senDeleteRequest(url)
+    return sendDeleteRequest(url)
   }
 
   /**
@@ -285,7 +285,7 @@ export default class Hasoop {
     const toLinkInfo = await this.getLinkByLinkName(config['toLinkName'])
     const body = setCreateJobRequestBody(config.jobName, config.jobConfig, fromLinkInfo, toLinkInfo)
     const url = this.formatUrl([jobUri])
-    return senPostRequest(url, JSON.stringify(body))
+    return sendPostRequest(url, JSON.stringify(body))
   }
 
   /**
@@ -301,7 +301,7 @@ export default class Hasoop {
     const toLinkInfo = await this.getLinkByLinkName(config['toLinkName'])
     const body = setUpdateJobRequestBody(config.jobName, config.jobConfig, fromLinkInfo, toLinkInfo, oldJobConfig.topId)
     const url = this.formatUrl([jobUri], oldJobName)
-    return senPutRequest(url, JSON.stringify(body))
+    return sendPutRequest(url, JSON.stringify(body))
   }
 
   /**
@@ -312,7 +312,7 @@ export default class Hasoop {
    */
   updateJobEnable (jobName) {
     const url = this.formatUrl([jobUri], jobName, sqoopAction.enable)
-    return senPutRequest(url)
+    return sendPutRequest(url)
   }
 
   /**
@@ -323,7 +323,7 @@ export default class Hasoop {
    */
   updateJobDisable (jobName) {
     const url = this.formatUrl([jobUri], jobName, sqoopAction.disable)
-    return senPutRequest(url)
+    return sendPutRequest(url)
   }
 
   /**
@@ -334,7 +334,7 @@ export default class Hasoop {
    */
   deleteJob (jobName) {
     const url = this.formatUrl([jobUri], jobName)
-    return senDeleteRequest(url)
+    return sendDeleteRequest(url)
   }
 
   /**
@@ -356,7 +356,7 @@ export default class Hasoop {
    */
   startJob (jobName) {
     const url = this.formatUrl([jobUri], jobName, sqoopAction.start)
-    return senPutRequest(url)
+    return sendPutRequest(url)
   }
 
   /**
@@ -367,7 +367,7 @@ export default class Hasoop {
    */
   stopJob (jobName) {
     const url = this.formatUrl([jobUri], jobName, sqoopAction.stop)
-    return senPutRequest(url)
+    return sendPutRequest(url)
   }
 
   /**
