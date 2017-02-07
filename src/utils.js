@@ -18,6 +18,11 @@ function splitInputsConfig (configs) {
   return inputConfig
 }
 
+/**
+ * @public
+ * @param linkInfo
+ * @returns {{}}
+ */
 export function splitLinkConfig (linkInfo) {
   const topConfig = splitTopConfig(_.get(linkInfo, 'links[0]'))
   const otherConfig = splitInputsConfig(_.get(linkInfo, 'links[0].link-config-values.configs'))
@@ -29,6 +34,11 @@ export function splitLinkConfig (linkInfo) {
   return linkConfig
 }
 
+/**
+ * @public
+ * @param jobInfo
+ * @returns {{}}
+ */
 export function splitJobConfig (jobInfo) {
   const topConfig = splitTopConfig(_.get(jobInfo, 'jobs[0]'))
   const fromLinkConfig = splitInputsConfig(_.get(jobInfo, 'jobs[0].from-config-values.configs'))

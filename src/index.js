@@ -53,6 +53,7 @@ const jobUri = `${version}/job`
 const submissionsUri = `${version}/submissions`
 
 /**
+ * @public
  * Hasoop client, get your own instance by creating an instance.
  */
 export default class Hasoop {
