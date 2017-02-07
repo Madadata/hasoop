@@ -1,7 +1,3 @@
-/**
- * Created by Chyroc on 17/1/10.
- */
-
 import url from 'url'
 import _ from 'lodash'
 import path from 'path'
@@ -15,11 +11,17 @@ import { splitJobConfig } from './utils'
 
 export * from './utils'
 
+/**
+ * type of all connectors, currently supporting generic (databases) and HDFS.
+ */
 export const connectorType = keyMirror({
   generic: null,
   hdfs: null
 })
 
+/**
+ * specific types within generic types.
+ */
 export const genericType = keyMirror({
   mysql: null
 })
@@ -50,6 +52,9 @@ const linkUri = `${version}/link`
 const jobUri = `${version}/job`
 const submissionsUri = `${version}/submissions`
 
+/**
+ * Hasoop client, get your own instance by creating an instance.
+ */
 export default class Hasoop {
   constructor (config) {
     this.userName = config.userName
@@ -77,19 +82,19 @@ export default class Hasoop {
     return url.format(urlObj)
   }
 
-  // version
+  /** version */
   getVersion () {
     const url = this.formatUrl([versionUri])
     return sendGetRequest(url)
   }
 
-  // driver
+  /** driver */
   getDriver () {
     const url = this.formatUrl([driverUri], sqoopAction.all)
     return sendGetRequest(url)
   }
 
-  // connector
+  /**  connector */
   getConnectorAll () {
     const url = this.formatUrl([connectorUri], sqoopAction.all)
     return sendGetRequest(url)
@@ -100,7 +105,7 @@ export default class Hasoop {
     return sendGetRequest(url)
   }
 
-  // link
+  /** link */
   getLinkAll () {
     const url = this.formatUrl([linkUri], sqoopAction.all)
     return sendGetRequest(url)

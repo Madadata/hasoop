@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/index.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  <a href="test.html" data-ice="testLink">Test</a>
+  <a data-ice="repoURL" href="https://github.com/Madadata/hasoop" class="repo-url-github">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/index.js~Hasoop.html">Hasoop</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-senDeleteRequest">senDeleteRequest</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-senPostRequest">senPostRequest</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-senPutRequest">senPutRequest</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendGetRequest">sendGetRequest</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setCreateJobRequestBody">setCreateJobRequestBody</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setUpdateJobRequestBody">setUpdateJobRequestBody</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setCreateLinkRequestBody">setCreateLinkRequestBody</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setUpdateLinkRequestBody">setUpdateLinkRequestBody</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-splitJobConfig">splitJobConfig</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-splitLinkConfig">splitLinkConfig</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-connectorType">connectorType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-genericType">genericType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-linkType">linkType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-version">version</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/index.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import url from &apos;url&apos;
+import _ from &apos;lodash&apos;
+import path from &apos;path&apos;
+import keyMirror from &apos;keymirror&apos;
+import querystring from &apos;querystring&apos;
+
+import { sendGetRequest, senPostRequest, senPutRequest, senDeleteRequest } from &apos;./sendRequest&apos;
+import { setCreateLinkRequestBody, setUpdateLinkRequestBody } from &apos;./setLinkOptions&apos;
+import { setCreateJobRequestBody, setUpdateJobRequestBody } from &apos;./setJobOptions&apos;
+import { splitJobConfig } from &apos;./utils&apos;
+
+export * from &apos;./utils&apos;
+
+/**
+ * type of all connectors, currently supporting generic (databases) and HDFS.
+ */
+export const connectorType = keyMirror({
+  generic: null,
+  hdfs: null
+})
+
+/**
+ * specific types within generic types.
+ */
+export const genericType = keyMirror({
+  mysql: null
+})
+
+export const linkType = keyMirror({
+  mysql: null,
+  hdfs: null
+})
+
+const sqoopAction = keyMirror({
+  start: null,
+  stop: null,
+  status: null,
+
+  all: null,
+  jname: null,
+  cname: null,
+
+  enable: null,
+  disable: null
+})
+
+export const version = &apos;v1&apos;
+const versionUri = &apos;version&apos;
+const driverUri = `${version}/driver`
+const connectorUri = `${version}/connector`
+const linkUri = `${version}/link`
+const jobUri = `${version}/job`
+const submissionsUri = `${version}/submissions`
+
+/**
+ * Hasoop client, get your own instance by creating an instance.
+ */
+export default class Hasoop {
+  constructor (config) {
+    this.userName = config.userName
+    this.host = config.host
+    this.port = config.port
+    this.weapp = config.webapp
+  }
+
+  formatUrl ([basicPath, queryObject = {}], ...otherPath) {
+    _.set(queryObject, [&apos;user.name&apos;], this.userName)
+    const urlQuery = querystring.stringify(queryObject)
+    const urlPath = path.join(
+      this.weapp,
+      basicPath,
+      ...otherPath
+    )
+    const urlObj = {
+      protocol: &apos;http:&apos;,
+      slashes: true,
+      hostname: this.host,
+      port: this.port,
+      search: &apos;?&apos; + urlQuery,
+      pathname: urlPath
+    }
+    return url.format(urlObj)
+  }
+
+  /** version */
+  getVersion () {
+    const url = this.formatUrl([versionUri])
+    return sendGetRequest(url)
+  }
+
+  /** driver */
+  getDriver () {
+    const url = this.formatUrl([driverUri], sqoopAction.all)
+    return sendGetRequest(url)
+  }
+
+  /**  connector */
+  getConnectorAll () {
+    const url = this.formatUrl([connectorUri], sqoopAction.all)
+    return sendGetRequest(url)
+  }
+
+  getConnectorByConnectorName (connectorName) {
+    const url = this.formatUrl([connectorUri], connectorName)
+    return sendGetRequest(url)
+  }
+
+  // link
+  getLinkAll () {
+    const url = this.formatUrl([linkUri], sqoopAction.all)
+    return sendGetRequest(url)
+  }
+
+  getLinkByConnectorName (connectorName) {
+    const url = this.formatUrl([linkUri, {[sqoopAction.cname]: connectorName}], sqoopAction.all)
+    return sendGetRequest(url)
+  }
+
+  getLinkByLinkName (linkName) {
+    const url = this.formatUrl([linkUri], linkName)
+    return sendGetRequest(url)
+  }
+
+  createLink (config) {
+    const body = setCreateLinkRequestBody(config)
+    const url = this.formatUrl([linkUri])
+    return senPostRequest(url, JSON.stringify(body))
+  }
+
+  updateLinkConfig (oldLinkName, config) {
+    const body = setUpdateLinkRequestBody(config)
+    const url = this.formatUrl([linkUri], oldLinkName)
+    return senPutRequest(url, JSON.stringify(body))
+  }
+
+  updateLinkEnable (linkName) {
+    const url = this.formatUrl([linkUri], linkName, sqoopAction.enable)
+    return senPutRequest(url)
+  }
+
+  updateLinkDisable (linkName) {
+    const url = this.formatUrl([linkUri], linkName, sqoopAction.disable)
+    return senPutRequest(url)
+  }
+
+  deleteLink (linkName) {
+    const url = this.formatUrl([linkUri], linkName)
+    return senDeleteRequest(url)
+  }
+
+  async deleteLinkAll () {
+    const data = await this.getLinkAll()
+    const deleteList = data.links.map(link =&gt; this.deleteLink(link.name))
+    return await Promise.all(deleteList)
+  }
+
+  // job
+  getJobAll () {
+    const url = this.formatUrl([jobUri], sqoopAction.all)
+    return sendGetRequest(url)
+  }
+
+  getJobByJobName (JobName) {
+    const url = this.formatUrl([jobUri], JobName)
+    return sendGetRequest(url)
+  }
+
+  getJobByConnectorName (connectorName) {
+    const url = this.formatUrl([jobUri, {
+      [sqoopAction.cname]: connectorName
+    }],
+      sqoopAction.all
+    )
+    return sendGetRequest(url)
+  }
+
+  async createJob (config) {
+    const fromLinkInfo = await this.getLinkByLinkName(config[&apos;fromLinkName&apos;])
+    const toLinkInfo = await this.getLinkByLinkName(config[&apos;toLinkName&apos;])
+    const body = setCreateJobRequestBody(config.jobName, config.jobConfig, fromLinkInfo, toLinkInfo)
+    const url = this.formatUrl([jobUri])
+    return senPostRequest(url, JSON.stringify(body))
+  }
+
+  async updateJobConfig (oldJobName, config) {
+    const oldJobConfig = splitJobConfig(await this.getJobByJobName(oldJobName))
+    const fromLinkInfo = await this.getLinkByLinkName(config[&apos;fromLinkName&apos;])
+    const toLinkInfo = await this.getLinkByLinkName(config[&apos;toLinkName&apos;])
+    const body = setUpdateJobRequestBody(config.jobName, config.jobConfig, fromLinkInfo, toLinkInfo, oldJobConfig.topId)
+    const url = this.formatUrl([jobUri], oldJobName)
+    return senPutRequest(url, JSON.stringify(body))
+  }
+
+  updateJobEnable (jobName) {
+    const url = this.formatUrl([jobUri], jobName, sqoopAction.enable)
+    return senPutRequest(url)
+  }
+
+  updateJobDisable (jobName) {
+    const url = this.formatUrl([jobUri], jobName, sqoopAction.disable)
+    return senPutRequest(url)
+  }
+
+  deleteJob (jobName) {
+    const url = this.formatUrl([jobUri], jobName)
+    return senDeleteRequest(url)
+  }
+
+  async deleteJobAll () {
+    const data = await this.getJobAll()
+    const deleteList = data.jobs.map(job =&gt; this.deleteJob(job.name))
+    return await Promise.all(deleteList)
+  }
+
+  startJob (jobName) {
+    const url = this.formatUrl([jobUri], jobName, sqoopAction.start)
+    return senPutRequest(url)
+  }
+
+  stopJob (jobName) {
+    const url = this.formatUrl([jobUri], jobName, sqoopAction.stop)
+    return senPutRequest(url)
+  }
+
+  jobStatus (jobName) {
+    const url = this.formatUrl([jobUri], jobName, sqoopAction.status)
+    return sendGetRequest(url)
+  }
+
+  // submission
+  getSubmissionAll () {
+    const url = this.formatUrl([submissionsUri], sqoopAction.all)
+    return sendGetRequest(url)
+  }
+
+  getSubmissionByJobName (jobName) {
+    const url = this.formatUrl([submissionsUri, {[sqoopAction.jname]: jobName}], sqoopAction.all)
+    return sendGetRequest(url)
+  }
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

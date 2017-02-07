@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">test/job.test.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  <a href="test.html" data-ice="testLink">Test</a>
+  <a data-ice="repoURL" href="https://github.com/Madadata/hasoop" class="repo-url-github">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/index.js~Hasoop.html">Hasoop</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-senDeleteRequest">senDeleteRequest</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-senPostRequest">senPostRequest</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-senPutRequest">senPutRequest</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sendGetRequest">sendGetRequest</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setCreateJobRequestBody">setCreateJobRequestBody</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setUpdateJobRequestBody">setUpdateJobRequestBody</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setCreateLinkRequestBody">setCreateLinkRequestBody</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setUpdateLinkRequestBody">setUpdateLinkRequestBody</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-splitJobConfig">splitJobConfig</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-splitLinkConfig">splitLinkConfig</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-connectorType">connectorType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-genericType">genericType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-linkType">linkType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-version">version</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">test/job.test.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/* eslint-env mocha */
+
+import { expect } from &apos;chai&apos;
+import _ from &apos;lodash&apos;
+import faker from &apos;faker&apos;
+
+import { sqoopClient, generateMysqlConfig, generateHdfsConfig, generateFromMysqlToHdfsConfig } from &apos;./index&apos;
+
+suite(&apos;job&apos;, () =&gt; {
+  let firstJobName
+  let secondJobName
+  let thirdJobName
+  let firstMysqlLinkName
+  let firstHdfsLinkName
+
+  before(async () =&gt; {
+    firstMysqlLinkName = faker.name.firstName()
+    const firstMysqlLinkConfig = generateMysqlConfig(firstMysqlLinkName)
+    await sqoopClient.createLink(firstMysqlLinkConfig)
+
+    firstHdfsLinkName = faker.name.firstName()
+    const firstHdfsLinkConfig = generateHdfsConfig(firstHdfsLinkName)
+    await sqoopClient.createLink(firstHdfsLinkConfig)
+
+    firstJobName = faker.name.firstName()
+    secondJobName = faker.name.firstName()
+
+    thirdJobName = faker.name.firstName()
+    const config = generateFromMysqlToHdfsConfig(thirdJobName, firstMysqlLinkName, firstHdfsLinkName)
+    await sqoopClient.createJob(config)
+  })
+
+  test(&apos;createJobFromMysqlToJob&apos;, async () =&gt; {
+    const config = generateFromMysqlToHdfsConfig(firstJobName, firstMysqlLinkName, firstHdfsLinkName)
+    const data = await sqoopClient.createJob(config)
+    expect(data).to.deep.equal({
+      &apos;name&apos;: firstJobName,
+      &apos;validation-result&apos;: [{}, {}, {}]
+    })
+  })
+
+  test(&apos;getJobByJobName&apos;, async () =&gt; {
+    const data = await sqoopClient.getJobByJobName(firstJobName)
+    expect(_.get(data, &apos;jobs[0].name&apos;)).to.equal(firstJobName)
+  })
+
+  test(&apos;getJobByConnectorName&apos;, async () =&gt; {
+    const data = await sqoopClient.getJobByConnectorName(&apos;hdfs-connector&apos;)
+    const jobNames = _.map(data.jobs, &apos;name&apos;)
+    expect(firstJobName).to.be.oneOf(jobNames)
+  })
+
+  test(&apos;updateJobFromMysqlToJob&apos;, async () =&gt; {
+    const config = generateFromMysqlToHdfsConfig(secondJobName, firstMysqlLinkName, firstHdfsLinkName)
+    const data = await sqoopClient.updateJobConfig(firstJobName, config)
+    expect(data).to.deep.equal({&apos;validation-result&apos;: [{}, {}, {}]})
+  })
+
+  test(&apos;getJobAll&apos;, async () =&gt; {
+    const data = await sqoopClient.getJobAll()
+    const jobNames = _.map(data.jobs, &apos;name&apos;)
+    expect(secondJobName).to.be.oneOf(jobNames)
+  })
+
+  test(&apos;updateJobDisable&apos;, async () =&gt; {
+    await sqoopClient.updateJobDisable(secondJobName)
+    const data = await sqoopClient.getJobByJobName(secondJobName)
+    expect(_.get(data, &apos;jobs[0].enabled&apos;)).to.be.false
+  })
+
+  test(&apos;updateJobEnable&apos;, async () =&gt; {
+    await sqoopClient.updateJobEnable(secondJobName)
+    const data = await sqoopClient.getJobByJobName(secondJobName)
+    expect(_.get(data, &apos;jobs[0].enabled&apos;)).to.be.true
+  })
+
+  test(&apos;deleteJob&apos;, async () =&gt; {
+    const data = await sqoopClient.deleteJob(secondJobName)
+    expect(data).to.be.empty
+  })
+
+  test(&apos;jobStatus When not start&apos;, async () =&gt; {
+    const data = await sqoopClient.jobStatus(thirdJobName)
+    expect(_.get(data, &apos;submissions[0].job-name&apos;)).to.equal(thirdJobName)
+    expect(_.get(data, &apos;submissions[0].status&apos;)).to.equal(&apos;NEVER_EXECUTED&apos;)
+  })
+
+  // next 4 test is ok for ec2, so remove `skip`.
+  test(&apos;startJob&apos;, async () =&gt; {
+    // const data = await sqoopClient.startJob(thirdJobName)
+    // expect(_.get(data, &apos;submissions[0].job-name&apos;)).to.equal(thirdJobName)
+    // expect(_.get(data, &apos;submissions[0].status&apos;)).to.equal(&apos;BOOTING&apos;)
+  })
+
+  test(&apos;jobStatus When start&apos;, async () =&gt; {
+    // const data = await sqoopClient.jobStatus(thirdJobName)
+    // expect(_.get(data, &apos;submissions[0].job-name&apos;)).to.equal(thirdJobName)
+    // expect(_.get(data, &apos;submissions[0].status&apos;)).to.equal(&apos;BOOTING&apos;)
+  })
+
+  test(&apos;stopJob&apos;, async () =&gt; {
+    // const data = await sqoopClient.stopJob(thirdJobName)
+    // expect(_.get(data, &apos;submissions[0].job-name&apos;)).to.equal(thirdJobName)
+    // expect(_.get(data, &apos;submissions[0].status&apos;)).to.equal(&apos;FAILED&apos;)
+  })
+
+  test(&apos;jobStatus When stop&apos;, async () =&gt; {
+    // const data = await sqoopClient.jobStatus(thirdJobName)
+    // expect(_.get(data, &apos;submissions[0].job-name&apos;)).to.equal(thirdJobName)
+    // expect(_.get(data, &apos;submissions[0].status&apos;)).to.equal(&apos;FAILED&apos;)
+  })
+})
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

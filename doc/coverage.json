@@ -1,0 +1,79 @@
+{
+  "coverage": "12.5%",
+  "expectCount": 48,
+  "actualCount": 6,
+  "files": {
+    "src/index.js": {
+      "expectCount": 38,
+      "actualCount": 6,
+      "undocumentLines": [
+        59,
+        177,
+        124,
+        204,
+        209,
+        146,
+        151,
+        66,
+        103,
+        158,
+        168,
+        163,
+        109,
+        114,
+        119,
+        231,
+        236,
+        61,
+        225,
+        29,
+        62,
+        215,
+        220,
+        185,
+        199,
+        194,
+        130,
+        141,
+        136,
+        60,
+        47,
+        63
+      ]
+    },
+    "src/sendRequest.js": {
+      "expectCount": 4,
+      "actualCount": 0,
+      "undocumentLines": [
+        29,
+        21,
+        25,
+        17
+      ]
+    },
+    "src/setJobOptions.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        228,
+        250
+      ]
+    },
+    "src/setLinkOptions.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        192,
+        202
+      ]
+    },
+    "src/utils.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        32,
+        21
+      ]
+    }
+  }
+}

@@ -1,0 +1,3346 @@
+[
+  {
+    "__docId__": 0,
+    "kind": "file",
+    "name": "src/index.js",
+    "content": "import url from 'url'\nimport _ from 'lodash'\nimport path from 'path'\nimport keyMirror from 'keymirror'\nimport querystring from 'querystring'\n\nimport { sendGetRequest, senPostRequest, senPutRequest, senDeleteRequest } from './sendRequest'\nimport { setCreateLinkRequestBody, setUpdateLinkRequestBody } from './setLinkOptions'\nimport { setCreateJobRequestBody, setUpdateJobRequestBody } from './setJobOptions'\nimport { splitJobConfig } from './utils'\n\nexport * from './utils'\n\n/**\n * type of all connectors, currently supporting generic (databases) and HDFS.\n */\nexport const connectorType = keyMirror({\n  generic: null,\n  hdfs: null\n})\n\n/**\n * specific types within generic types.\n */\nexport const genericType = keyMirror({\n  mysql: null\n})\n\nexport const linkType = keyMirror({\n  mysql: null,\n  hdfs: null\n})\n\nconst sqoopAction = keyMirror({\n  start: null,\n  stop: null,\n  status: null,\n\n  all: null,\n  jname: null,\n  cname: null,\n\n  enable: null,\n  disable: null\n})\n\nexport const version = 'v1'\nconst versionUri = 'version'\nconst driverUri = `${version}/driver`\nconst connectorUri = `${version}/connector`\nconst linkUri = `${version}/link`\nconst jobUri = `${version}/job`\nconst submissionsUri = `${version}/submissions`\n\n/**\n * Hasoop client, get your own instance by creating an instance.\n */\nexport default class Hasoop {\n  constructor (config) {\n    this.userName = config.userName\n    this.host = config.host\n    this.port = config.port\n    this.weapp = config.webapp\n  }\n\n  formatUrl ([basicPath, queryObject = {}], ...otherPath) {\n    _.set(queryObject, ['user.name'], this.userName)\n    const urlQuery = querystring.stringify(queryObject)\n    const urlPath = path.join(\n      this.weapp,\n      basicPath,\n      ...otherPath\n    )\n    const urlObj = {\n      protocol: 'http:',\n      slashes: true,\n      hostname: this.host,\n      port: this.port,\n      search: '?' + urlQuery,\n      pathname: urlPath\n    }\n    return url.format(urlObj)\n  }\n\n  /** version */\n  getVersion () {\n    const url = this.formatUrl([versionUri])\n    return sendGetRequest(url)\n  }\n\n  /** driver */\n  getDriver () {\n    const url = this.formatUrl([driverUri], sqoopAction.all)\n    return sendGetRequest(url)\n  }\n\n  /**  connector */\n  getConnectorAll () {\n    const url = this.formatUrl([connectorUri], sqoopAction.all)\n    return sendGetRequest(url)\n  }\n\n  getConnectorByConnectorName (connectorName) {\n    const url = this.formatUrl([connectorUri], connectorName)\n    return sendGetRequest(url)\n  }\n\n  // link\n  getLinkAll () {\n    const url = this.formatUrl([linkUri], sqoopAction.all)\n    return sendGetRequest(url)\n  }\n\n  getLinkByConnectorName (connectorName) {\n    const url = this.formatUrl([linkUri, {[sqoopAction.cname]: connectorName}], sqoopAction.all)\n    return sendGetRequest(url)\n  }\n\n  getLinkByLinkName (linkName) {\n    const url = this.formatUrl([linkUri], linkName)\n    return sendGetRequest(url)\n  }\n\n  createLink (config) {\n    const body = setCreateLinkRequestBody(config)\n    const url = this.formatUrl([linkUri])\n    return senPostRequest(url, JSON.stringify(body))\n  }\n\n  updateLinkConfig (oldLinkName, config) {\n    const body = setUpdateLinkRequestBody(config)\n    const url = this.formatUrl([linkUri], oldLinkName)\n    return senPutRequest(url, JSON.stringify(body))\n  }\n\n  updateLinkEnable (linkName) {\n    const url = this.formatUrl([linkUri], linkName, sqoopAction.enable)\n    return senPutRequest(url)\n  }\n\n  updateLinkDisable (linkName) {\n    const url = this.formatUrl([linkUri], linkName, sqoopAction.disable)\n    return senPutRequest(url)\n  }\n\n  deleteLink (linkName) {\n    const url = this.formatUrl([linkUri], linkName)\n    return senDeleteRequest(url)\n  }\n\n  async deleteLinkAll () {\n    const data = await this.getLinkAll()\n    const deleteList = data.links.map(link => this.deleteLink(link.name))\n    return await Promise.all(deleteList)\n  }\n\n  // job\n  getJobAll () {\n    const url = this.formatUrl([jobUri], sqoopAction.all)\n    return sendGetRequest(url)\n  }\n\n  getJobByJobName (JobName) {\n    const url = this.formatUrl([jobUri], JobName)\n    return sendGetRequest(url)\n  }\n\n  getJobByConnectorName (connectorName) {\n    const url = this.formatUrl([jobUri, {\n      [sqoopAction.cname]: connectorName\n    }],\n      sqoopAction.all\n    )\n    return sendGetRequest(url)\n  }\n\n  async createJob (config) {\n    const fromLinkInfo = await this.getLinkByLinkName(config['fromLinkName'])\n    const toLinkInfo = await this.getLinkByLinkName(config['toLinkName'])\n    const body = setCreateJobRequestBody(config.jobName, config.jobConfig, fromLinkInfo, toLinkInfo)\n    const url = this.formatUrl([jobUri])\n    return senPostRequest(url, JSON.stringify(body))\n  }\n\n  async updateJobConfig (oldJobName, config) {\n    const oldJobConfig = splitJobConfig(await this.getJobByJobName(oldJobName))\n    const fromLinkInfo = await this.getLinkByLinkName(config['fromLinkName'])\n    const toLinkInfo = await this.getLinkByLinkName(config['toLinkName'])\n    const body = setUpdateJobRequestBody(config.jobName, config.jobConfig, fromLinkInfo, toLinkInfo, oldJobConfig.topId)\n    const url = this.formatUrl([jobUri], oldJobName)\n    return senPutRequest(url, JSON.stringify(body))\n  }\n\n  updateJobEnable (jobName) {\n    const url = this.formatUrl([jobUri], jobName, sqoopAction.enable)\n    return senPutRequest(url)\n  }\n\n  updateJobDisable (jobName) {\n    const url = this.formatUrl([jobUri], jobName, sqoopAction.disable)\n    return senPutRequest(url)\n  }\n\n  deleteJob (jobName) {\n    const url = this.formatUrl([jobUri], jobName)\n    return senDeleteRequest(url)\n  }\n\n  async deleteJobAll () {\n    const data = await this.getJobAll()\n    const deleteList = data.jobs.map(job => this.deleteJob(job.name))\n    return await Promise.all(deleteList)\n  }\n\n  startJob (jobName) {\n    const url = this.formatUrl([jobUri], jobName, sqoopAction.start)\n    return senPutRequest(url)\n  }\n\n  stopJob (jobName) {\n    const url = this.formatUrl([jobUri], jobName, sqoopAction.stop)\n    return senPutRequest(url)\n  }\n\n  jobStatus (jobName) {\n    const url = this.formatUrl([jobUri], jobName, sqoopAction.status)\n    return sendGetRequest(url)\n  }\n\n  // submission\n  getSubmissionAll () {\n    const url = this.formatUrl([submissionsUri], sqoopAction.all)\n    return sendGetRequest(url)\n  }\n\n  getSubmissionByJobName (jobName) {\n    const url = this.formatUrl([submissionsUri, {[sqoopAction.jname]: jobName}], sqoopAction.all)\n    return sendGetRequest(url)\n  }\n}\n",
+    "static": true,
+    "longname": "src/index.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 1,
+    "kind": "variable",
+    "name": "connectorType",
+    "memberof": "src/index.js",
+    "static": true,
+    "longname": "src/index.js~connectorType",
+    "access": null,
+    "export": true,
+    "importPath": "hasoop/src/index.js",
+    "importStyle": "{connectorType}",
+    "description": "type of all connectors, currently supporting generic (databases) and HDFS.",
+    "lineNumber": 17,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 2,
+    "kind": "variable",
+    "name": "genericType",
+    "memberof": "src/index.js",
+    "static": true,
+    "longname": "src/index.js~genericType",
+    "access": null,
+    "export": true,
+    "importPath": "hasoop/src/index.js",
+    "importStyle": "{genericType}",
+    "description": "specific types within generic types.",
+    "lineNumber": 25,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 3,
+    "kind": "variable",
+    "name": "linkType",
+    "memberof": "src/index.js",
+    "static": true,
+    "longname": "src/index.js~linkType",
+    "access": null,
+    "export": true,
+    "importPath": "hasoop/src/index.js",
+    "importStyle": "{linkType}",
+    "description": null,
+    "lineNumber": 29,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 4,
+    "kind": "variable",
+    "name": "sqoopAction",
+    "memberof": "src/index.js",
+    "static": true,
+    "longname": "src/index.js~sqoopAction",
+    "access": null,
+    "export": false,
+    "importPath": "hasoop/src/index.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 34,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 5,
+    "kind": "variable",
+    "name": "version",
+    "memberof": "src/index.js",
+    "static": true,
+    "longname": "src/index.js~version",
+    "access": null,
+    "export": true,
+    "importPath": "hasoop/src/index.js",
+    "importStyle": "{version}",
+    "description": null,
+    "lineNumber": 47,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "string"
+      ]
+    }
+  },
+  {
+    "__docId__": 6,
+    "kind": "variable",
+    "name": "versionUri",
+    "memberof": "src/index.js",
+    "static": true,
+    "longname": "src/index.js~versionUri",
+    "access": null,
+    "export": false,
+    "importPath": "hasoop/src/index.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 48,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "string"
+      ]
+    }
+  },
+  {
+    "__docId__": 7,
+    "kind": "variable",
+    "name": "driverUri",
+    "memberof": "src/index.js",
+    "static": true,
+    "longname": "src/index.js~driverUri",
+    "access": null,
+    "export": false,
+    "importPath": "hasoop/src/index.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 49,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "string"
+      ]
+    }
+  },
+  {
+    "__docId__": 8,
+    "kind": "variable",
+    "name": "connectorUri",
+    "memberof": "src/index.js",
+    "static": true,
+    "longname": "src/index.js~connectorUri",
+    "access": null,
+    "export": false,
+    "importPath": "hasoop/src/index.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 50,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "string"
+      ]
+    }
+  },
+  {
+    "__docId__": 9,
+    "kind": "variable",
+    "name": "linkUri",
+    "memberof": "src/index.js",
+    "static": true,
+    "longname": "src/index.js~linkUri",
+    "access": null,
+    "export": false,
+    "importPath": "hasoop/src/index.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 51,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "string"
+      ]
+    }
+  },
+  {
+    "__docId__": 10,
+    "kind": "variable",
+    "name": "jobUri",
+    "memberof": "src/index.js",
+    "static": true,
+    "longname": "src/index.js~jobUri",
+    "access": null,
+    "export": false,
+    "importPath": "hasoop/src/index.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 52,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "string"
+      ]
+    }
+  },
+  {
+    "__docId__": 11,
+    "kind": "variable",
+    "name": "submissionsUri",
+    "memberof": "src/index.js",
+    "static": true,
+    "longname": "src/index.js~submissionsUri",
+    "access": null,
+    "export": false,
+    "importPath": "hasoop/src/index.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 53,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "string"
+      ]
+    }
+  },
+  {
+    "__docId__": 12,
+    "kind": "class",
+    "name": "Hasoop",
+    "memberof": "src/index.js",
+    "static": true,
+    "longname": "src/index.js~Hasoop",
+    "access": null,
+    "export": true,
+    "importPath": "hasoop/src/index.js",
+    "importStyle": "Hasoop",
+    "description": "Hasoop client, get your own instance by creating an instance.",
+    "lineNumber": 58,
+    "interface": false
+  },
+  {
+    "__docId__": 13,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#constructor",
+    "access": null,
+    "description": null,
+    "lineNumber": 59,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "config",
+        "types": [
+          "*"
+        ]
+      }
+    ]
+  },
+  {
+    "__docId__": 14,
+    "kind": "member",
+    "name": "userName",
+    "memberof": "src/index.js~Hasoop",
+    "static": false,
+    "longname": "src/index.js~Hasoop#userName",
+    "access": null,
+    "description": null,
+    "lineNumber": 60,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 15,
+    "kind": "member",
+    "name": "host",
+    "memberof": "src/index.js~Hasoop",
+    "static": false,
+    "longname": "src/index.js~Hasoop#host",
+    "access": null,
+    "description": null,
+    "lineNumber": 61,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 16,
+    "kind": "member",
+    "name": "port",
+    "memberof": "src/index.js~Hasoop",
+    "static": false,
+    "longname": "src/index.js~Hasoop#port",
+    "access": null,
+    "description": null,
+    "lineNumber": 62,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 17,
+    "kind": "member",
+    "name": "weapp",
+    "memberof": "src/index.js~Hasoop",
+    "static": false,
+    "longname": "src/index.js~Hasoop#weapp",
+    "access": null,
+    "description": null,
+    "lineNumber": 63,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 18,
+    "kind": "method",
+    "name": "formatUrl",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#formatUrl",
+    "access": null,
+    "description": null,
+    "lineNumber": 66,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "arrayPattern",
+        "types": [
+          "*[]"
+        ],
+        "defaultRaw": [
+          "null",
+          "*"
+        ],
+        "defaultValue": "[null, *]"
+      },
+      {
+        "name": "otherPath",
+        "types": [
+          "...*"
+        ],
+        "spread": true
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 19,
+    "kind": "method",
+    "name": "getVersion",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#getVersion",
+    "access": null,
+    "description": "version",
+    "lineNumber": 86,
+    "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 20,
+    "kind": "method",
+    "name": "getDriver",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#getDriver",
+    "access": null,
+    "description": "driver",
+    "lineNumber": 92,
+    "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 21,
+    "kind": "method",
+    "name": "getConnectorAll",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#getConnectorAll",
+    "access": null,
+    "description": " connector",
+    "lineNumber": 98,
+    "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 22,
+    "kind": "method",
+    "name": "getConnectorByConnectorName",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#getConnectorByConnectorName",
+    "access": null,
+    "description": null,
+    "lineNumber": 103,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "connectorName",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 23,
+    "kind": "method",
+    "name": "getLinkAll",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#getLinkAll",
+    "access": null,
+    "description": null,
+    "lineNumber": 109,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 24,
+    "kind": "method",
+    "name": "getLinkByConnectorName",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#getLinkByConnectorName",
+    "access": null,
+    "description": null,
+    "lineNumber": 114,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "connectorName",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 25,
+    "kind": "method",
+    "name": "getLinkByLinkName",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#getLinkByLinkName",
+    "access": null,
+    "description": null,
+    "lineNumber": 119,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "linkName",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 26,
+    "kind": "method",
+    "name": "createLink",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#createLink",
+    "access": null,
+    "description": null,
+    "lineNumber": 124,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "config",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 27,
+    "kind": "method",
+    "name": "updateLinkConfig",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#updateLinkConfig",
+    "access": null,
+    "description": null,
+    "lineNumber": 130,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "oldLinkName",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "config",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 28,
+    "kind": "method",
+    "name": "updateLinkEnable",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#updateLinkEnable",
+    "access": null,
+    "description": null,
+    "lineNumber": 136,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "linkName",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 29,
+    "kind": "method",
+    "name": "updateLinkDisable",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#updateLinkDisable",
+    "access": null,
+    "description": null,
+    "lineNumber": 141,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "linkName",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 30,
+    "kind": "method",
+    "name": "deleteLink",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#deleteLink",
+    "access": null,
+    "description": null,
+    "lineNumber": 146,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "linkName",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 31,
+    "kind": "method",
+    "name": "deleteLinkAll",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "src/index.js~Hasoop#deleteLinkAll",
+    "access": null,
+    "description": null,
+    "lineNumber": 151,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 32,
+    "kind": "method",
+    "name": "getJobAll",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#getJobAll",
+    "access": null,
+    "description": null,
+    "lineNumber": 158,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 33,
+    "kind": "method",
+    "name": "getJobByJobName",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#getJobByJobName",
+    "access": null,
+    "description": null,
+    "lineNumber": 163,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "JobName",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 34,
+    "kind": "method",
+    "name": "getJobByConnectorName",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#getJobByConnectorName",
+    "access": null,
+    "description": null,
+    "lineNumber": 168,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "connectorName",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 35,
+    "kind": "method",
+    "name": "createJob",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "src/index.js~Hasoop#createJob",
+    "access": null,
+    "description": null,
+    "lineNumber": 177,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "config",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 36,
+    "kind": "method",
+    "name": "updateJobConfig",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "src/index.js~Hasoop#updateJobConfig",
+    "access": null,
+    "description": null,
+    "lineNumber": 185,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "oldJobName",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "config",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 37,
+    "kind": "method",
+    "name": "updateJobEnable",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#updateJobEnable",
+    "access": null,
+    "description": null,
+    "lineNumber": 194,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "jobName",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 38,
+    "kind": "method",
+    "name": "updateJobDisable",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#updateJobDisable",
+    "access": null,
+    "description": null,
+    "lineNumber": 199,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "jobName",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 39,
+    "kind": "method",
+    "name": "deleteJob",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#deleteJob",
+    "access": null,
+    "description": null,
+    "lineNumber": 204,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "jobName",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 40,
+    "kind": "method",
+    "name": "deleteJobAll",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "src/index.js~Hasoop#deleteJobAll",
+    "access": null,
+    "description": null,
+    "lineNumber": 209,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 41,
+    "kind": "method",
+    "name": "startJob",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#startJob",
+    "access": null,
+    "description": null,
+    "lineNumber": 215,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "jobName",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 42,
+    "kind": "method",
+    "name": "stopJob",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#stopJob",
+    "access": null,
+    "description": null,
+    "lineNumber": 220,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "jobName",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 43,
+    "kind": "method",
+    "name": "jobStatus",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#jobStatus",
+    "access": null,
+    "description": null,
+    "lineNumber": 225,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "jobName",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 44,
+    "kind": "method",
+    "name": "getSubmissionAll",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#getSubmissionAll",
+    "access": null,
+    "description": null,
+    "lineNumber": 231,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 45,
+    "kind": "method",
+    "name": "getSubmissionByJobName",
+    "memberof": "src/index.js~Hasoop",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/index.js~Hasoop#getSubmissionByJobName",
+    "access": null,
+    "description": null,
+    "lineNumber": 236,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "jobName",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 46,
+    "kind": "file",
+    "name": "src/sendRequest.js",
+    "content": "/**\n * Created by Chyroc on 17/1/10.\n */\n\nimport fetch from 'isomorphic-fetch'\n\nfunction sendRequest (method, url, body = null) {\n  return fetch(url, {method: method, body: body})\n    .then(function (res) {\n      return res.json()\n    })\n    .catch(function (err) {\n      console.log(err)\n    })\n}\n\nexport function sendGetRequest (url, body = null) {\n  return body ? sendRequest('GET', url, body) : sendRequest('GET', url)\n}\n\nexport function senPostRequest (url, body = null) {\n  return body ? sendRequest('POST', url, body) : sendRequest('POST', url)\n}\n\nexport function senPutRequest (url, body = null) {\n  return body ? sendRequest('PUT', url, body) : sendRequest('PUT', url)\n}\n\nexport function senDeleteRequest (url, body = null) {\n  return body ? sendRequest('DELETE', url, body) : sendRequest('DELETE', url)\n}\n",
+    "static": true,
+    "longname": "src/sendRequest.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 47,
+    "kind": "function",
+    "name": "sendRequest",
+    "memberof": "src/sendRequest.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/sendRequest.js~sendRequest",
+    "access": null,
+    "export": false,
+    "importPath": "hasoop/src/sendRequest.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 7,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "method",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "url",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "body",
+        "optional": true,
+        "types": [
+          "undefined"
+        ],
+        "defaultValue": "undefined"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 48,
+    "kind": "function",
+    "name": "sendGetRequest",
+    "memberof": "src/sendRequest.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/sendRequest.js~sendGetRequest",
+    "access": null,
+    "export": true,
+    "importPath": "hasoop/src/sendRequest.js",
+    "importStyle": "{sendGetRequest}",
+    "description": null,
+    "lineNumber": 17,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "url",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "body",
+        "optional": true,
+        "types": [
+          "undefined"
+        ],
+        "defaultValue": "undefined"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 49,
+    "kind": "function",
+    "name": "senPostRequest",
+    "memberof": "src/sendRequest.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/sendRequest.js~senPostRequest",
+    "access": null,
+    "export": true,
+    "importPath": "hasoop/src/sendRequest.js",
+    "importStyle": "{senPostRequest}",
+    "description": null,
+    "lineNumber": 21,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "url",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "body",
+        "optional": true,
+        "types": [
+          "undefined"
+        ],
+        "defaultValue": "undefined"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 50,
+    "kind": "function",
+    "name": "senPutRequest",
+    "memberof": "src/sendRequest.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/sendRequest.js~senPutRequest",
+    "access": null,
+    "export": true,
+    "importPath": "hasoop/src/sendRequest.js",
+    "importStyle": "{senPutRequest}",
+    "description": null,
+    "lineNumber": 25,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "url",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "body",
+        "optional": true,
+        "types": [
+          "undefined"
+        ],
+        "defaultValue": "undefined"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 51,
+    "kind": "function",
+    "name": "senDeleteRequest",
+    "memberof": "src/sendRequest.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/sendRequest.js~senDeleteRequest",
+    "access": null,
+    "export": true,
+    "importPath": "hasoop/src/sendRequest.js",
+    "importStyle": "{senDeleteRequest}",
+    "description": null,
+    "lineNumber": 29,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "url",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "body",
+        "optional": true,
+        "types": [
+          "undefined"
+        ],
+        "defaultValue": "undefined"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 52,
+    "kind": "file",
+    "name": "src/setJobOptions.js",
+    "content": "/**\n * Created by Chyroc on 17/1/15.\n */\n\n// import { connectorType } from './index'\nimport { splitLinkConfig } from './utils'\n\nfunction setMysqlJobConfig (linkConfig, jobConfig) {\n  return {\n    'configs': [{\n      'validators': [],\n      'inputs': [{\n        'size': 50,\n        'editable': 'ANY',\n        'validators': [],\n        'name': 'fromJobConfig.schemaName',\n        'id': 74,\n        'sensitive': false,\n        'overrides': '',\n        'type': 'STRING',\n        'value': jobConfig.schemaName\n      }, {\n        'size': 50,\n        'editable': 'ANY',\n        'validators': [],\n        'name': 'fromJobConfig.tableName',\n        'id': 75,\n        'sensitive': false,\n        'overrides': '',\n        'type': 'STRING',\n        'value': jobConfig.tableName\n      }, {\n        'size': 2000,\n        'editable': 'ANY',\n        'validators': [],\n        'name': 'fromJobConfig.sql',\n        'id': 76,\n        'sensitive': false,\n        'overrides': '',\n        'type': 'STRING'\n      }, {\n        'editable': 'ANY',\n        'validators': [],\n        'name': 'fromJobConfig.columnList',\n        'id': 77,\n        'sensitive': false,\n        'overrides': '',\n        'type': 'LIST'\n      }, {\n        'size': 50,\n        'editable': 'ANY',\n        'validators': [],\n        'name': 'fromJobConfig.partitionColumn',\n        'id': 78,\n        'sensitive': false,\n        'overrides': '',\n        'type': 'STRING'\n      }, {\n        'editable': 'ANY',\n        'validators': [],\n        'name': 'fromJobConfig.allowNullValueInPartitionColumn',\n        'id': 79,\n        'sensitive': false,\n        'overrides': '',\n        'type': 'BOOLEAN'\n      }, {\n        'size': 50,\n        'editable': 'ANY',\n        'validators': [],\n        'name': 'fromJobConfig.boundaryQuery',\n        'id': 80,\n        'sensitive': false,\n        'overrides': '',\n        'type': 'STRING'\n      }],\n      'name': 'fromJobConfig',\n      'id': 19,\n      'type': 'JOB'\n    }, {\n      'validators': [],\n      'inputs': [{\n        'size': 50,\n        'editable': 'ANY',\n        'validators': [],\n        'name': 'incrementalRead.checkColumn',\n        'id': 81,\n        'sensitive': false,\n        'overrides': '',\n        'type': 'STRING'\n      }, {\n        'size': -1,\n        'editable': 'ANY',\n        'validators': [],\n        'name': 'incrementalRead.lastValue',\n        'id': 82,\n        'sensitive': false,\n        'overrides': '',\n        'type': 'STRING'\n      }],\n      'name': 'incrementalRead',\n      'id': 20,\n      'type': 'JOB'\n    }],\n    'validators': []\n  }\n}\n\nfunction setHdfsJobConfig (linkConfig, jobConfig) {\n  return {\n    'configs': [{\n      'validators': [],\n      'inputs': [{\n        'editable': 'ANY',\n        'validators': [],\n        'name': 'toJobConfig.overrideNullValue',\n        'id': 60,\n        'sensitive': false,\n        'overrides': '',\n        'type': 'BOOLEAN'\n      }, {\n        'size': 255,\n        'editable': 'ANY',\n        'validators': [],\n        'name': 'toJobConfig.nullValue',\n        'id': 61,\n        'sensitive': false,\n        'overrides': '',\n        'type': 'STRING'\n      }, {\n        'editable': 'ANY',\n        'validators': [],\n        'values': 'TEXT_FILE,SEQUENCE_FILE,PARQUET_FILE',\n        'name': 'toJobConfig.outputFormat',\n        'id': 62,\n        'sensitive': false,\n        'overrides': '',\n        'type': 'ENUM',\n        'value': 'TEXT_FILE' // TODO\n      }, {\n        'editable': 'ANY',\n        'validators': [],\n        'values': 'NONE,DEFAULT,DEFLATE,GZIP,BZIP2,LZO,LZ4,SNAPPY,CUSTOM',\n        'name': 'toJobConfig.compression',\n        'id': 63,\n        'sensitive': false,\n        'overrides': '',\n        'type': 'ENUM',\n        'value': 'NONE' // TODO\n      }, {\n        'size': 255,\n        'editable': 'ANY',\n        'validators': [],\n        'name': 'toJobConfig.customCompression',\n        'id': 64,\n        'sensitive': false,\n        'overrides': '',\n        'type': 'STRING'\n      }, {\n        'size': 255,\n        'editable': 'ANY',\n        'validators': [],\n        'name': 'toJobConfig.outputDirectory',\n        'id': 65,\n        'sensitive': false,\n        'overrides': '',\n        'type': 'STRING',\n        'value': encodeURIComponent(jobConfig.outputDirectory)\n      }, {\n        'editable': 'ANY',\n        'validators': [],\n        'name': 'toJobConfig.appendMode',\n        'id': 66,\n        'sensitive': false,\n        'overrides': '',\n        'type': 'BOOLEAN'\n      }],\n      'name': 'toJobConfig',\n      'id': 16,\n      'type': 'JOB'\n    }],\n    'validators': []\n  }\n}\n\nfunction setJobConfig (jobConfig) {\n  return {\n    'configs': [{\n      'validators': [],\n      'inputs': [{\n        'editable': 'ANY',\n        'validators': [],\n        'name': 'throttlingConfig.numExtractors',\n        'id': 88,\n        'sensitive': false,\n        'overrides': '',\n        'type': 'INTEGER'\n      }, {\n        'editable': 'ANY',\n        'validators': [],\n        'name': 'throttlingConfig.numLoaders',\n        'id': 89,\n        'sensitive': false,\n        'overrides': '',\n        'type': 'INTEGER'\n      }],\n      'name': 'throttlingConfig',\n      'id': 22,\n      'type': 'JOB'\n    }, {\n      'validators': [],\n      'inputs': [{\n        'editable': 'ANY',\n        'validators': [],\n        'name': 'jarConfig.extraJars',\n        'id': 90,\n        'sensitive': false,\n        'overrides': '',\n        'type': 'LIST'\n      }],\n      'name': 'jarConfig',\n      'id': 23,\n      'type': 'JOB'\n    }],\n    'validators': []\n  }\n}\n\nexport function setCreateJobRequestBody (jobName, jobConfig, fromLinkInfo, toLinkInfo, jobId = -1) {\n  const fromLinkConfig = splitLinkConfig(fromLinkInfo)\n  const toLinkConfig = splitLinkConfig(toLinkInfo)\n  return {\n    'jobs': [{\n      'id': jobId,\n      'name': jobName,\n      'creation-date': Date.now(),\n      'creation-user': null,\n      'update-user': null,\n      'update-date': Date.now(),\n      'enabled': true,\n      'from-link-name': fromLinkConfig.name,\n      'from-connector-name': fromLinkConfig.connectorName,\n      'to-link-name': toLinkConfig.name,\n      'to-connector-name': toLinkConfig.connectorName,\n      'to-config-values': setHdfsJobConfig(toLinkConfig, jobConfig),\n      'from-config-values': setMysqlJobConfig(fromLinkConfig, jobConfig),\n      'driver-config-values': setJobConfig(jobConfig)\n    }]\n  }\n}\nexport function setUpdateJobRequestBody (jobName, jobConfig, fromLinkInfo, toLinkInfo, jobId) {\n  return setCreateJobRequestBody(jobName, jobConfig, fromLinkInfo, toLinkInfo, jobId)\n}\n",
+    "static": true,
+    "longname": "src/setJobOptions.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 53,
+    "kind": "function",
+    "name": "setMysqlJobConfig",
+    "memberof": "src/setJobOptions.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/setJobOptions.js~setMysqlJobConfig",
+    "access": null,
+    "export": false,
+    "importPath": "hasoop/src/setJobOptions.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 8,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "linkConfig",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "jobConfig",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "{\"configs\": *, \"validators\": *}"
+      ]
+    }
+  },
+  {
+    "__docId__": 54,
+    "kind": "function",
+    "name": "setHdfsJobConfig",
+    "memberof": "src/setJobOptions.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/setJobOptions.js~setHdfsJobConfig",
+    "access": null,
+    "export": false,
+    "importPath": "hasoop/src/setJobOptions.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 108,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "linkConfig",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "jobConfig",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "{\"configs\": *, \"validators\": *}"
+      ]
+    }
+  },
+  {
+    "__docId__": 55,
+    "kind": "function",
+    "name": "setJobConfig",
+    "memberof": "src/setJobOptions.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/setJobOptions.js~setJobConfig",
+    "access": null,
+    "export": false,
+    "importPath": "hasoop/src/setJobOptions.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 185,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "jobConfig",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "{\"configs\": *, \"validators\": *}"
+      ]
+    }
+  },
+  {
+    "__docId__": 56,
+    "kind": "function",
+    "name": "setCreateJobRequestBody",
+    "memberof": "src/setJobOptions.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/setJobOptions.js~setCreateJobRequestBody",
+    "access": null,
+    "export": true,
+    "importPath": "hasoop/src/setJobOptions.js",
+    "importStyle": "{setCreateJobRequestBody}",
+    "description": null,
+    "lineNumber": 228,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "jobName",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "jobConfig",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "fromLinkInfo",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "toLinkInfo",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "jobId",
+        "optional": true,
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "{\"jobs\": *}"
+      ]
+    }
+  },
+  {
+    "__docId__": 57,
+    "kind": "function",
+    "name": "setUpdateJobRequestBody",
+    "memberof": "src/setJobOptions.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/setJobOptions.js~setUpdateJobRequestBody",
+    "access": null,
+    "export": true,
+    "importPath": "hasoop/src/setJobOptions.js",
+    "importStyle": "{setUpdateJobRequestBody}",
+    "description": null,
+    "lineNumber": 250,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "jobName",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "jobConfig",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "fromLinkInfo",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "toLinkInfo",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "jobId",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 58,
+    "kind": "file",
+    "name": "src/setLinkOptions.js",
+    "content": "/**\n * Created by Chyroc on 17/1/11.\n */\n\nimport _ from 'lodash'\n\nimport { linkType } from './index'\n\nfunction setCreateLinkRequestMainBody (linkName, connectorName) {\n  return {\n    'id': -1,\n    'name': linkName,\n    'connector-name': connectorName,\n    'enabled': true,\n    'creation-date': Date.now(),\n    'creation-user': null,\n    'update-user': null,\n    'update-date': Date.now()\n  }\n}\nfunction setCreateLinkRequestMysqlBody (jdbcDriver, connectionString, fetchSize, identifierEnclose, linkConfig) {\n  return {\n    'link-config-values': {\n      'configs': [\n        {\n          'validators': [],\n          'inputs': [\n            {\n              'size': 128,\n              'editable': 'ANY',\n              'validators': [],\n              'name': 'linkConfig.jdbcDriver',\n              'id': 67,\n              'sensitive': false,\n              'overrides': '',\n              'type': 'STRING',\n              'value': jdbcDriver\n            }, {\n              'size': 2000,\n              'editable': 'ANY',\n              'validators': [],\n              'name': 'linkConfig.connectionString',\n              'id': 68,\n              'sensitive': false,\n              'overrides': '',\n              'type': 'STRING',\n              'value': encodeURIComponent(connectionString)\n            }, {\n              'size': 40,\n              'editable': 'ANY',\n              'validators': [],\n              'name': 'linkConfig.username',\n              'id': 69,\n              'sensitive': false,\n              'overrides': '',\n              'type': 'STRING',\n              'value': linkConfig.username\n            }, {\n              'size': 40,\n              'editable': 'ANY',\n              'validators': [],\n              'name': 'linkConfig.password',\n              'id': 70,\n              'sensitive': true,\n              'overrides': '',\n              'type': 'STRING',\n              'value': linkConfig.password\n            }, {\n              'editable': 'ANY',\n              'validators': [],\n              'name': 'linkConfig.fetchSize',\n              'id': 71,\n              'sensitive': false,\n              'overrides': '',\n              'type': 'INTEGER',\n              'value': `${fetchSize}`\n            }, {\n              'editable': 'ANY',\n              'validators': [],\n              'name': 'linkConfig.jdbcProperties',\n              'id': 72,\n              'sensitive': false,\n              'overrides': '',\n              'type': 'MAP',\n              'sensitive-pattern': ''\n            }\n          ],\n          'name': 'linkConfig',\n          'id': 17,\n          'type': 'LINK'\n        },\n        {\n          'validators': [],\n          'inputs': [\n            {\n              'size': 5,\n              'editable': 'ANY',\n              'validators': [],\n              'name': 'dialect.identifierEnclose',\n              'id': 73,\n              'sensitive': false,\n              'overrides': '',\n              'type': 'STRING',\n              'value': encodeURIComponent(identifierEnclose)\n            }\n          ],\n          'name': 'dialect',\n          'id': 18,\n          'type': 'LINK'\n        }\n      ],\n      'validators': []\n    }\n  }\n}\n\nfunction setCreateLinkRequestHdfsBody (linkConfig) {\n  const body = {\n    'link-config-values': {\n      'configs': [\n        {\n          'validators': [],\n          'inputs': [\n            {\n              'size': 255,\n              'editable': 'ANY',\n              'validators': [],\n              'name': 'linkConfig.uri',\n              'id': 52,\n              'sensitive': false,\n              'overrides': '',\n              'type': 'STRING',\n              'value': encodeURIComponent(linkConfig.uri)\n            }, {\n              'size': 255,\n              'editable': 'ANY',\n              'validators': [],\n              'name': 'linkConfig.confDir',\n              'id': 53,\n              'sensitive': false,\n              'overrides': '',\n              'type': 'STRING'\n            }, {\n              'editable': 'ANY',\n              'validators': [],\n              'name': 'linkConfig.configOverrides',\n              'id': 54,\n              'sensitive': false,\n              'overrides': '',\n              'type': 'MAP',\n              // 'value': {'key': 'value'}, TODO\n              'sensitive-pattern': ''\n            }\n          ],\n          'name': 'linkConfig',\n          'id': 13,\n          'type': 'LINK'\n        }\n      ],\n      'validators': []\n    }\n  }\n  if (linkConfig.maps) {\n    _.set(body, 'link-config-values.configs[0].inputs[2].value', linkConfig.maps)\n  }\n  return body\n}\n\nfunction setCreateMysqlLinkRequestBody (linkConfig) {\n  const fetchSize = linkConfig.fetchSize || 1000\n  const identifierEnclose = linkConfig.identifierEnclose || '`'\n  const port = linkConfig.port || 3306\n  const connectorName = 'generic-jdbc-connector'\n  const jdbcDriver = 'com.mysql.jdbc.Driver'\n  const connectionString = `jdbc:mysql://${linkConfig.host}:${port}/${linkConfig.databaseName}`\n  const mainBody = setCreateLinkRequestMainBody(linkConfig.linkName, connectorName)\n  const mysqlBody = setCreateLinkRequestMysqlBody(jdbcDriver, connectionString, fetchSize, identifierEnclose, linkConfig)\n  return {'links': [{...mainBody, ...mysqlBody}]}\n}\n\nfunction setCreateHdfsLinkRequestBody (linkConfig) {\n  const connectorName = 'hdfs-connector'\n  const mainBody = setCreateLinkRequestMainBody(linkConfig.linkName, connectorName)\n  const hdfsBody = setCreateLinkRequestHdfsBody(linkConfig)\n  const createHdfsLinkBody = {'links': [{...mainBody, ...hdfsBody}]}\n  if (linkConfig.hadoopConfDir) {\n    _.set(createHdfsLinkBody, 'links[0].link-config-values.configs[0].inputs[1].value', encodeURIComponent(linkConfig.hadoopConfDir))\n  }\n  return createHdfsLinkBody\n}\n\nexport function setCreateLinkRequestBody (linkConfig) {\n  if (linkConfig.linkType === linkType.mysql) {\n    return setCreateMysqlLinkRequestBody(linkConfig)\n  } else if (linkConfig.linkType === linkType.hdfs) {\n    return setCreateHdfsLinkRequestBody(linkConfig)\n  } else {\n    throw new Error('linkType must be mysql or hdfs')\n  }\n}\n\nexport function setUpdateLinkRequestBody (linkConfig) {\n  return setCreateLinkRequestBody(linkConfig)\n}\n",
+    "static": true,
+    "longname": "src/setLinkOptions.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 59,
+    "kind": "function",
+    "name": "setCreateLinkRequestMainBody",
+    "memberof": "src/setLinkOptions.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/setLinkOptions.js~setCreateLinkRequestMainBody",
+    "access": null,
+    "export": false,
+    "importPath": "hasoop/src/setLinkOptions.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 9,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "linkName",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "connectorName",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "{\"id\": *, \"name\": *, \"connector-name\": *, \"enabled\": boolean, \"creation-date\": *, \"creation-user\": *, \"update-user\": *, \"update-date\": *}"
+      ]
+    }
+  },
+  {
+    "__docId__": 60,
+    "kind": "function",
+    "name": "setCreateLinkRequestMysqlBody",
+    "memberof": "src/setLinkOptions.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/setLinkOptions.js~setCreateLinkRequestMysqlBody",
+    "access": null,
+    "export": false,
+    "importPath": "hasoop/src/setLinkOptions.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 21,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "jdbcDriver",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "connectionString",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "fetchSize",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "identifierEnclose",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "linkConfig",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "{\"link-config-values\": *}"
+      ]
+    }
+  },
+  {
+    "__docId__": 61,
+    "kind": "function",
+    "name": "setCreateLinkRequestHdfsBody",
+    "memberof": "src/setLinkOptions.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/setLinkOptions.js~setCreateLinkRequestHdfsBody",
+    "access": null,
+    "export": false,
+    "importPath": "hasoop/src/setLinkOptions.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 117,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "linkConfig",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 62,
+    "kind": "function",
+    "name": "setCreateMysqlLinkRequestBody",
+    "memberof": "src/setLinkOptions.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/setLinkOptions.js~setCreateMysqlLinkRequestBody",
+    "access": null,
+    "export": false,
+    "importPath": "hasoop/src/setLinkOptions.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 169,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "linkConfig",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "{\"links\": *}"
+      ]
+    }
+  },
+  {
+    "__docId__": 63,
+    "kind": "function",
+    "name": "setCreateHdfsLinkRequestBody",
+    "memberof": "src/setLinkOptions.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/setLinkOptions.js~setCreateHdfsLinkRequestBody",
+    "access": null,
+    "export": false,
+    "importPath": "hasoop/src/setLinkOptions.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 181,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "linkConfig",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 64,
+    "kind": "function",
+    "name": "setCreateLinkRequestBody",
+    "memberof": "src/setLinkOptions.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/setLinkOptions.js~setCreateLinkRequestBody",
+    "access": null,
+    "export": true,
+    "importPath": "hasoop/src/setLinkOptions.js",
+    "importStyle": "{setCreateLinkRequestBody}",
+    "description": null,
+    "lineNumber": 192,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "linkConfig",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 65,
+    "kind": "function",
+    "name": "setUpdateLinkRequestBody",
+    "memberof": "src/setLinkOptions.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/setLinkOptions.js~setUpdateLinkRequestBody",
+    "access": null,
+    "export": true,
+    "importPath": "hasoop/src/setLinkOptions.js",
+    "importStyle": "{setUpdateLinkRequestBody}",
+    "description": null,
+    "lineNumber": 202,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "linkConfig",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 66,
+    "kind": "file",
+    "name": "src/utils.js",
+    "content": "/**\n * Created by Chyroc on 17/1/15.\n */\nimport _ from 'lodash'\n\nfunction splitTopConfig (config) {\n  return _.omitBy(config, _.isObject)\n}\n\nfunction splitInputsConfig (configs) {\n  const inputConfig = {}\n  _.map(configs, (config) => {\n    _.map(config.inputs, (input) => {\n      const nameSplit = input.name.split('.')\n      _.set(inputConfig, nameSplit[1], input.value || null)\n    })\n  })\n  return inputConfig\n}\n\nexport function splitLinkConfig (linkInfo) {\n  const topConfig = splitTopConfig(_.get(linkInfo, 'links[0]'))\n  const otherConfig = splitInputsConfig(_.get(linkInfo, 'links[0].link-config-values.configs'))\n  const linkConfig = {}\n  _.map({\n    ...topConfig,\n    ...otherConfig\n  }, (value, key) => _.set(linkConfig, _.camelCase(key), _.isString(value) ? decodeURIComponent(value) : value))\n  return linkConfig\n}\n\nexport function splitJobConfig (jobInfo) {\n  const topConfig = splitTopConfig(_.get(jobInfo, 'jobs[0]'))\n  const fromLinkConfig = splitInputsConfig(_.get(jobInfo, 'jobs[0].from-config-values.configs'))\n  const toLinkConfig = splitInputsConfig(_.get(jobInfo, 'jobs[0].to-config-values.configs'))\n  const driverConfig = splitInputsConfig(_.get(jobInfo, 'jobs[0].driver-config-values.configs'))\n  const jobConfig = {}\n  _.map({\n    ..._.mapKeys(topConfig, (value, key) => `top_${key}`),\n    ..._.mapKeys(driverConfig, (value, key) => `driver_${key}`),\n    ..._.mapKeys(fromLinkConfig, (value, key) => `from_${key}`),\n    ..._.mapKeys(toLinkConfig, (value, key) => `to_${key}`)\n  }, (value, key) => _.set(jobConfig, _.camelCase(key), _.isString(value) ? decodeURIComponent(value) : value))\n  return jobConfig\n}\n",
+    "static": true,
+    "longname": "src/utils.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 67,
+    "kind": "function",
+    "name": "splitTopConfig",
+    "memberof": "src/utils.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/utils.js~splitTopConfig",
+    "access": null,
+    "export": false,
+    "importPath": "hasoop/src/utils.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 6,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "config",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 68,
+    "kind": "function",
+    "name": "splitInputsConfig",
+    "memberof": "src/utils.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/utils.js~splitInputsConfig",
+    "access": null,
+    "export": false,
+    "importPath": "hasoop/src/utils.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 10,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "configs",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 69,
+    "kind": "function",
+    "name": "splitLinkConfig",
+    "memberof": "src/utils.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/utils.js~splitLinkConfig",
+    "access": null,
+    "export": true,
+    "importPath": "hasoop/src/utils.js",
+    "importStyle": "{splitLinkConfig}",
+    "description": null,
+    "lineNumber": 21,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "linkInfo",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 70,
+    "kind": "function",
+    "name": "splitJobConfig",
+    "memberof": "src/utils.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/utils.js~splitJobConfig",
+    "access": null,
+    "export": true,
+    "importPath": "hasoop/src/utils.js",
+    "importStyle": "{splitJobConfig}",
+    "description": null,
+    "lineNumber": 32,
+    "undocument": true,
+    "unknown": [
+      {
+        "tagName": "@_undocument",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "name": "jobInfo",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 72,
+    "kind": "external",
+    "name": "Infinity",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Infinity",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Infinity",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 73,
+    "kind": "external",
+    "name": "NaN",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~NaN",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 74,
+    "kind": "external",
+    "name": "undefined",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~undefined",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 75,
+    "kind": "external",
+    "name": "null",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~null",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 76,
+    "kind": "external",
+    "name": "Object",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Object",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 77,
+    "kind": "external",
+    "name": "object",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~object",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 78,
+    "kind": "external",
+    "name": "Function",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Function",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 79,
+    "kind": "external",
+    "name": "function",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~function",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 80,
+    "kind": "external",
+    "name": "Boolean",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Boolean",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 81,
+    "kind": "external",
+    "name": "boolean",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~boolean",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 82,
+    "kind": "external",
+    "name": "Symbol",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Symbol",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 83,
+    "kind": "external",
+    "name": "Error",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Error",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 84,
+    "kind": "external",
+    "name": "EvalError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/EvalError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~EvalError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 85,
+    "kind": "external",
+    "name": "InternalError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/InternalError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~InternalError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 86,
+    "kind": "external",
+    "name": "RangeError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RangeError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~RangeError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 87,
+    "kind": "external",
+    "name": "ReferenceError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~ReferenceError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 88,
+    "kind": "external",
+    "name": "SyntaxError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~SyntaxError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 89,
+    "kind": "external",
+    "name": "TypeError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~TypeError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 90,
+    "kind": "external",
+    "name": "URIError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/URIError",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~URIError",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 91,
+    "kind": "external",
+    "name": "Number",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Number",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 92,
+    "kind": "external",
+    "name": "number",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~number",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 93,
+    "kind": "external",
+    "name": "Date",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Date",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 94,
+    "kind": "external",
+    "name": "String",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~String",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 95,
+    "kind": "external",
+    "name": "string",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~string",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 96,
+    "kind": "external",
+    "name": "RegExp",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~RegExp",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 97,
+    "kind": "external",
+    "name": "Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 98,
+    "kind": "external",
+    "name": "Int8Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int8Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Int8Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 99,
+    "kind": "external",
+    "name": "Uint8Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint8Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 100,
+    "kind": "external",
+    "name": "Uint8ClampedArray",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint8ClampedArray",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 101,
+    "kind": "external",
+    "name": "Int16Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int16Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Int16Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 102,
+    "kind": "external",
+    "name": "Uint16Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint16Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint16Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 103,
+    "kind": "external",
+    "name": "Int32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int32Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Int32Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 104,
+    "kind": "external",
+    "name": "Uint32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Uint32Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 105,
+    "kind": "external",
+    "name": "Float32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Float32Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 106,
+    "kind": "external",
+    "name": "Float64Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float64Array",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Float64Array",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 107,
+    "kind": "external",
+    "name": "Map",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Map",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 108,
+    "kind": "external",
+    "name": "Set",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Set",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 109,
+    "kind": "external",
+    "name": "WeakMap",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~WeakMap",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 110,
+    "kind": "external",
+    "name": "WeakSet",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~WeakSet",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 111,
+    "kind": "external",
+    "name": "ArrayBuffer",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~ArrayBuffer",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 112,
+    "kind": "external",
+    "name": "DataView",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~DataView",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 113,
+    "kind": "external",
+    "name": "JSON",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~JSON",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 114,
+    "kind": "external",
+    "name": "Promise",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Promise",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 115,
+    "kind": "external",
+    "name": "Generator",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Generator",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 116,
+    "kind": "external",
+    "name": "GeneratorFunction",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/GeneratorFunction",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~GeneratorFunction",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 117,
+    "kind": "external",
+    "name": "Reflect",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Reflect",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 118,
+    "kind": "external",
+    "name": "Proxy",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy",
+    "memberof": "BuiltinExternal/ECMAScriptExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/ECMAScriptExternal.js~Proxy",
+    "access": null,
+    "description": "",
+    "lineNumber": 193,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 120,
+    "kind": "external",
+    "name": "CanvasRenderingContext2D",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~CanvasRenderingContext2D",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 121,
+    "kind": "external",
+    "name": "DocumentFragment",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~DocumentFragment",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 122,
+    "kind": "external",
+    "name": "Element",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/Element",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~Element",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 123,
+    "kind": "external",
+    "name": "Event",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/Event",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~Event",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 124,
+    "kind": "external",
+    "name": "Node",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/Node",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~Node",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 125,
+    "kind": "external",
+    "name": "NodeList",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/API/NodeList",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~NodeList",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 126,
+    "kind": "external",
+    "name": "XMLHttpRequest",
+    "externalLink": "https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~XMLHttpRequest",
+    "access": null,
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 127,
+    "kind": "external",
+    "name": "AudioContext",
+    "externalLink": "https://developer.mozilla.org/en/docs/Web/API/AudioContext",
+    "memberof": "BuiltinExternal/WebAPIExternal.js",
+    "static": true,
+    "longname": "BuiltinExternal/WebAPIExternal.js~AudioContext",
+    "access": null,
+    "description": "",
+    "lineNumber": 34,
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 128,
+    "kind": "testFile",
+    "name": "test/authorization.test.js",
+    "content": "/* eslint-env mocha */\n\nimport { sqoopClient } from './index'\n\n// all TODO\n\nsuite('authorization', () => {\n  /**\n   /v1/authorization/roles/create - [POST] - Create Role\n   /v1/authorization/role/[role-name] - [DELETE] - Delete Role\n   /v1/authorization/roles?principal_type=[principal-type]&principal_name=[principal-name] - [GET] Get all Roles by Principal\n   /v1/authorization/principals?role_name=[rname] - [GET] Get all Principals by Role\n\n   /v1/authorization/roles/grant - [PUT] - Grant a Role to a Principal\n   /v1/authorization/roles/revoke - [PUT] - Revoke a Role from a Principal\n   /v1/authorization/privileges/grant - [PUT] - Grant a Privilege to a Principal\n   /v1/authorization/privileges/revoke - [PUT] - Revoke a Privilege to a Principal\n\n   /v1/authorization/privilieges?principal_type=[principal-type]&principal_name=[principal-name]&resource_type=[resource-type]&resource_name=[resource-name] - [GET] Get all Roles by Principal (and Resource)\n   */\n\n  test.skip('createRole', () => {\n    sqoopClient.createRole()\n  })\n\n  test.skip('getRoleAll', () => {\n    sqoopClient.getRoleAll()\n  })\n\n  test.skip('deleteRole', () => {\n    sqoopClient.deleteRole()\n  })\n\n  test.skip('getRoleByPrincipal', () => {\n    sqoopClient.getRoleByPrincipal()\n  })\n\n  test.skip('getPrincipalByRole', () => {\n    sqoopClient.getPrincipalByRole()\n  })\n})\n",
+    "static": true,
+    "longname": "test/authorization.test.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 129,
+    "kind": "testDescribe",
+    "name": "suite0",
+    "testId": 0,
+    "memberof": "test/authorization.test.js",
+    "testDepth": 0,
+    "static": true,
+    "longname": "test/authorization.test.js~suite0",
+    "access": null,
+    "description": "authorization",
+    "lineNumber": 7
+  },
+  {
+    "__docId__": 130,
+    "kind": "testFile",
+    "name": "test/connector.test.js",
+    "content": "/* eslint-env mocha */\n\nimport { expect } from 'chai'\nimport _ from 'lodash'\n\nimport { sqoopClient } from './index'\n\nsuite('connector', () => {\n  test('getConnectorAll', async () => {\n    const data = await sqoopClient.getConnectorAll()\n    expect(data.connectors.length).to.equal(7)\n  })\n\n  test('getConnectorByConnectorName', async () => {\n    const connectorName = 'generic-jdbc-connector'\n    const data = await sqoopClient.getConnectorByConnectorName(connectorName)\n    expect(_.get(data, 'connectors[0].name')).to.equal('generic-jdbc-connector')\n  })\n})\n",
+    "static": true,
+    "longname": "test/connector.test.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 131,
+    "kind": "testDescribe",
+    "name": "suite1",
+    "testId": 1,
+    "memberof": "test/connector.test.js",
+    "testDepth": 0,
+    "static": true,
+    "longname": "test/connector.test.js~suite1",
+    "access": null,
+    "description": "connector",
+    "lineNumber": 8
+  },
+  {
+    "__docId__": 132,
+    "kind": "testIt",
+    "name": "test2",
+    "testId": 2,
+    "memberof": "test/connector.test.js~suite1",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/connector.test.js~suite1.test2",
+    "access": null,
+    "description": "getConnectorAll",
+    "lineNumber": 9
+  },
+  {
+    "__docId__": 133,
+    "kind": "testIt",
+    "name": "test3",
+    "testId": 3,
+    "memberof": "test/connector.test.js~suite1",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/connector.test.js~suite1.test3",
+    "access": null,
+    "description": "getConnectorByConnectorName",
+    "lineNumber": 14
+  },
+  {
+    "__docId__": 134,
+    "kind": "testFile",
+    "name": "test/driver.test.js",
+    "content": "/* eslint-env mocha */\n\nimport { expect } from 'chai'\nimport _ from 'lodash'\n\nimport { sqoopClient } from './index'\n\nsuite('driver', () => {\n  test('getDriver', async () => {\n    const data = await sqoopClient.getDriver()\n    expect(data.version).to.equal('1')\n    expect(_.get(data, ['all-config-resources', 'jarConfig.label'])).to.equal('Classpath configuration')\n  })\n})\n",
+    "static": true,
+    "longname": "test/driver.test.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 135,
+    "kind": "testDescribe",
+    "name": "suite4",
+    "testId": 4,
+    "memberof": "test/driver.test.js",
+    "testDepth": 0,
+    "static": true,
+    "longname": "test/driver.test.js~suite4",
+    "access": null,
+    "description": "driver",
+    "lineNumber": 8
+  },
+  {
+    "__docId__": 136,
+    "kind": "testIt",
+    "name": "test5",
+    "testId": 5,
+    "memberof": "test/driver.test.js~suite4",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/driver.test.js~suite4.test5",
+    "access": null,
+    "description": "getDriver",
+    "lineNumber": 9
+  },
+  {
+    "__docId__": 137,
+    "kind": "testFile",
+    "name": "test/job.test.js",
+    "content": "/* eslint-env mocha */\n\nimport { expect } from 'chai'\nimport _ from 'lodash'\nimport faker from 'faker'\n\nimport { sqoopClient, generateMysqlConfig, generateHdfsConfig, generateFromMysqlToHdfsConfig } from './index'\n\nsuite('job', () => {\n  let firstJobName\n  let secondJobName\n  let thirdJobName\n  let firstMysqlLinkName\n  let firstHdfsLinkName\n\n  before(async () => {\n    firstMysqlLinkName = faker.name.firstName()\n    const firstMysqlLinkConfig = generateMysqlConfig(firstMysqlLinkName)\n    await sqoopClient.createLink(firstMysqlLinkConfig)\n\n    firstHdfsLinkName = faker.name.firstName()\n    const firstHdfsLinkConfig = generateHdfsConfig(firstHdfsLinkName)\n    await sqoopClient.createLink(firstHdfsLinkConfig)\n\n    firstJobName = faker.name.firstName()\n    secondJobName = faker.name.firstName()\n\n    thirdJobName = faker.name.firstName()\n    const config = generateFromMysqlToHdfsConfig(thirdJobName, firstMysqlLinkName, firstHdfsLinkName)\n    await sqoopClient.createJob(config)\n  })\n\n  test('createJobFromMysqlToJob', async () => {\n    const config = generateFromMysqlToHdfsConfig(firstJobName, firstMysqlLinkName, firstHdfsLinkName)\n    const data = await sqoopClient.createJob(config)\n    expect(data).to.deep.equal({\n      'name': firstJobName,\n      'validation-result': [{}, {}, {}]\n    })\n  })\n\n  test('getJobByJobName', async () => {\n    const data = await sqoopClient.getJobByJobName(firstJobName)\n    expect(_.get(data, 'jobs[0].name')).to.equal(firstJobName)\n  })\n\n  test('getJobByConnectorName', async () => {\n    const data = await sqoopClient.getJobByConnectorName('hdfs-connector')\n    const jobNames = _.map(data.jobs, 'name')\n    expect(firstJobName).to.be.oneOf(jobNames)\n  })\n\n  test('updateJobFromMysqlToJob', async () => {\n    const config = generateFromMysqlToHdfsConfig(secondJobName, firstMysqlLinkName, firstHdfsLinkName)\n    const data = await sqoopClient.updateJobConfig(firstJobName, config)\n    expect(data).to.deep.equal({'validation-result': [{}, {}, {}]})\n  })\n\n  test('getJobAll', async () => {\n    const data = await sqoopClient.getJobAll()\n    const jobNames = _.map(data.jobs, 'name')\n    expect(secondJobName).to.be.oneOf(jobNames)\n  })\n\n  test('updateJobDisable', async () => {\n    await sqoopClient.updateJobDisable(secondJobName)\n    const data = await sqoopClient.getJobByJobName(secondJobName)\n    expect(_.get(data, 'jobs[0].enabled')).to.be.false\n  })\n\n  test('updateJobEnable', async () => {\n    await sqoopClient.updateJobEnable(secondJobName)\n    const data = await sqoopClient.getJobByJobName(secondJobName)\n    expect(_.get(data, 'jobs[0].enabled')).to.be.true\n  })\n\n  test('deleteJob', async () => {\n    const data = await sqoopClient.deleteJob(secondJobName)\n    expect(data).to.be.empty\n  })\n\n  test('jobStatus When not start', async () => {\n    const data = await sqoopClient.jobStatus(thirdJobName)\n    expect(_.get(data, 'submissions[0].job-name')).to.equal(thirdJobName)\n    expect(_.get(data, 'submissions[0].status')).to.equal('NEVER_EXECUTED')\n  })\n\n  // next 4 test is ok for ec2, so remove `skip`.\n  test('startJob', async () => {\n    // const data = await sqoopClient.startJob(thirdJobName)\n    // expect(_.get(data, 'submissions[0].job-name')).to.equal(thirdJobName)\n    // expect(_.get(data, 'submissions[0].status')).to.equal('BOOTING')\n  })\n\n  test('jobStatus When start', async () => {\n    // const data = await sqoopClient.jobStatus(thirdJobName)\n    // expect(_.get(data, 'submissions[0].job-name')).to.equal(thirdJobName)\n    // expect(_.get(data, 'submissions[0].status')).to.equal('BOOTING')\n  })\n\n  test('stopJob', async () => {\n    // const data = await sqoopClient.stopJob(thirdJobName)\n    // expect(_.get(data, 'submissions[0].job-name')).to.equal(thirdJobName)\n    // expect(_.get(data, 'submissions[0].status')).to.equal('FAILED')\n  })\n\n  test('jobStatus When stop', async () => {\n    // const data = await sqoopClient.jobStatus(thirdJobName)\n    // expect(_.get(data, 'submissions[0].job-name')).to.equal(thirdJobName)\n    // expect(_.get(data, 'submissions[0].status')).to.equal('FAILED')\n  })\n})\n",
+    "static": true,
+    "longname": "test/job.test.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 138,
+    "kind": "testDescribe",
+    "name": "suite6",
+    "testId": 6,
+    "memberof": "test/job.test.js",
+    "testDepth": 0,
+    "static": true,
+    "longname": "test/job.test.js~suite6",
+    "access": null,
+    "description": "job",
+    "lineNumber": 9
+  },
+  {
+    "__docId__": 139,
+    "kind": "testIt",
+    "name": "test7",
+    "testId": 7,
+    "memberof": "test/job.test.js~suite6",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/job.test.js~suite6.test7",
+    "access": null,
+    "description": "createJobFromMysqlToJob",
+    "lineNumber": 33
+  },
+  {
+    "__docId__": 140,
+    "kind": "testIt",
+    "name": "test8",
+    "testId": 8,
+    "memberof": "test/job.test.js~suite6",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/job.test.js~suite6.test8",
+    "access": null,
+    "description": "getJobByJobName",
+    "lineNumber": 42
+  },
+  {
+    "__docId__": 141,
+    "kind": "testIt",
+    "name": "test9",
+    "testId": 9,
+    "memberof": "test/job.test.js~suite6",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/job.test.js~suite6.test9",
+    "access": null,
+    "description": "getJobByConnectorName",
+    "lineNumber": 47
+  },
+  {
+    "__docId__": 142,
+    "kind": "testIt",
+    "name": "test10",
+    "testId": 10,
+    "memberof": "test/job.test.js~suite6",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/job.test.js~suite6.test10",
+    "access": null,
+    "description": "updateJobFromMysqlToJob",
+    "lineNumber": 53
+  },
+  {
+    "__docId__": 143,
+    "kind": "testIt",
+    "name": "test11",
+    "testId": 11,
+    "memberof": "test/job.test.js~suite6",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/job.test.js~suite6.test11",
+    "access": null,
+    "description": "getJobAll",
+    "lineNumber": 59
+  },
+  {
+    "__docId__": 144,
+    "kind": "testIt",
+    "name": "test12",
+    "testId": 12,
+    "memberof": "test/job.test.js~suite6",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/job.test.js~suite6.test12",
+    "access": null,
+    "description": "updateJobDisable",
+    "lineNumber": 65
+  },
+  {
+    "__docId__": 145,
+    "kind": "testIt",
+    "name": "test13",
+    "testId": 13,
+    "memberof": "test/job.test.js~suite6",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/job.test.js~suite6.test13",
+    "access": null,
+    "description": "updateJobEnable",
+    "lineNumber": 71
+  },
+  {
+    "__docId__": 146,
+    "kind": "testIt",
+    "name": "test14",
+    "testId": 14,
+    "memberof": "test/job.test.js~suite6",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/job.test.js~suite6.test14",
+    "access": null,
+    "description": "deleteJob",
+    "lineNumber": 77
+  },
+  {
+    "__docId__": 147,
+    "kind": "testIt",
+    "name": "test15",
+    "testId": 15,
+    "memberof": "test/job.test.js~suite6",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/job.test.js~suite6.test15",
+    "access": null,
+    "description": "jobStatus When not start",
+    "lineNumber": 82
+  },
+  {
+    "__docId__": 148,
+    "kind": "testIt",
+    "name": "test16",
+    "testId": 16,
+    "memberof": "test/job.test.js~suite6",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/job.test.js~suite6.test16",
+    "access": null,
+    "description": "startJob",
+    "lineNumber": 89
+  },
+  {
+    "__docId__": 149,
+    "kind": "testIt",
+    "name": "test17",
+    "testId": 17,
+    "memberof": "test/job.test.js~suite6",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/job.test.js~suite6.test17",
+    "access": null,
+    "description": "jobStatus When start",
+    "lineNumber": 95
+  },
+  {
+    "__docId__": 150,
+    "kind": "testIt",
+    "name": "test18",
+    "testId": 18,
+    "memberof": "test/job.test.js~suite6",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/job.test.js~suite6.test18",
+    "access": null,
+    "description": "stopJob",
+    "lineNumber": 101
+  },
+  {
+    "__docId__": 151,
+    "kind": "testIt",
+    "name": "test19",
+    "testId": 19,
+    "memberof": "test/job.test.js~suite6",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/job.test.js~suite6.test19",
+    "access": null,
+    "description": "jobStatus When stop",
+    "lineNumber": 107
+  },
+  {
+    "__docId__": 152,
+    "kind": "testFile",
+    "name": "test/link.test.js",
+    "content": "/* eslint-env mocha */\n\nimport { expect } from 'chai'\nimport _ from 'lodash'\nimport faker from 'faker'\n\nimport { sqoopClient, generateMysqlConfig, generateHdfsConfig } from './index'\n\nsuite('link', () => {\n  let firstMysqlLinkName\n  let secondMysqlLinkName\n  let firstHdfsLinkName\n\n  before(() => {\n    firstMysqlLinkName = faker.name.findName()\n    secondMysqlLinkName = faker.name.findName()\n    firstHdfsLinkName = faker.name.findName()\n  })\n\n  test('createLinkForMysql', async () => {\n    const config = generateMysqlConfig(firstMysqlLinkName)\n    const data = await sqoopClient.createLink(config)\n    expect(data.name).to.equal(firstMysqlLinkName)\n    expect(_.get(data, 'validation-result[0]')).to.be.empty\n  })\n\n  test('createLinkForHdfs', async () => {\n    const config = generateHdfsConfig(firstHdfsLinkName)\n    const data = await sqoopClient.createLink(config)\n    expect(data.name).to.equal(firstHdfsLinkName)\n    expect(_.get(data, 'validation-result[0]')).to.be.empty\n  })\n\n  test('updateLinkForMysql and getLinkByLinkName', async () => {\n    const config = generateMysqlConfig(secondMysqlLinkName)\n    const updateData = await sqoopClient.updateLinkConfig(firstMysqlLinkName, config)\n    expect(_.get(updateData, 'validation-result[0]')).to.be.empty\n    const data = await sqoopClient.getLinkByLinkName(secondMysqlLinkName)\n    expect(_.get(data, 'links[0].name')).to.equal(secondMysqlLinkName)\n  })\n\n  test('getLinkByConnectorName', async () => {\n    const connectorName = 'generic-jdbc-connector'\n    const data = await sqoopClient.getLinkByConnectorName(connectorName)\n    const linkNames = _.map(data.links, 'name')\n    expect(secondMysqlLinkName).to.be.oneOf(linkNames)\n  })\n\n  test('updateLinkDisable', async () => {\n    await sqoopClient.updateLinkDisable(secondMysqlLinkName)\n    const data = await sqoopClient.getLinkByLinkName(secondMysqlLinkName)\n    expect(_.get(data, 'links[0].enabled')).to.be.false\n  })\n\n  test('updateLinkEnable', async () => {\n    await sqoopClient.updateLinkEnable(secondMysqlLinkName)\n    const data = await sqoopClient.getLinkByLinkName(secondMysqlLinkName)\n    expect(_.get(data, 'links[0].enabled')).to.be.true\n  })\n\n  test('getLinkAll', async () => {\n    const data = await sqoopClient.getLinkAll()\n    const linkNames = _.map(data.links, 'name')\n    expect(firstHdfsLinkName).to.be.oneOf(linkNames)\n    expect(secondMysqlLinkName).to.be.oneOf(linkNames)\n  })\n\n  test('deleteLink', async () => {\n    const hdfsData = await sqoopClient.deleteLink(firstHdfsLinkName)\n    expect(hdfsData).to.be.empty\n    const mysqlData = await sqoopClient.deleteLink(secondMysqlLinkName)\n    expect(mysqlData).to.be.empty\n  })\n})\n",
+    "static": true,
+    "longname": "test/link.test.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 153,
+    "kind": "testDescribe",
+    "name": "suite20",
+    "testId": 20,
+    "memberof": "test/link.test.js",
+    "testDepth": 0,
+    "static": true,
+    "longname": "test/link.test.js~suite20",
+    "access": null,
+    "description": "link",
+    "lineNumber": 9
+  },
+  {
+    "__docId__": 154,
+    "kind": "testIt",
+    "name": "test21",
+    "testId": 21,
+    "memberof": "test/link.test.js~suite20",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/link.test.js~suite20.test21",
+    "access": null,
+    "description": "createLinkForMysql",
+    "lineNumber": 20
+  },
+  {
+    "__docId__": 155,
+    "kind": "testIt",
+    "name": "test22",
+    "testId": 22,
+    "memberof": "test/link.test.js~suite20",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/link.test.js~suite20.test22",
+    "access": null,
+    "description": "createLinkForHdfs",
+    "lineNumber": 27
+  },
+  {
+    "__docId__": 156,
+    "kind": "testIt",
+    "name": "test23",
+    "testId": 23,
+    "memberof": "test/link.test.js~suite20",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/link.test.js~suite20.test23",
+    "access": null,
+    "description": "updateLinkForMysql and getLinkByLinkName",
+    "lineNumber": 34
+  },
+  {
+    "__docId__": 157,
+    "kind": "testIt",
+    "name": "test24",
+    "testId": 24,
+    "memberof": "test/link.test.js~suite20",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/link.test.js~suite20.test24",
+    "access": null,
+    "description": "getLinkByConnectorName",
+    "lineNumber": 42
+  },
+  {
+    "__docId__": 158,
+    "kind": "testIt",
+    "name": "test25",
+    "testId": 25,
+    "memberof": "test/link.test.js~suite20",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/link.test.js~suite20.test25",
+    "access": null,
+    "description": "updateLinkDisable",
+    "lineNumber": 49
+  },
+  {
+    "__docId__": 159,
+    "kind": "testIt",
+    "name": "test26",
+    "testId": 26,
+    "memberof": "test/link.test.js~suite20",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/link.test.js~suite20.test26",
+    "access": null,
+    "description": "updateLinkEnable",
+    "lineNumber": 55
+  },
+  {
+    "__docId__": 160,
+    "kind": "testIt",
+    "name": "test27",
+    "testId": 27,
+    "memberof": "test/link.test.js~suite20",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/link.test.js~suite20.test27",
+    "access": null,
+    "description": "getLinkAll",
+    "lineNumber": 61
+  },
+  {
+    "__docId__": 161,
+    "kind": "testIt",
+    "name": "test28",
+    "testId": 28,
+    "memberof": "test/link.test.js~suite20",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/link.test.js~suite20.test28",
+    "access": null,
+    "description": "deleteLink",
+    "lineNumber": 68
+  },
+  {
+    "__docId__": 162,
+    "kind": "testFile",
+    "name": "test/submission.test.js",
+    "content": "/* eslint-env mocha */\n\nimport { sqoopClient } from './index'\n\nsuite('submission', () => {\n  test.skip('getSubmissionAll', () => {\n    sqoopClient.getSubmissionAll()\n  })\n\n  test.skip('getSubmissionByJobName', () => {\n    sqoopClient.getSubmissionByJobName()\n  })\n})\n",
+    "static": true,
+    "longname": "test/submission.test.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 163,
+    "kind": "testDescribe",
+    "name": "suite29",
+    "testId": 29,
+    "memberof": "test/submission.test.js",
+    "testDepth": 0,
+    "static": true,
+    "longname": "test/submission.test.js~suite29",
+    "access": null,
+    "description": "submission",
+    "lineNumber": 5
+  }
+]
