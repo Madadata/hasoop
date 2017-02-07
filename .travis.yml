@@ -8,8 +8,6 @@ language: node_js
 node_js:
   - "node"
   - "6"
-  - "5"
-  - "4"
 
 before_install:
   - docker run --name test-mysql -e MYSQL_ROOT_PASSWORD=1234 -d mysql
