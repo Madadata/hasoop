@@ -6,6 +6,9 @@ import _ from 'lodash'
 
 import { linkType } from './index'
 
+/**
+ * @ignore
+ */
 function setCreateLinkRequestMainBody (linkName, connectorName) {
   return {
     'id': -1,
@@ -18,6 +21,10 @@ function setCreateLinkRequestMainBody (linkName, connectorName) {
     'update-date': Date.now()
   }
 }
+
+/**
+ * @ignore
+ */
 function setCreateLinkRequestMysqlBody (jdbcDriver, connectionString, fetchSize, identifierEnclose, linkConfig) {
   return {
     'link-config-values': {
@@ -114,6 +121,9 @@ function setCreateLinkRequestMysqlBody (jdbcDriver, connectionString, fetchSize,
   }
 }
 
+/**
+ * @ignore
+ */
 function setCreateLinkRequestHdfsBody (linkConfig) {
   const body = {
     'link-config-values': {
@@ -166,6 +176,9 @@ function setCreateLinkRequestHdfsBody (linkConfig) {
   return body
 }
 
+/**
+ * @ignore
+ */
 function setCreateMysqlLinkRequestBody (linkConfig) {
   const fetchSize = linkConfig.fetchSize || 1000
   const identifierEnclose = linkConfig.identifierEnclose || '`'
@@ -178,6 +191,9 @@ function setCreateMysqlLinkRequestBody (linkConfig) {
   return {'links': [{...mainBody, ...mysqlBody}]}
 }
 
+/**
+ * @ignore
+ */
 function setCreateHdfsLinkRequestBody (linkConfig) {
   const connectorName = 'hdfs-connector'
   const mainBody = setCreateLinkRequestMainBody(linkConfig.linkName, connectorName)
@@ -189,6 +205,9 @@ function setCreateHdfsLinkRequestBody (linkConfig) {
   return createHdfsLinkBody
 }
 
+/**
+ * @ignore
+ */
 export function setCreateLinkRequestBody (linkConfig) {
   if (linkConfig.linkType === linkType.mysql) {
     return setCreateMysqlLinkRequestBody(linkConfig)
@@ -199,6 +218,9 @@ export function setCreateLinkRequestBody (linkConfig) {
   }
 }
 
+/**
+ * @ignore
+ */
 export function setUpdateLinkRequestBody (linkConfig) {
   return setCreateLinkRequestBody(linkConfig)
 }
