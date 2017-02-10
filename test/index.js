@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 
-import Hasoop, { version, linkType, expectSqoopHeaders } from '../src/index'
+import Hasoop, { version, linkType, expectSqoopHeaders, splitJobConfig } from '../src/index'
 
 const sqoopHost = process.env.SQOOP_HOST
 
@@ -30,7 +30,7 @@ function generateHdfsConfig (linkName) {
   }
 }
 
-function generateFromMysqlToHdfsConfig (jobName, fromLinkName, toLinkName) {
+function generateFromMysqlToHdfsCreateConfig (jobName, fromLinkName, toLinkName) {
   return {
     'jobName': jobName,
     'fromLinkName': fromLinkName,
@@ -47,11 +47,23 @@ function generateFromMysqlToHdfsConfig (jobName, fromLinkName, toLinkName) {
   }
 }
 
+function generateFromMysqlToHdfsUpdateConfig (jobName, fromLinkName, toLinkName) {
+  return {
+    'jobConfig': {
+      // for mysql
+      'schemaName': 'harry',
+      'tableName': 'mysql'
+    }
+  }
+}
+
 export {
   sqoopClient,
   version,
   expectSqoopHeaders,
   generateMysqlConfig,
   generateHdfsConfig,
-  generateFromMysqlToHdfsConfig
+  splitJobConfig,
+  generateFromMysqlToHdfsCreateConfig,
+  generateFromMysqlToHdfsUpdateConfig
 }
