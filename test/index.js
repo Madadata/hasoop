@@ -6,7 +6,7 @@ const sqoopHost = process.env.SQOOP_HOST
 
 const sqoopClient = new Hasoop({
   'userName': 'Developer',
-  'host': sqoopHost,
+  'host': 'localhost',
   'port': 12000,
   'webapp': 'sqoop'
 })
