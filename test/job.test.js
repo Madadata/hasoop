@@ -3,11 +3,10 @@
 import _ from 'lodash'
 import faker from 'faker'
 import { expect } from 'chai'
-import { sqoopClient, generateMysqlConfig, generateHdfsConfig, generateFromMysqlToHdfsConfig, expectSqoopHeaders } from './index'
+import { sqoopClient, generateMysqlConfig, generateHdfsConfig, generateFromMysqlToHdfsCreateConfig, generateFromMysqlToHdfsUpdateConfig, expectSqoopHeaders, splitJobConfig } from './index'
 
 suite('job', () => {
   let firstJobName
-  let secondJobName
   let thirdJobName
   let firstMysqlLinkName
   let firstHdfsLinkName
@@ -22,15 +21,14 @@ suite('job', () => {
     await sqoopClient.createLink(firstHdfsLinkConfig)
 
     firstJobName = faker.name.firstName()
-    secondJobName = faker.name.firstName()
 
     thirdJobName = faker.name.firstName()
-    const config = generateFromMysqlToHdfsConfig(thirdJobName, firstMysqlLinkName, firstHdfsLinkName)
+    const config = generateFromMysqlToHdfsCreateConfig(thirdJobName, firstMysqlLinkName, firstHdfsLinkName)
     await sqoopClient.createJob(config)
   })
 
   test('createJobFromMysqlToJob', async () => {
-    const config = generateFromMysqlToHdfsConfig(firstJobName, firstMysqlLinkName, firstHdfsLinkName)
+    const config = generateFromMysqlToHdfsCreateConfig(firstJobName, firstMysqlLinkName, firstHdfsLinkName)
     const res = await sqoopClient.createJob(config)
     const json = await res.json()
     expectSqoopHeaders(res)
@@ -56,12 +54,16 @@ suite('job', () => {
   })
 
   test('updateJobFromMysqlToJob', async () => {
-    const config = generateFromMysqlToHdfsConfig(secondJobName, firstMysqlLinkName, firstHdfsLinkName)
-    const res = await sqoopClient.updateJobConfig(firstJobName, config)
-    const json = await res.json()
-
-    expectSqoopHeaders(res)
-    expect(json).to.deep.equal({'validation-result': [{}, {}, {}]})
+    const config = generateFromMysqlToHdfsUpdateConfig()
+    const updateJobRes = await sqoopClient.updateJobConfig(firstJobName, config)
+    const updateJobResJson = await updateJobRes.json()
+    expectSqoopHeaders(updateJobRes)
+    expect(updateJobResJson).to.deep.equal({'validation-result': [{}, {}, {}]})
+    const getJobRes = await sqoopClient.getJobByJobName(firstJobName)
+    const getJobResJson = await getJobRes.json()
+    const getJobResJsonConfig = splitJobConfig(getJobResJson)
+    expectSqoopHeaders(getJobRes)
+    expect(getJobResJsonConfig.fromTableName).to.equal(config.jobConfig.tableName)
   })
 
   test('getJobAll', async () => {
@@ -69,27 +71,27 @@ suite('job', () => {
     const json = await res.json()
     const jobNames = _.map(json.jobs, 'name')
     expectSqoopHeaders(res)
-    expect(secondJobName).to.be.oneOf(jobNames)
+    expect(firstJobName).to.be.oneOf(jobNames)
   })
 
   test('updateJobDisable', async () => {
-    await sqoopClient.updateJobDisable(secondJobName)
-    const res = await sqoopClient.getJobByJobName(secondJobName)
+    await sqoopClient.updateJobDisable(firstJobName)
+    const res = await sqoopClient.getJobByJobName(firstJobName)
     const json = await res.json()
     expectSqoopHeaders(res)
     expect(_.get(json, 'jobs[0].enabled')).to.be.false
   })
 
   test('updateJobEnable', async () => {
-    await sqoopClient.updateJobEnable(secondJobName)
-    const res = await sqoopClient.getJobByJobName(secondJobName)
+    await sqoopClient.updateJobEnable(firstJobName)
+    const res = await sqoopClient.getJobByJobName(firstJobName)
     const json = await res.json()
     expectSqoopHeaders(res)
     expect(_.get(json, 'jobs[0].enabled')).to.be.true
   })
 
   test('deleteJob', async () => {
-    const res = await sqoopClient.deleteJob(secondJobName)
+    const res = await sqoopClient.deleteJob(firstJobName)
     const json = await res.json()
     expectSqoopHeaders(res)
     expect(json).to.be.empty

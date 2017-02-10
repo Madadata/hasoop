@@ -270,9 +270,17 @@ export default class Hasoop {
    */
   async updateJobConfig (oldJobName, config) {
     const oldJobConfig = splitJobConfig(await this.launchRequest(hasoopMethod.getJobByJobName, oldJobName))
-    const fromLinkInfo = await this.launchRequest(hasoopMethod.getLinkByLinkName, config['fromLinkName'])
-    const toLinkInfo = await this.launchRequest(hasoopMethod.getLinkByLinkName, config['toLinkName'])
-    const body = setUpdateJobRequestBody(config.jobName, config.jobConfig, fromLinkInfo, toLinkInfo, oldJobConfig.topId)
+    const updateJobConfig = {
+      schemaName: config.jobConfig.schemaName || oldJobConfig.fromSchemaName,
+      tableName: config.jobConfig.tableName || oldJobConfig.fromTableName,
+      outputDirectory: config.jobConfig.outputDirectory || oldJobConfig.toOutputDirectory
+    }
+    const jobName = config.jobName || oldJobConfig.topName
+    const fromLinkName = config.fromLinkName || oldJobConfig.topFromLinkName
+    const toLinkName = config.toLinkName || oldJobConfig.topToLinkName
+    const fromLinkInfo = await this.launchRequest(hasoopMethod.getLinkByLinkName, fromLinkName)
+    const toLinkInfo = await this.launchRequest(hasoopMethod.getLinkByLinkName, toLinkName)
+    const body = setUpdateJobRequestBody(jobName, updateJobConfig, fromLinkInfo, toLinkInfo, oldJobConfig.topId)
     const url = this.formatUrl([jobUri], oldJobName)
     return sendPutRequest(url, JSON.stringify(body))
   }
