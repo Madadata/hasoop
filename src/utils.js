@@ -9,10 +9,16 @@ export function expectSqoopHeaders (res) {
   expect(res.headers.get('sqoop-error-message')).to.equal('OK')
 }
 
+/**
+ * @ignore
+ */
 function splitTopConfig (config) {
   return _.omitBy(config, _.isObject)
 }
 
+/**
+ * @ignore
+ */
 function splitInputsConfig (configs) {
   const inputConfig = {}
   _.map(configs, (config) => {
@@ -24,6 +30,12 @@ function splitInputsConfig (configs) {
   return inputConfig
 }
 
+/**
+ * split link config.
+ *
+ * @param linkInfo
+ * @returns {{}}
+ */
 export function splitLinkConfig (linkInfo) {
   const topConfig = splitTopConfig(_.get(linkInfo, 'links[0]'))
   const otherConfig = splitInputsConfig(_.get(linkInfo, 'links[0].link-config-values.configs'))
@@ -35,6 +47,12 @@ export function splitLinkConfig (linkInfo) {
   return linkConfig
 }
 
+/**
+ * split job config.
+ *
+ * @param jobInfo
+ * @returns {{}}
+ */
 export function splitJobConfig (jobInfo) {
   const topConfig = splitTopConfig(_.get(jobInfo, 'jobs[0]'))
   const fromLinkConfig = splitInputsConfig(_.get(jobInfo, 'jobs[0].from-config-values.configs'))
