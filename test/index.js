@@ -1,16 +1,15 @@
 /* eslint-env mocha */
 
-import Hasoop, { version, linkType } from '../src/index'
+import Hasoop, { version, linkType, expectSqoopHeaders } from '../src/index'
 
-const config = {
+const sqoopHost = process.env.SQOOP_HOST
+
+const sqoopClient = new Hasoop({
   'userName': 'Developer',
-  'host': 'localhost',
+  'host': sqoopHost,
   'port': 12000,
   'webapp': 'sqoop'
-}
-const sqoopClient = new Hasoop(config)
-
-const SQOOPHOST = process.env.SQOOPHOST
+})
 
 function generateMysqlConfig (linkName) {
   return {
@@ -27,7 +26,7 @@ function generateHdfsConfig (linkName) {
   return {
     'linkName': linkName,
     'linkType': linkType.hdfs,
-    'uri': `hdfs://${SQOOPHOST}:9000`
+    'uri': `hdfs://${sqoopHost}:9000`
   }
 }
 
@@ -43,7 +42,7 @@ function generateFromMysqlToHdfsConfig (jobName, fromLinkName, toLinkName) {
       // 'partitionColumn':'id' TODO
 
       // for hdfs
-      'outputDirectory': `hdfs://${SQOOPHOST}:9000/data`
+      'outputDirectory': `hdfs://${sqoopHost}:9000/data`
     }
   }
 }
@@ -51,6 +50,7 @@ function generateFromMysqlToHdfsConfig (jobName, fromLinkName, toLinkName) {
 export {
   sqoopClient,
   version,
+  expectSqoopHeaders,
   generateMysqlConfig,
   generateHdfsConfig,
   generateFromMysqlToHdfsConfig

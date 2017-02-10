@@ -2,6 +2,12 @@
  * Created by Chyroc on 17/1/15.
  */
 import _ from 'lodash'
+import { expect } from 'chai'
+
+export function expectSqoopHeaders (res) {
+  expect(res.headers.get('sqoop-error-code')).to.equal('1000')
+  expect(res.headers.get('sqoop-error-message')).to.equal('OK')
+}
 
 function splitTopConfig (config) {
   return _.omitBy(config, _.isObject)

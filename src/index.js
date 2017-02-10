@@ -55,6 +55,36 @@ const submissionsUri = `${version}/submissions`
 /**
  * Hasoop client, get your own instance by creating an instance.
  */
+export const HASOOP_METHODS = keyMirror({
+  getVersion: null,
+  getDriver: null,
+  getConnectorAll: null,
+  getConnectorByConnectorName: null,
+  getLinkAll: null,
+  getLinkByConnectorName: null,
+  getLinkByLinkName: null,
+  createLink: null,
+  updateLinkConfig: null,
+  updateLinkEnable: null,
+  updateLinkDisable: null,
+  deleteLink: null,
+  deleteLinkAll: null,
+  getJobAll: null,
+  getJobByJobName: null,
+  getJobByConnectorName: null,
+  createJob: null,
+  updateJobConfig: null,
+  updateJobEnable: null,
+  updateJobDisable: null,
+  deleteJob: null,
+  deleteJobAll: null,
+  startJob: null,
+  stopJob: null,
+  jobStatus: null,
+  getSubmissionAll: null,
+  getSubmissionByJobName: null
+})
+
 export default class Hasoop {
   constructor (config) {
     this.userName = config.userName
@@ -80,6 +110,19 @@ export default class Hasoop {
       pathname: urlPath
     }
     return url.format(urlObj)
+  }
+
+  async doMethod (methodName, ...params) {
+    if (!Object.keys(HASOOP_METHODS).includes(methodName)) {
+      throw Error(`hasoop method ${methodName} is not supported`)
+    }
+    const res = await this[methodName](...params)
+    if (res.headers.get('sqoop-error-code') === '1000' && res.headers.get('sqoop-error-message') === 'OK') {
+      return await res.json()
+    } else {
+      const errorMessage = res.headers.get('sqoop-internal-error-message')
+      throw new Error(`Hasoop error of ${errorMessage}`)
+    }
   }
 
   /** version */
@@ -149,7 +192,7 @@ export default class Hasoop {
   }
 
   async deleteLinkAll () {
-    const data = await this.getLinkAll()
+    const data = await this.doMethod(HASOOP_METHODS.getLinkAll)
     const deleteList = data.links.map(link => this.deleteLink(link.name))
     return await Promise.all(deleteList)
   }
@@ -175,17 +218,17 @@ export default class Hasoop {
   }
 
   async createJob (config) {
-    const fromLinkInfo = await this.getLinkByLinkName(config['fromLinkName'])
-    const toLinkInfo = await this.getLinkByLinkName(config['toLinkName'])
+    const fromLinkInfo = await this.doMethod(HASOOP_METHODS.getLinkByLinkName, config['fromLinkName'])
+    const toLinkInfo = await this.doMethod(HASOOP_METHODS.getLinkByLinkName, config['toLinkName'])
     const body = setCreateJobRequestBody(config.jobName, config.jobConfig, fromLinkInfo, toLinkInfo)
     const url = this.formatUrl([jobUri])
     return sendPostRequest(url, JSON.stringify(body))
   }
 
   async updateJobConfig (oldJobName, config) {
-    const oldJobConfig = splitJobConfig(await this.getJobByJobName(oldJobName))
-    const fromLinkInfo = await this.getLinkByLinkName(config['fromLinkName'])
-    const toLinkInfo = await this.getLinkByLinkName(config['toLinkName'])
+    const oldJobConfig = splitJobConfig(await this.doMethod(HASOOP_METHODS.getJobByJobName, oldJobName))
+    const fromLinkInfo = await this.doMethod(HASOOP_METHODS.getLinkByLinkName, config['fromLinkName'])
+    const toLinkInfo = await this.doMethod(HASOOP_METHODS.getLinkByLinkName, config['toLinkName'])
     const body = setUpdateJobRequestBody(config.jobName, config.jobConfig, fromLinkInfo, toLinkInfo, oldJobConfig.topId)
     const url = this.formatUrl([jobUri], oldJobName)
     return sendPutRequest(url, JSON.stringify(body))
@@ -207,7 +250,7 @@ export default class Hasoop {
   }
 
   async deleteJobAll () {
-    const data = await this.getJobAll()
+    const data = await this.doMethod(HASOOP_METHODS.getJobAll)
     const deleteList = data.jobs.map(job => this.deleteJob(job.name))
     return await Promise.all(deleteList)
   }
