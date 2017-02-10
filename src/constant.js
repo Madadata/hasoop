@@ -1,4 +1,4 @@
-import keyMirror from 'keyMirror'
+import keyMirror from 'keymirror'
 
 /**
  * type of all connectors, currently supporting generic (databases) and HDFS.
