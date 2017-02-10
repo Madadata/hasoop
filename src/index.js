@@ -206,7 +206,7 @@ export default class Hasoop {
    * @returns {*}
    */
   async deleteLinkAll () {
-    const data = await this.doMethod(hasoopMethod.getLinkAll)
+    const data = await this.launchRequest(hasoopMethod.getLinkAll)
     const deleteList = data.links.map(link => this.deleteLink(link.name))
     return await Promise.all(deleteList)
   }
@@ -254,8 +254,8 @@ export default class Hasoop {
    * @returns {*}
    */
   async createJob (config) {
-    const fromLinkInfo = await this.doMethod(hasoopMethod.getLinkByLinkName, config['fromLinkName'])
-    const toLinkInfo = await this.doMethod(hasoopMethod.getLinkByLinkName, config['toLinkName'])
+    const fromLinkInfo = await this.launchRequest(hasoopMethod.getLinkByLinkName, config['fromLinkName'])
+    const toLinkInfo = await this.launchRequest(hasoopMethod.getLinkByLinkName, config['toLinkName'])
     const body = setCreateJobRequestBody(config.jobName, config.jobConfig, fromLinkInfo, toLinkInfo)
     const url = this.formatUrl([jobUri])
     return sendPostRequest(url, JSON.stringify(body))
@@ -269,9 +269,9 @@ export default class Hasoop {
    * @returns {*}
    */
   async updateJobConfig (oldJobName, config) {
-    const oldJobConfig = splitJobConfig(await this.doMethod(hasoopMethod.getJobByJobName, oldJobName))
-    const fromLinkInfo = await this.doMethod(hasoopMethod.getLinkByLinkName, config['fromLinkName'])
-    const toLinkInfo = await this.doMethod(hasoopMethod.getLinkByLinkName, config['toLinkName'])
+    const oldJobConfig = splitJobConfig(await this.launchRequest(hasoopMethod.getJobByJobName, oldJobName))
+    const fromLinkInfo = await this.launchRequest(hasoopMethod.getLinkByLinkName, config['fromLinkName'])
+    const toLinkInfo = await this.launchRequest(hasoopMethod.getLinkByLinkName, config['toLinkName'])
     const body = setUpdateJobRequestBody(config.jobName, config.jobConfig, fromLinkInfo, toLinkInfo, oldJobConfig.topId)
     const url = this.formatUrl([jobUri], oldJobName)
     return sendPutRequest(url, JSON.stringify(body))
@@ -316,7 +316,7 @@ export default class Hasoop {
    * @returns {*}
    */
   async deleteJobAll () {
-    const data = await this.doMethod(hasoopMethod.getJobAll)
+    const data = await this.launchRequest(hasoopMethod.getJobAll)
     const deleteList = data.jobs.map(job => this.deleteJob(job.name))
     return await Promise.all(deleteList)
   }
