@@ -9,12 +9,7 @@ import fetch from 'isomorphic-fetch'
  */
 function sendRequest (method, url, body = null) {
   return fetch(url, {method: method, body: body})
-    .then(function (res) {
-      return res.json()
-    })
-    .catch(function (err) {
-      console.log(err)
-    })
+    .catch(err => console.log(err))
 }
 
 /**

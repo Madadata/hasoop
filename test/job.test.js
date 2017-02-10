@@ -1,10 +1,9 @@
 /* eslint-env mocha */
 
-import { expect } from 'chai'
 import _ from 'lodash'
 import faker from 'faker'
-
-import { sqoopClient, generateMysqlConfig, generateHdfsConfig, generateFromMysqlToHdfsConfig } from './index'
+import { expect } from 'chai'
+import { sqoopClient, generateMysqlConfig, generateHdfsConfig, generateFromMysqlToHdfsConfig, expectSqoopHeaders } from './index'
 
 suite('job', () => {
   let firstJobName
@@ -32,81 +31,96 @@ suite('job', () => {
 
   test('createJobFromMysqlToJob', async () => {
     const config = generateFromMysqlToHdfsConfig(firstJobName, firstMysqlLinkName, firstHdfsLinkName)
-    const data = await sqoopClient.createJob(config)
-    expect(data).to.deep.equal({
+    const res = await sqoopClient.createJob(config)
+    const json = await res.json()
+    expectSqoopHeaders(res)
+    expect(json).to.deep.equal({
       'name': firstJobName,
       'validation-result': [{}, {}, {}]
     })
   })
 
   test('getJobByJobName', async () => {
-    const data = await sqoopClient.getJobByJobName(firstJobName)
-    expect(_.get(data, 'jobs[0].name')).to.equal(firstJobName)
+    const res = await sqoopClient.getJobByJobName(firstJobName)
+    const json = await res.json()
+    expectSqoopHeaders(res)
+    expect(_.get(json, 'jobs[0].name')).to.equal(firstJobName)
   })
 
   test('getJobByConnectorName', async () => {
-    const data = await sqoopClient.getJobByConnectorName('hdfs-connector')
-    const jobNames = _.map(data.jobs, 'name')
+    const res = await sqoopClient.getJobByConnectorName('hdfs-connector')
+    const json = await res.json()
+    const jobNames = _.map(json.jobs, 'name')
+    expectSqoopHeaders(res)
     expect(firstJobName).to.be.oneOf(jobNames)
   })
 
   test('updateJobFromMysqlToJob', async () => {
     const config = generateFromMysqlToHdfsConfig(secondJobName, firstMysqlLinkName, firstHdfsLinkName)
-    const data = await sqoopClient.updateJobConfig(firstJobName, config)
-    expect(data).to.deep.equal({'validation-result': [{}, {}, {}]})
+    const res = await sqoopClient.updateJobConfig(firstJobName, config)
+    const json = await res.json()
+
+    expectSqoopHeaders(res)
+    expect(json).to.deep.equal({'validation-result': [{}, {}, {}]})
   })
 
   test('getJobAll', async () => {
-    const data = await sqoopClient.getJobAll()
-    const jobNames = _.map(data.jobs, 'name')
+    const res = await sqoopClient.getJobAll()
+    const json = await res.json()
+    const jobNames = _.map(json.jobs, 'name')
+    expectSqoopHeaders(res)
     expect(secondJobName).to.be.oneOf(jobNames)
   })
 
   test('updateJobDisable', async () => {
     await sqoopClient.updateJobDisable(secondJobName)
-    const data = await sqoopClient.getJobByJobName(secondJobName)
-    expect(_.get(data, 'jobs[0].enabled')).to.be.false
+    const res = await sqoopClient.getJobByJobName(secondJobName)
+    const json = await res.json()
+    expectSqoopHeaders(res)
+    expect(_.get(json, 'jobs[0].enabled')).to.be.false
   })
 
   test('updateJobEnable', async () => {
     await sqoopClient.updateJobEnable(secondJobName)
-    const data = await sqoopClient.getJobByJobName(secondJobName)
-    expect(_.get(data, 'jobs[0].enabled')).to.be.true
+    const res = await sqoopClient.getJobByJobName(secondJobName)
+    const json = await res.json()
+    expectSqoopHeaders(res)
+    expect(_.get(json, 'jobs[0].enabled')).to.be.true
   })
 
   test('deleteJob', async () => {
-    const data = await sqoopClient.deleteJob(secondJobName)
-    expect(data).to.be.empty
+    const res = await sqoopClient.deleteJob(secondJobName)
+    const json = await res.json()
+    expectSqoopHeaders(res)
+    expect(json).to.be.empty
   })
 
   test('jobStatus When not start', async () => {
-    const data = await sqoopClient.jobStatus(thirdJobName)
-    expect(_.get(data, 'submissions[0].job-name')).to.equal(thirdJobName)
-    expect(_.get(data, 'submissions[0].status')).to.equal('NEVER_EXECUTED')
+    const res = await sqoopClient.jobStatus(thirdJobName)
+    const json = await res.json()
+    expectSqoopHeaders(res)
+    expect(_.get(json, 'submissions[0].job-name')).to.equal(thirdJobName)
+    expect(_.get(json, 'submissions[0].status')).to.equal('NEVER_EXECUTED')
   })
 
   // next 4 test is ok for ec2, so remove `skip`.
   test('startJob', async () => {
-    // const data = await sqoopClient.startJob(thirdJobName)
-    // expect(_.get(data, 'submissions[0].job-name')).to.equal(thirdJobName)
-    // expect(_.get(data, 'submissions[0].status')).to.equal('BOOTING')
+    // const res = await sqoopClient.startJob(thirdJobName)
+    // expectSqoopHeaders(res)
   })
 
   test('jobStatus When start', async () => {
-    // const data = await sqoopClient.jobStatus(thirdJobName)
-    // expect(_.get(data, 'submissions[0].job-name')).to.equal(thirdJobName)
-    // expect(_.get(data, 'submissions[0].status')).to.equal('BOOTING')
+    // const res = await sqoopClient.jobStatus(thirdJobName)
+    // expectSqoopHeaders(res)
   })
 
   test('stopJob', async () => {
-    // const data = await sqoopClient.stopJob(thirdJobName)
-    // expect(_.get(data, 'submissions[0].job-name')).to.equal(thirdJobName)
-    // expect(_.get(data, 'submissions[0].status')).to.equal('FAILED')
+    // const res = await sqoopClient.stopJob(thirdJobName)
+    // expectSqoopHeaders(res)
   })
 
   test('jobStatus When stop', async () => {
-    // const data = await sqoopClient.jobStatus(thirdJobName)
-    // expect(_.get(data, 'submissions[0].job-name')).to.equal(thirdJobName)
-    // expect(_.get(data, 'submissions[0].status')).to.equal('FAILED')
+    // const res = await sqoopClient.jobStatus(thirdJobName)
+    // expectSqoopHeaders(res)
   })
 })

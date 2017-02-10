@@ -29,7 +29,7 @@
     "postbuild": "npm run esdoc",
     "esdoc": "esdoc",
     "lint": "standard --verbose | snazzy",
-    "test": "npm run pre-test-mysql && SQOOPHOST=$(docker exec -i test-sqoop hostname) mocha",
+    "test": "npm run pre-test-mysql && SQOOP_HOST=$(docker exec -i test-sqoop hostname) mocha",
     "precommit": "npm run lint",
     "prepush": "npm run lint",
     "prepublish": "npm run clean && npm run build && npm run lint",

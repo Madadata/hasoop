@@ -1,54 +1,14 @@
 import url from 'url'
 import _ from 'lodash'
 import path from 'path'
-import keyMirror from 'keymirror'
 import querystring from 'querystring'
-
-import { sendGetRequest, sendPostRequest, sendPutRequest, sendDeleteRequest } from './sendRequest'
-import { setCreateLinkRequestBody, setUpdateLinkRequestBody } from './setLinkOptions'
-import { setCreateJobRequestBody, setUpdateJobRequestBody } from './setJobOptions'
 import { splitJobConfig } from './utils'
-
+import { setCreateJobRequestBody, setUpdateJobRequestBody } from './setJobOptions'
+import { setCreateLinkRequestBody, setUpdateLinkRequestBody } from './setLinkOptions'
+import { sendGetRequest, sendPostRequest, sendPutRequest, sendDeleteRequest } from './sendRequest'
+import { sqoopAction, hasoopMethod } from './constant'
+export * from './constant'
 export * from './utils'
-
-/**
- * type of all connectors, currently supporting generic (databases) and HDFS.
- */
-export const connectorType = keyMirror({
-  generic: null,
-  hdfs: null
-})
-
-/**
- * specific types within generic types.
- */
-export const genericType = keyMirror({
-  mysql: null
-})
-
-/**
- * type of all links, currently supporting mysql and hdfs.
- */
-export const linkType = keyMirror({
-  mysql: null,
-  hdfs: null
-})
-
-/**
- *  * action of sqoop, used in sqoop rest api querySting / params / body.
- */
-const sqoopAction = keyMirror({
-  start: null,
-  stop: null,
-  status: null,
-
-  all: null,
-  jname: null,
-  cname: null,
-
-  enable: null,
-  disable: null
-})
 
 export const version = 'v1'
 const versionUri = 'version'
@@ -94,6 +54,19 @@ export default class Hasoop {
       pathname: urlPath
     }
     return url.format(urlObj)
+  }
+
+  async launchRequest (methodName, ...params) {
+    if (!Object.keys(hasoopMethod).includes(methodName)) {
+      throw Error(`hasoop method ${methodName} is not supported`)
+    }
+    const res = await this[methodName](...params)
+    if (res.headers.get('sqoop-error-code') === '1000' && res.headers.get('sqoop-error-message') === 'OK') {
+      return await res.json()
+    } else {
+      const errorMessage = res.headers.get('sqoop-internal-error-message')
+      throw new Error(`Hasoop error of ${errorMessage}`)
+    }
   }
 
   /**
@@ -233,7 +206,7 @@ export default class Hasoop {
    * @returns {*}
    */
   async deleteLinkAll () {
-    const data = await this.getLinkAll()
+    const data = await this.launchRequest(hasoopMethod.getLinkAll)
     const deleteList = data.links.map(link => this.deleteLink(link.name))
     return await Promise.all(deleteList)
   }
@@ -281,8 +254,8 @@ export default class Hasoop {
    * @returns {*}
    */
   async createJob (config) {
-    const fromLinkInfo = await this.getLinkByLinkName(config['fromLinkName'])
-    const toLinkInfo = await this.getLinkByLinkName(config['toLinkName'])
+    const fromLinkInfo = await this.launchRequest(hasoopMethod.getLinkByLinkName, config['fromLinkName'])
+    const toLinkInfo = await this.launchRequest(hasoopMethod.getLinkByLinkName, config['toLinkName'])
     const body = setCreateJobRequestBody(config.jobName, config.jobConfig, fromLinkInfo, toLinkInfo)
     const url = this.formatUrl([jobUri])
     return sendPostRequest(url, JSON.stringify(body))
@@ -296,9 +269,9 @@ export default class Hasoop {
    * @returns {*}
    */
   async updateJobConfig (oldJobName, config) {
-    const oldJobConfig = splitJobConfig(await this.getJobByJobName(oldJobName))
-    const fromLinkInfo = await this.getLinkByLinkName(config['fromLinkName'])
-    const toLinkInfo = await this.getLinkByLinkName(config['toLinkName'])
+    const oldJobConfig = splitJobConfig(await this.launchRequest(hasoopMethod.getJobByJobName, oldJobName))
+    const fromLinkInfo = await this.launchRequest(hasoopMethod.getLinkByLinkName, config['fromLinkName'])
+    const toLinkInfo = await this.launchRequest(hasoopMethod.getLinkByLinkName, config['toLinkName'])
     const body = setUpdateJobRequestBody(config.jobName, config.jobConfig, fromLinkInfo, toLinkInfo, oldJobConfig.topId)
     const url = this.formatUrl([jobUri], oldJobName)
     return sendPutRequest(url, JSON.stringify(body))
@@ -343,7 +316,7 @@ export default class Hasoop {
    * @returns {*}
    */
   async deleteJobAll () {
-    const data = await this.getJobAll()
+    const data = await this.launchRequest(hasoopMethod.getJobAll)
     const deleteList = data.jobs.map(job => this.deleteJob(job.name))
     return await Promise.all(deleteList)
   }

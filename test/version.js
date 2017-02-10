@@ -1,12 +1,14 @@
 /* eslint-env mocha */
-import { expect } from 'chai'
-import _ from 'lodash'
 
-import { sqoopClient, version } from './index'
+import _ from 'lodash'
+import { expect } from 'chai'
+import { sqoopClient, version, expectSqoopHeaders } from './index'
 
 suite('version', () => {
   test('getVersion', async () => {
-    const data = await sqoopClient.getVersion()
-    expect(_.get(data, 'api-versions[0]')).to.equal(version)
+    const res = await sqoopClient.getVersion()
+    const json = await res.json()
+    expectSqoopHeaders(res)
+    expect(_.get(json, 'api-versions[0]')).to.equal(version)
   })
 })
