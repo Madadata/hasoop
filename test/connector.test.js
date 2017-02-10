@@ -10,6 +10,9 @@ suite('connector', () => {
     const json = await res.json()
     expectSqoopHeaders(res)
     expect(json.connectors.length).to.equal(7)
+    const connectorNames = _.map(json.connectors, 'name')
+    expect('hdfs-connector').to.be.oneOf(connectorNames)
+    expect('generic-jdbc-connector').to.be.oneOf(connectorNames)
   })
 
   test('getConnectorByConnectorName', async () => {
