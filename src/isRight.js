@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import keymirror from 'keymirror'
+import { splitLinkConfig } from './utils'
 
 export const hasoopMethodTypes = keymirror({
   // version
@@ -60,8 +61,11 @@ function getLinkAllDispose (responseJson, responseHeaders) {
 function getLinkByConnectorNameDispose (responseJson, responseHeaders) {
   return {isRight: true, data: responseJson, headers: responseHeaders}
 }
-function getLinkByLinkNameDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+function getLinkByLinkNameDispose (responseJson, responseHeaders, linkName) {
+  const linkConfig = splitLinkConfig(responseJson)
+  // TODO have key 'id', 'enabled', 'connectorName'
+  const isOk = linkConfig.name === linkName
+  return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function createLinkDispose (responseJson, responseHeaders, linkName) {
   const isOk = responseJson === {name: linkName, 'validation-result': [{}]}
@@ -147,59 +151,59 @@ export async function isHasoopRequestRight (methodName, res, ...params) {
   }
   switch (methodName) {
     case hasoopMethodTypes.getVersion:
-      return getVersionDispose(responseJson, responseHeaders)
+      return getVersionDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.getDriver:
-      return getDriverDispose(responseJson, responseHeaders)
+      return getDriverDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.getConnectorAll:
-      return getConnectorAllDispose(responseJson, responseHeaders)
+      return getConnectorAllDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.getConnectorByConnectorName:
       return getConnectorByConnectorNameDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.getLinkAll:
-      return getLinkAllDispose(responseJson, responseHeaders)
+      return getLinkAllDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.getLinkByConnectorName:
-      return getLinkByConnectorNameDispose(responseJson, responseHeaders)
+      return getLinkByConnectorNameDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.getLinkByLinkName:
-      return getLinkByLinkNameDispose(responseJson, responseHeaders)
+      return getLinkByLinkNameDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.createLink:
       return createLinkDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.updateLinkConfig:
-      return updateLinkConfigDispose(responseJson, responseHeaders)
+      return updateLinkConfigDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.updateLinkEnable:
-      return updateLinkEnableDispose(responseJson, responseHeaders)
+      return updateLinkEnableDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.updateLinkDisable:
-      return updateLinkDisableDispose(responseJson, responseHeaders)
+      return updateLinkDisableDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.deleteLink:
-      return deleteLinkDispose(responseJson, responseHeaders)
+      return deleteLinkDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.deleteLinkAll:
-      return deleteLinkAllDispose(responseJson, responseHeaders)
+      return deleteLinkAllDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.getJobAll:
-      return getJobAllDispose(responseJson, responseHeaders)
+      return getJobAllDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.getJobByJobName:
-      return getJobByJobNameDispose(responseJson, responseHeaders)
+      return getJobByJobNameDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.getJobByConnectorName:
-      return getJobByConnectorNameDispose(responseJson, responseHeaders)
+      return getJobByConnectorNameDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.createJob:
-      return createJobDispose(responseJson, responseHeaders)
+      return createJobDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.updateJobConfig:
-      return updateJobConfigDispose(responseJson, responseHeaders)
+      return updateJobConfigDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.updateJobEnable:
-      return updateJobEnableDispose(responseJson, responseHeaders)
+      return updateJobEnableDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.updateJobDisable:
-      return updateJobDisableDispose(responseJson, responseHeaders)
+      return updateJobDisableDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.deleteJob:
-      return deleteJobDispose(responseJson, responseHeaders)
+      return deleteJobDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.deleteJobAll:
-      return deleteJobAllDispose(responseJson, responseHeaders)
+      return deleteJobAllDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.startJob:
-      return startJobDispose(responseJson, responseHeaders)
+      return startJobDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.stopJob:
-      return stopJobDispose(responseJson, responseHeaders)
+      return stopJobDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.jobStatus:
-      return jobStatusDispose(responseJson, responseHeaders)
+      return jobStatusDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.getSubmissionAll:
-      return getSubmissionAllDispose(responseJson, responseHeaders)
+      return getSubmissionAllDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.getSubmissionByJobName:
-      return getSubmissionByJobNameDispose(responseJson, responseHeaders)
+      return getSubmissionByJobNameDispose(responseJson, responseHeaders, ...params)
     default:
       throw new Error(`hasoop method ${methodName} is not supported`)
   }
