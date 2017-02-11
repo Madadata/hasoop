@@ -87,10 +87,14 @@ suite('job', () => {
   })
 
   test('getJobAll', async () => {
-    const res = await sqoopClient.getJobAll()
-    const json = await res.json()
-    const jobNames = _.map(json.jobs, 'name')
-    expectSqoopHeaders(res)
+    const getJobAllResJson = await sqoopClient.getJobAll()
+      .then(getJobAllRes => {
+        expectSqoopHeaders(getJobAllRes)
+        return getJobAllRes.json()
+      })
+    const jobNames = _.map(_.map(getJobAllResJson.jobs, (jobObject) => {
+      return splitJobConfig({jobs: [jobObject]})
+    }), 'topName')
     expect(firstJobName).to.be.oneOf(jobNames)
   })
 
