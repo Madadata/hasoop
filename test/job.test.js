@@ -27,7 +27,7 @@ suite('job', () => {
     await sqoopClient.createJob(config)
   })
 
-  test('createJobFromMysqlToJob', async () => {
+  test('createJobFromMysqlToHdfsJob', async () => {
     const config = generateFromMysqlToHdfsCreateConfig(firstJobName, firstMysqlLinkName, firstHdfsLinkName)
     const createJobResJson = await sqoopClient.createJob(config)
       .then(createJobRes => {
@@ -37,11 +37,24 @@ suite('job', () => {
     expect(createJobResJson).to.deep.equal({ name: firstJobName, 'validation-result': [ {}, {}, {} ] })
   })
 
-  test('getJobByJobName', async () => {
-    const res = await sqoopClient.getJobByJobName(firstJobName)
-    const json = await res.json()
-    expectSqoopHeaders(res)
-    expect(_.get(json, 'jobs[0].name')).to.equal(firstJobName)
+  test('getFromMysqlToHdfsJobByJobName', async () => {
+    const getJobByJobNameResJson = await sqoopClient.getJobByJobName(firstJobName)
+      .then(getJobByJobNameRes => {
+        expectSqoopHeaders(getJobByJobNameRes)
+        return getJobByJobNameRes.json()
+      })
+    const jobConfig = splitJobConfig(getJobByJobNameResJson)
+    expect(jobConfig.topName).to.equal(firstJobName)
+    expect(jobConfig).to.have.all.keys(
+      'topEnabled', 'topUpdateUser', 'topFromLinkName', 'topCreationDate',
+      'topUpdateDate', 'topCreationUser', 'topId', 'topToLinkName', 'topName',
+      'topFromConnectorName', 'topToConnectorName', 'driverNumExtractors',
+      'driverNumLoaders', 'driverExtraJars', 'fromSchemaName', 'fromTableName',
+      'fromSql', 'fromColumnList', 'fromPartitionColumn', 'toOutputDirectory',
+      'fromAllowNullValueInPartitionColumn', 'fromBoundaryQuery',
+      'fromCheckColumn', 'fromLastValue', 'toOverrideNullValue', 'toAppendMode',
+      'toNullValue', 'toOutputFormat', 'toCompression', 'toCustomCompression'
+      )
   })
 
   test('getJobByConnectorName', async () => {
