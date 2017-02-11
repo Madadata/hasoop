@@ -150,13 +150,16 @@ suite('link', () => {
   })
 
   test('deleteLink', async () => {
-    const hdfsRes = await sqoopClient.deleteLink(firstHdfsLinkName)
-    const hdfsResJson = await hdfsRes.json()
-    expectSqoopHeaders(hdfsRes)
-    expect(hdfsResJson).to.be.empty
-    const mysqlRes = await sqoopClient.deleteLink(secondMysqlLinkName)
-    const mysqlResJson = await mysqlRes.json()
-    expectSqoopHeaders(mysqlRes)
-    expect(mysqlResJson).to.be.empty
+    const deleteLinkResJson = await sqoopClient.deleteLink(firstHdfsLinkName)
+      .then(deleteLinkRes => {
+        expectSqoopHeaders(deleteLinkRes)
+        return deleteLinkRes.json()
+      })
+    expect(deleteLinkResJson).to.be.empty
+    const getLinkByLinkNameRes = await sqoopClient.getLinkByLinkName(firstHdfsLinkName)
+    expect(getLinkByLinkNameRes.headers.get('sqoop-error-code')).to.equal('2000')
+    expect(getLinkByLinkNameRes.headers.get('sqoop-error-message')).to.equal('ERROR')
+    expect(getLinkByLinkNameRes.headers.get('sqoop-internal-error-code')).to.equal('SERVER_0006')
+    expect(getLinkByLinkNameRes.headers.get('sqoop-internal-error-message')).to.equal(`SERVER_0006:Entity requested doesn't exist - Invalid link name: ${firstHdfsLinkName} doesn't exist`)
   })
 })
