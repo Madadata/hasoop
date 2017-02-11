@@ -57,7 +57,7 @@ export function splitJobConfig (jobInfo) {
   const fromLinkConfig = splitInputsConfig(_.get(jobInfo, 'jobs[0].from-config-values.configs'))
   const toLinkConfig = splitInputsConfig(_.get(jobInfo, 'jobs[0].to-config-values.configs'))
   const driverConfig = splitInputsConfig(_.get(jobInfo, 'jobs[0].driver-config-values.configs'))
-  return _.map({
+  return _.transform({
     ..._.mapKeys(topConfig, (value, key) => `top_${key}`),
     ..._.mapKeys(driverConfig, (value, key) => `driver_${key}`),
     ..._.mapKeys(fromLinkConfig, (value, key) => `from_${key}`),
@@ -66,10 +66,14 @@ export function splitJobConfig (jobInfo) {
 }
 
 export function splitSubmissionConfig (submissionInfo) {
-  let topConfig = {}
-  _.map({
+  const topConfig = _.transform({
     ...splitTopConfig(_.get(submissionInfo, 'submissions[0]'))
-  }, (value, key) => _.set(topConfig, _.camelCase(key), _.isString(value) ? decodeURIComponent(value) : value))
+  }, (result, value, key) => _.set(result, _.camelCase(key), _.isString(value) ? decodeURIComponent(value) : value), {})
+  console.log({
+    topConfig,
+    fromSchemaConfig: _.get(submissionInfo, 'submissions[0].from-schema'),
+    toSchemaConfig: _.get(submissionInfo, 'submissions[0].to-schema')
+  })
   return {
     topConfig,
     fromSchemaConfig: _.get(submissionInfo, 'submissions[0].from-schema'),
