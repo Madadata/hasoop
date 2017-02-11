@@ -29,13 +29,12 @@ suite('job', () => {
 
   test('createJobFromMysqlToJob', async () => {
     const config = generateFromMysqlToHdfsCreateConfig(firstJobName, firstMysqlLinkName, firstHdfsLinkName)
-    const res = await sqoopClient.createJob(config)
-    const json = await res.json()
-    expectSqoopHeaders(res)
-    expect(json).to.deep.equal({
-      'name': firstJobName,
-      'validation-result': [{}, {}, {}]
-    })
+    const createJobResJson = await sqoopClient.createJob(config)
+      .then(createJobRes => {
+        expectSqoopHeaders(createJobRes)
+        return createJobRes.json()
+      })
+    expect(createJobResJson).to.deep.equal({ name: firstJobName, 'validation-result': [ {}, {}, {} ] })
   })
 
   test('getJobByJobName', async () => {
