@@ -131,10 +131,19 @@ suite('job', () => {
   })
 
   test('deleteJob', async () => {
-    const res = await sqoopClient.deleteJob(firstJobName)
-    const json = await res.json()
-    expectSqoopHeaders(res)
-    expect(json).to.be.empty
+    const deleteJobResJson = await sqoopClient.deleteJob(firstJobName)
+      .then(deleteJobRes => {
+        expectSqoopHeaders(deleteJobRes)
+        return deleteJobRes.json()
+      })
+    expect(deleteJobResJson).to.be.empty
+    const getJobByJobNameResJson = await sqoopClient.getJobByJobName(firstJobName)
+      .then(getJobByJobNameRes => {
+        console.log(getJobByJobNameRes.headers)
+        // expectSqoopHeaders(getJobByJobNameRes)
+        return getJobByJobNameRes.json()
+      })
+    console.log(getJobByJobNameResJson)
   })
 
   test('jobStatus When not start', async () => {
