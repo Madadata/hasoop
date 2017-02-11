@@ -137,13 +137,11 @@ suite('job', () => {
         return deleteJobRes.json()
       })
     expect(deleteJobResJson).to.be.empty
-    const getJobByJobNameResJson = await sqoopClient.getJobByJobName(firstJobName)
-      .then(getJobByJobNameRes => {
-        console.log(getJobByJobNameRes.headers)
-        // expectSqoopHeaders(getJobByJobNameRes)
-        return getJobByJobNameRes.json()
-      })
-    console.log(getJobByJobNameResJson)
+    const getJobByJobNameRes = await sqoopClient.getJobByJobName(firstJobName)
+    expect(getJobByJobNameRes.headers.get('sqoop-error-code')).to.equal('2000')
+    expect(getJobByJobNameRes.headers.get('sqoop-error-message')).to.equal('ERROR')
+    expect(getJobByJobNameRes.headers.get('sqoop-internal-error-code')).to.equal('SERVER_0006')
+    expect(getJobByJobNameRes.headers.get('sqoop-internal-error-message')).to.equal(`SERVER_0006:Entity requested doesn't exist - Job: ${firstJobName} doesn't exist`)
   })
 
   test('jobStatus When not start', async () => {
