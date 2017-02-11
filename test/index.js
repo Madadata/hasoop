@@ -5,7 +5,8 @@ import Hasoop, {
   linkType,
   expectSqoopHeaders,
   splitLinkConfig,
-  splitJobConfig
+  splitJobConfig,
+  splitSubmissionConfig
 } from '../src/index'
 
 const sqoopHost = process.env.SQOOP_HOST
@@ -71,6 +72,7 @@ export {
   generateHdfsConfig,
   splitLinkConfig,
   splitJobConfig,
+  splitSubmissionConfig,
   generateFromMysqlToHdfsCreateConfig,
   generateFromMysqlToHdfsUpdateConfig
 }

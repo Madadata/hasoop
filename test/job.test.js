@@ -3,7 +3,16 @@
 import _ from 'lodash'
 import faker from 'faker'
 import { expect } from 'chai'
-import { sqoopClient, generateMysqlConfig, generateHdfsConfig, generateFromMysqlToHdfsCreateConfig, generateFromMysqlToHdfsUpdateConfig, expectSqoopHeaders, splitJobConfig } from './index'
+import {
+  sqoopClient,
+  generateMysqlConfig,
+  generateHdfsConfig,
+  generateFromMysqlToHdfsCreateConfig,
+  generateFromMysqlToHdfsUpdateConfig,
+  expectSqoopHeaders,
+  splitJobConfig,
+  splitSubmissionConfig
+} from './index'
 
 suite('job', () => {
   let firstJobName
@@ -145,11 +154,14 @@ suite('job', () => {
   })
 
   test('jobStatus When not start', async () => {
-    const res = await sqoopClient.jobStatus(thirdJobName)
-    const json = await res.json()
-    expectSqoopHeaders(res)
-    expect(_.get(json, 'submissions[0].job-name')).to.equal(thirdJobName)
-    expect(_.get(json, 'submissions[0].status')).to.equal('NEVER_EXECUTED')
+    const jobStatusResJson = await sqoopClient.jobStatus(thirdJobName)
+      .then(jobStatusRes => {
+        expectSqoopHeaders(jobStatusRes)
+        return jobStatusRes.json()
+      })
+    const submissionConfig = splitSubmissionConfig(jobStatusResJson)
+    expect(submissionConfig.jobName).to.equal(thirdJobName)
+    expect(submissionConfig.status).to.equal('NEVER_EXECUTED')
   })
 
   // next 4 test is ok for ec2, so remove `skip`.
