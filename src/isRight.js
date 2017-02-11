@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import keymirror from 'keymirror'
 
 export const hasoopMethodTypes = keymirror({
@@ -43,10 +44,14 @@ function getDriverDispose (responseJson, responseHeaders) {
   return {isRight: true, data: responseJson, headers: responseHeaders}
 }
 function getConnectorAllDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+  // TODO generic-jdbc-connector
+  // const connectorNames = _.map(json.connectors, 'name')
+  const isOk = responseJson.connectors.length === 7
+  return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
-function getConnectorByConnectorNameDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+function getConnectorByConnectorNameDispose (responseJson, responseHeaders, connectorName) {
+  const isOk = _.get(responseJson, 'connectors[0].name') === connectorName
+  return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function getLinkAllDispose (responseJson, responseHeaders) {
   return {isRight: true, data: responseJson, headers: responseHeaders}
@@ -127,7 +132,7 @@ const getResponseHeaders = res => [{
   sqoopInternalErrorMessage: res.headers.get('sqoop-internal-error-message') || null
 }]
 
-export async function isHasoopRequestRight (methodName, res) {
+export async function isHasoopRequestRight (methodName, res, ...params) {
   if (!Object.keys(hasoopMethodTypes).includes(methodName)) {
     throw new Error(`hasoop method ${methodName} is not supported`)
   }
@@ -146,7 +151,7 @@ export async function isHasoopRequestRight (methodName, res) {
     case hasoopMethodTypes.getConnectorAll:
       return getConnectorAllDispose(responseJson, responseHeaders)
     case hasoopMethodTypes.getConnectorByConnectorName:
-      return getConnectorByConnectorNameDispose(responseJson, responseHeaders)
+      return getConnectorByConnectorNameDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.getLinkAll:
       return getLinkAllDispose(responseJson, responseHeaders)
     case hasoopMethodTypes.getLinkByConnectorName:
