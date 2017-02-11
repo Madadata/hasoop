@@ -103,22 +103,20 @@ suite('link', () => {
   })
 
   test('updateLinkDisable', async () => {
-    await sqoopClient.updateLinkDisable(secondMysqlLinkName)
-    const json = await sqoopClient.getLinkByLinkName(secondMysqlLinkName)
-      .thrn(res => {
+    const updateLinkDisableJson = await sqoopClient.updateLinkDisable(secondMysqlLinkName)
+      .then(res => {
         expectSqoopHeaders(res)
         return res.json()
       })
-    console.log('json', json)
-    // expect(_.get(json, 'links[0].enabled')).to.be.false
-
-    const getLinkResJson = await sqoopClient.getLinkByLinkName(secondMysqlLinkName)
-      .then(getLinkRes => {
-        expectSqoopHeaders(getLinkRes)
-        return getLinkRes.json()
+    expect(updateLinkDisableJson).to.be.empty
+    const getLinkByLinkNameJson = await sqoopClient.getLinkByLinkName(secondMysqlLinkName)
+      .then(res => {
+        expectSqoopHeaders(res)
+        return res.json()
       })
-
-    console.log('link config', splitLinkConfig(getLinkResJson))
+    const linkConfig = splitLinkConfig(getLinkByLinkNameJson)
+    expect(linkConfig.name).to.equal(secondMysqlLinkName)
+    expect(linkConfig.enabled).to.be.false
   })
 
   test('updateLinkEnable', async () => {
