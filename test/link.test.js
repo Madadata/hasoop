@@ -24,24 +24,30 @@ suite('link', () => {
 
   test('createLinkForMysql', async () => {
     const config = generateMysqlConfig(firstMysqlLinkName)
-    const res = await sqoopClient.createLink(config)
-    const json = await res.json()
-    expectSqoopHeaders(res)
+    const json = await sqoopClient.createLink(config)
+      .then(res => {
+        expectSqoopHeaders(res)
+        return res.json()
+      })
     expect(json).to.deep.equal({'name': firstMysqlLinkName, 'validation-result': [{}]})
   })
 
   test('createLinkForHdfs', async () => {
     const config = generateHdfsConfig(firstHdfsLinkName)
-    const res = await sqoopClient.createLink(config)
-    const json = await res.json()
-    expectSqoopHeaders(res)
+    const json = await sqoopClient.createLink(config)
+      .then(res => {
+        expectSqoopHeaders(res)
+        return res.json()
+      })
     expect(json).to.deep.equal({'name': firstHdfsLinkName, 'validation-result': [{}]})
   })
 
   test('getMyqlLinkByLinkName', async () => {
-    const getLinkRes = await sqoopClient.getLinkByLinkName(firstMysqlLinkName)
-    const getLinkResJson = await getLinkRes.json()
-    expectSqoopHeaders(getLinkRes)
+    const getLinkResJson = await sqoopClient.getLinkByLinkName(firstMysqlLinkName)
+      .then(getLinkRes => {
+        expectSqoopHeaders(getLinkRes)
+        return getLinkRes.json()
+      })
     const linkConfig = splitLinkConfig(getLinkResJson)
     expect(linkConfig.name).to.equal(firstMysqlLinkName)
     expect(linkConfig).to.have.all.keys(
@@ -53,9 +59,11 @@ suite('link', () => {
   })
 
   test('getHdfsLinkByLinkName', async () => {
-    const getLinkRes = await sqoopClient.getLinkByLinkName(firstHdfsLinkName)
-    const getLinkResJson = await getLinkRes.json()
-    expectSqoopHeaders(getLinkRes)
+    const getLinkResJson = await sqoopClient.getLinkByLinkName(firstHdfsLinkName)
+      .then(getLinkRes => {
+        expectSqoopHeaders(getLinkRes)
+        return getLinkRes.json()
+      })
     const linkConfig = splitLinkConfig(getLinkResJson)
     expect(linkConfig.name).to.equal(firstHdfsLinkName)
     expect(linkConfig).to.have.all.keys(
@@ -67,20 +75,30 @@ suite('link', () => {
   test('updateLinkForMysql', async () => {
     const config = generateMysqlConfig(secondMysqlLinkName)
     const updateResJson = await sqoopClient.updateLinkConfig(firstMysqlLinkName, config)
-      .then(updateRes => updateRes.json())
+      .then(updateRes => {
+        expectSqoopHeaders(updateRes)
+        return updateRes.json()
+      })
     expect(updateResJson).to.deep.equal({ 'validation-result': [ {} ] })
     const getLinkResJson = await sqoopClient.getLinkByLinkName(secondMysqlLinkName)
-      .then(getLinkRes => getLinkRes.json())
+      .then(getLinkRes => {
+        expectSqoopHeaders(getLinkRes)
+        return getLinkRes.json()
+      })
     const linkConfig = splitLinkConfig(getLinkResJson)
     expect(linkConfig.name).to.equal(secondMysqlLinkName)
   })
 
   test('getLinkByConnectorName', async () => {
     const connectorName = 'generic-jdbc-connector'
-    const res = await sqoopClient.getLinkByConnectorName(connectorName)
-    const json = await res.json()
-    const linkNames = _.map(json.links, 'name')
-    expectSqoopHeaders(res)
+    const json = await sqoopClient.getLinkByConnectorName(connectorName)
+      .then(res => {
+        expectSqoopHeaders(res)
+        return res.json()
+      })
+    const linkNames = _.map(_.map(json.links, (linkObject) => {
+      return splitLinkConfig({links: [linkObject]})
+    }), 'name')
     expect(secondMysqlLinkName).to.be.oneOf(linkNames)
   })
 
