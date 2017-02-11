@@ -99,11 +99,19 @@ suite('job', () => {
   })
 
   test('updateJobDisable', async () => {
-    await sqoopClient.updateJobDisable(firstJobName)
-    const res = await sqoopClient.getJobByJobName(firstJobName)
-    const json = await res.json()
-    expectSqoopHeaders(res)
-    expect(_.get(json, 'jobs[0].enabled')).to.be.false
+    const updateJobDisableResJson = await sqoopClient.updateJobDisable(firstJobName)
+      .then(updateJobDisableRes => {
+        expectSqoopHeaders(updateJobDisableRes)
+        return updateJobDisableRes.json()
+      })
+    expect(updateJobDisableResJson).to.be.empty
+    const getJobByJobNameResJson = await sqoopClient.getJobByJobName(firstJobName)
+      .then(getJobByJobNameRes => {
+        expectSqoopHeaders(getJobByJobNameRes)
+        return getJobByJobNameRes.json()
+      })
+    const jobConfig = splitJobConfig(getJobByJobNameResJson)
+    expect(jobConfig.topEnabled).to.be.false
   })
 
   test('updateJobEnable', async () => {
