@@ -71,14 +71,18 @@ suite('job', () => {
 
   test('updateJobFromMysqlToJob', async () => {
     const config = generateFromMysqlToHdfsUpdateConfig()
-    const updateJobRes = await sqoopClient.updateJobConfig(firstJobName, config)
-    const updateJobResJson = await updateJobRes.json()
-    expectSqoopHeaders(updateJobRes)
+    const updateJobResJson = await sqoopClient.updateJobConfig(firstJobName, config)
+      .then(updateJobRes => {
+        expectSqoopHeaders(updateJobRes)
+        return updateJobRes.json()
+      })
     expect(updateJobResJson).to.deep.equal({'validation-result': [{}, {}, {}]})
-    const getJobRes = await sqoopClient.getJobByJobName(firstJobName)
-    const getJobResJson = await getJobRes.json()
+    const getJobResJson = await sqoopClient.getJobByJobName(firstJobName)
+      .then(getJobRes => {
+        expectSqoopHeaders(getJobRes)
+        return getJobRes.json()
+      })
     const getJobResJsonConfig = splitJobConfig(getJobResJson)
-    expectSqoopHeaders(getJobRes)
     expect(getJobResJsonConfig.fromTableName).to.equal(config.jobConfig.tableName)
   })
 
