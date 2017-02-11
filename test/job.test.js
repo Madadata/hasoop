@@ -58,10 +58,14 @@ suite('job', () => {
   })
 
   test('getJobByConnectorName', async () => {
-    const res = await sqoopClient.getJobByConnectorName('hdfs-connector')
-    const json = await res.json()
-    const jobNames = _.map(json.jobs, 'name')
-    expectSqoopHeaders(res)
+    const getJobByConnectorNameResJson = await sqoopClient.getJobByConnectorName('hdfs-connector')
+      .then(getJobByConnectorNameRes => {
+        expectSqoopHeaders(getJobByConnectorNameRes)
+        return getJobByConnectorNameRes.json()
+      })
+    const jobNames = _.map(_.map(getJobByConnectorNameResJson.jobs, (jobObject) => {
+      return splitJobConfig({jobs: [jobObject]})
+    }), 'topName')
     expect(firstJobName).to.be.oneOf(jobNames)
   })
 
