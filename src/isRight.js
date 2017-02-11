@@ -44,14 +44,16 @@ const getRequestHeaders = res => [{
   sqoopInternalErrorCode: res.headers.get('sqoop-internal-error-code') || null,
   sqoopInternalErrorMessage: res.headers.get('sqoop-internal-error-message') || null
 }]
-getRequestHeaders('1')
 
 export async function isHasoopRequestRight (methodName, res) {
   if (!Object.keys(hasoopMethodTypes).includes(methodName)) {
     throw new Error(`hasoop method ${methodName} is not supported`)
   }
+
   const responseJson = await res.json()
+  const requestHeaders = getRequestHeaders(res)
+
   if (!isRightFromHeaders(res)) {
-    return {isRight: false, data: responseJson}
+    return {isRight: false, data: responseJson, headers: requestHeaders}
   }
 }
