@@ -20,14 +20,15 @@ function splitTopConfig (config) {
  * @ignore
  */
 function splitInputsConfig (configs) {
-  const inputConfig = {}
-  _.map(configs, (config) => {
-    _.map(config.inputs, (input) => {
-      const nameSplit = input.name.split('.')
-      _.set(inputConfig, nameSplit[1], input.value || null)
+  const configListObject = _(configs)
+    .map(configInput => configInput.inputs)
+    .flatten()
+    .map(({name, value = null}) => {
+      const nameSplit = name.split('.')
+      return {[nameSplit[1]]: _.isString(value) ? decodeURIComponent(value) : value}
     })
-  })
-  return inputConfig
+    .value()
+  return _.merge(...configListObject)
 }
 
 /**
