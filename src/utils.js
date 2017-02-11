@@ -40,12 +40,12 @@ function splitInputsConfig (configs) {
 export function splitLinkConfig (linkInfo) {
   const topConfig = splitTopConfig(_.get(linkInfo, 'links[0]'))
   const otherConfig = splitInputsConfig(_.get(linkInfo, 'links[0].link-config-values.configs'))
-  const linkConfig = {}
-  _.map({
+  return _.transform({
     ...topConfig,
     ...otherConfig
-  }, (value, key) => _.set(linkConfig, _.camelCase(key), _.isString(value) ? decodeURIComponent(value) : value))
-  return linkConfig
+  }, (result, value, key) => {
+    _.set(result, _.camelCase(key), _.isString(value) ? decodeURIComponent(value) : value)
+  }, {})
 }
 
 /**
