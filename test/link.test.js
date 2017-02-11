@@ -64,16 +64,15 @@ suite('link', () => {
     )
   })
 
-  test('updateLinkForMysql and getLinkByLinkName', async () => {
+  test('updateLinkForMysql', async () => {
     const config = generateMysqlConfig(secondMysqlLinkName)
-    const updateRes = await sqoopClient.updateLinkConfig(firstMysqlLinkName, config)
-    const updateResJson = await updateRes.json()
-    expectSqoopHeaders(updateRes)
-    expect(_.get(updateResJson, 'validation-result[0]')).to.be.empty
-    const getLinkRes = await sqoopClient.getLinkByLinkName(secondMysqlLinkName)
-    const getLinkResJson = await getLinkRes.json()
-    expectSqoopHeaders(getLinkRes)
-    expect(_.get(getLinkResJson, 'links[0].name')).to.equal(secondMysqlLinkName)
+    const updateResJson = await sqoopClient.updateLinkConfig(firstMysqlLinkName, config)
+      .then(updateRes => updateRes.json())
+    expect(updateResJson).to.deep.equal({ 'validation-result': [ {} ] })
+    const getLinkResJson = await sqoopClient.getLinkByLinkName(secondMysqlLinkName)
+      .then(getLinkRes => getLinkRes.json())
+    const linkConfig = splitLinkConfig(getLinkResJson)
+    expect(linkConfig.name).to.equal(secondMysqlLinkName)
   })
 
   test('getLinkByConnectorName', async () => {
