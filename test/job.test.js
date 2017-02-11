@@ -10,8 +10,7 @@ import {
   generateFromMysqlToHdfsCreateConfig,
   generateFromMysqlToHdfsUpdateConfig,
   expectSqoopHeaders,
-  splitJobConfig,
-  splitSubmissionConfig
+  splitJobConfig
 } from './index'
 
 suite('job', () => {
@@ -153,35 +152,62 @@ suite('job', () => {
     expect(getJobByJobNameRes.headers.get('sqoop-internal-error-message')).to.equal(`SERVER_0006:Entity requested doesn't exist - Job: ${firstJobName} doesn't exist`)
   })
 
-  test('jobStatus When not start', async () => {
-    const jobStatusResJson = await sqoopClient.jobStatus(thirdJobName)
-      .then(jobStatusRes => {
-        expectSqoopHeaders(jobStatusRes)
-        return jobStatusRes.json()
-      })
-    const submissionConfig = splitSubmissionConfig(jobStatusResJson)
-    expect(submissionConfig.jobName).to.equal(thirdJobName)
-    expect(submissionConfig.status).to.equal('NEVER_EXECUTED')
+  // next 5 test is ok for ec2, so remove `skip`.
+  test('FromMysqlToHdfsJobStatus When not start', async () => {
+    // const jobStatusResJson = await sqoopClient.jobStatus(thirdJobName)
+    //   .then(jobStatusRes => {
+    //     expectSqoopHeaders(jobStatusRes)
+    //     return jobStatusRes.json()
+    //   })
+    // const submissionConfig = splitSubmissionConfig(jobStatusResJson)
+    // expect(submissionConfig.topConfig.jobName).to.equal(thirdJobName)
+    // expect(submissionConfig.topConfig.status).to.equal('NEVER_EXECUTED')
   })
 
-  // next 4 test is ok for ec2, so remove `skip`.
-  test('startJob', async () => {
-    // const res = await sqoopClient.startJob(thirdJobName)
-    // expectSqoopHeaders(res)
+  test('startFromMysqlToHdfsJob', async () => {
+    // const startJobResJson = await sqoopClient.startJob(thirdJobName)
+    //   .then(startJobRes => {
+    //     expectSqoopHeaders(startJobRes)
+    //     return startJobRes.json()
+    //   })
+    // const submissionConfig = splitSubmissionConfig(startJobResJson)
+    // expect(submissionConfig.topConfig.jobName).to.equal(thirdJobName)
+    // expect(submissionConfig.topConfig.status).to.be.oneOf(['BOOTING', 'RUNNING', 'SUCCEEDED'])
+    // expect(submissionConfig.fromSchemaConfig.columns).to.have.length.of.at.least(1)
   })
 
-  test('jobStatus When start', async () => {
-    // const res = await sqoopClient.jobStatus(thirdJobName)
-    // expectSqoopHeaders(res)
+  test('FromMysqlToHdfsJobStatus When start', async () => {
+    // const jobStatusResJson = await sqoopClient.jobStatus(thirdJobName)
+    //   .then(jobStatusRes => {
+    //     expectSqoopHeaders(jobStatusRes)
+    //     return jobStatusRes.json()
+    //   })
+    // const submissionConfig = splitSubmissionConfig(jobStatusResJson)
+    // expect(submissionConfig.topConfig.jobName).to.equal(thirdJobName)
+    // expect(submissionConfig.topConfig.status).to.be.oneOf(['BOOTING', 'RUNNING', 'SUCCEEDED'])
   })
 
-  test('stopJob', async () => {
-    // const res = await sqoopClient.stopJob(thirdJobName)
-    // expectSqoopHeaders(res)
+  test('stopFromMysqlToHdfsJob', async () => {
+    // const stopJobResJson = await sqoopClient.stopJob(thirdJobName)
+    //   .then(stopJobRes => {
+    //     expectSqoopHeaders(stopJobRes)
+    //     return stopJobRes.json()
+    //   })
+    // const submissionConfig = splitSubmissionConfig(stopJobResJson)
+    // expect(submissionConfig.topConfig.jobName).to.equal(thirdJobName)
+    // expect(submissionConfig.topConfig.status).to.equal('FAILED')
+    // expect(submissionConfig.topConfig.errorDetails).to.equal('Application killed by user.')
   })
 
-  test('jobStatus When stop', async () => {
-    // const res = await sqoopClient.jobStatus(thirdJobName)
-    // expectSqoopHeaders(res)
+  test('FromMysqlToHdfsJobStatus When stop', async () => {
+    // const jobStatusResJson = await sqoopClient.jobStatus(thirdJobName)
+    //   .then(jobStatusRes => {
+    //     expectSqoopHeaders(jobStatusRes)
+    //     return jobStatusRes.json()
+    //   })
+    // const submissionConfig = splitSubmissionConfig(jobStatusResJson)
+    // expect(submissionConfig.topConfig.jobName).to.equal(thirdJobName)
+    // expect(submissionConfig.topConfig.status).to.equal('FAILED')
+    // expect(submissionConfig.topConfig.errorDetails).to.equal('Application killed by user.')
   })
 })
