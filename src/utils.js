@@ -69,11 +69,6 @@ export function splitSubmissionConfig (submissionInfo) {
   const topConfig = _.transform({
     ...splitTopConfig(_.get(submissionInfo, 'submissions[0]'))
   }, (result, value, key) => _.set(result, _.camelCase(key), _.isString(value) ? decodeURIComponent(value) : value), {})
-  console.log({
-    topConfig,
-    fromSchemaConfig: _.get(submissionInfo, 'submissions[0].from-schema'),
-    toSchemaConfig: _.get(submissionInfo, 'submissions[0].to-schema')
-  })
   return {
     topConfig,
     fromSchemaConfig: _.get(submissionInfo, 'submissions[0].from-schema'),
