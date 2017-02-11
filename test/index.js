@@ -1,6 +1,12 @@
 /* eslint-env mocha */
 
-import Hasoop, { version, linkType, expectSqoopHeaders, splitJobConfig } from '../src/index'
+import Hasoop, {
+  version,
+  linkType,
+  expectSqoopHeaders,
+  splitLinkConfig,
+  splitJobConfig
+} from '../src/index'
 
 const sqoopHost = process.env.SQOOP_HOST
 
@@ -63,6 +69,7 @@ export {
   expectSqoopHeaders,
   generateMysqlConfig,
   generateHdfsConfig,
+  splitLinkConfig,
   splitJobConfig,
   generateFromMysqlToHdfsCreateConfig,
   generateFromMysqlToHdfsUpdateConfig

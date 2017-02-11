@@ -3,8 +3,13 @@
 import _ from 'lodash'
 import faker from 'faker'
 import { expect } from 'chai'
-
-import { sqoopClient, generateMysqlConfig, generateHdfsConfig, expectSqoopHeaders } from './index'
+import {
+  sqoopClient,
+  generateMysqlConfig,
+  generateHdfsConfig,
+  expectSqoopHeaders,
+  splitLinkConfig
+} from './index'
 
 suite('link', () => {
   let firstMysqlLinkName
@@ -22,8 +27,7 @@ suite('link', () => {
     const res = await sqoopClient.createLink(config)
     const json = await res.json()
     expectSqoopHeaders(res)
-    expect(json.name).to.equal(firstMysqlLinkName)
-    expect(_.get(json, 'validation-result[0]')).to.be.empty
+    expect(json).to.deep.equal({'name': firstMysqlLinkName, 'validation-result': [{}]})
   })
 
   test('createLinkForHdfs', async () => {
@@ -31,8 +35,33 @@ suite('link', () => {
     const res = await sqoopClient.createLink(config)
     const json = await res.json()
     expectSqoopHeaders(res)
-    expect(json.name).to.equal(firstHdfsLinkName)
-    expect(_.get(json, 'validation-result[0]')).to.be.empty
+    expect(json).to.deep.equal({'name': firstHdfsLinkName, 'validation-result': [{}]})
+  })
+
+  test('getMyqlLinkByLinkName', async () => {
+    const getLinkRes = await sqoopClient.getLinkByLinkName(firstMysqlLinkName)
+    const getLinkResJson = await getLinkRes.json()
+    expectSqoopHeaders(getLinkRes)
+    const linkConfig = splitLinkConfig(getLinkResJson)
+    expect(linkConfig.name).to.equal(firstMysqlLinkName)
+    expect(linkConfig).to.have.all.keys(
+      'id', 'enabled', 'updateUser', 'name',
+      'connectorName', 'creationDate', 'updateDate', 'creationUser',
+      'jdbcDriver', 'connectionString', 'username', 'password', 'fetchSize',
+      'jdbcProperties', 'identifierEnclose'
+    )
+  })
+
+  test('getHdfsLinkByLinkName', async () => {
+    const getLinkRes = await sqoopClient.getLinkByLinkName(firstHdfsLinkName)
+    const getLinkResJson = await getLinkRes.json()
+    expectSqoopHeaders(getLinkRes)
+    const linkConfig = splitLinkConfig(getLinkResJson)
+    expect(linkConfig.name).to.equal(firstHdfsLinkName)
+    expect(linkConfig).to.have.all.keys(
+      'id', 'enabled', 'updateUser', 'name', 'connectorName', 'creationDate',
+      'updateDate', 'creationUser', 'uri', 'confDir', 'configOverrides'
+    )
   })
 
   test('updateLinkForMysql and getLinkByLinkName', async () => {
