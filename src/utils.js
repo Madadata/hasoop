@@ -43,9 +43,7 @@ export function splitLinkConfig (linkInfo) {
   return _.transform({
     ...topConfig,
     ...otherConfig
-  }, (result, value, key) => {
-    _.set(result, _.camelCase(key), _.isString(value) ? decodeURIComponent(value) : value)
-  }, {})
+  }, (result, value, key) => _.set(result, _.camelCase(key), _.isString(value) ? decodeURIComponent(value) : value), {})
 }
 
 /**
@@ -59,14 +57,12 @@ export function splitJobConfig (jobInfo) {
   const fromLinkConfig = splitInputsConfig(_.get(jobInfo, 'jobs[0].from-config-values.configs'))
   const toLinkConfig = splitInputsConfig(_.get(jobInfo, 'jobs[0].to-config-values.configs'))
   const driverConfig = splitInputsConfig(_.get(jobInfo, 'jobs[0].driver-config-values.configs'))
-  const jobConfig = {}
-  _.map({
+  return _.map({
     ..._.mapKeys(topConfig, (value, key) => `top_${key}`),
     ..._.mapKeys(driverConfig, (value, key) => `driver_${key}`),
     ..._.mapKeys(fromLinkConfig, (value, key) => `from_${key}`),
     ..._.mapKeys(toLinkConfig, (value, key) => `to_${key}`)
-  }, (value, key) => _.set(jobConfig, _.camelCase(key), _.isString(value) ? decodeURIComponent(value) : value))
-  return jobConfig
+  }, (result, value, key) => _.set(result, _.camelCase(key), _.isString(value) ? decodeURIComponent(value) : value), {})
 }
 
 export function splitSubmissionConfig (submissionInfo) {
