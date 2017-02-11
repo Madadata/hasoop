@@ -137,19 +137,16 @@ suite('link', () => {
   })
 
   test('getLinkAll', async () => {
-    // const getLinkAllResJson = await sqoopClient.getLinkAll()
-    //   .then(getLinkAllRes => {
-    //     expectSqoopHeaders(getLinkAllRes)
-    //     return getLinkAllRes.json()
-    //   })
-    // const linkNames = _.map(_.map(getLinkAllResJson.links, (linkObject) => {
-    //   return splitLinkConfig({links: [linkObject]})
-    // }), 'name')
-    //
-    // const linkNames = _.map(json.links, 'name')
-    // expectSqoopHeaders(res)
-    // expect(firstHdfsLinkName).to.be.oneOf(linkNames)
-    // expect(secondMysqlLinkName).to.be.oneOf(linkNames)
+    const getLinkAllResJson = await sqoopClient.getLinkAll()
+      .then(getLinkAllRes => {
+        expectSqoopHeaders(getLinkAllRes)
+        return getLinkAllRes.json()
+      })
+    const linkNames = _.map(_.map(getLinkAllResJson.links, (linkObject) => {
+      return splitLinkConfig({links: [linkObject]})
+    }), 'name')
+    expect(firstHdfsLinkName).to.be.oneOf(linkNames)
+    expect(secondMysqlLinkName).to.be.oneOf(linkNames)
   })
 
   test('deleteLink', async () => {
