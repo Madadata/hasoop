@@ -41,7 +41,8 @@ function getVersionDispose (responseJson, responseHeaders) {
   return {isRight: true, data: responseJson, headers: responseHeaders}
 }
 function getDriverDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+  const isOk = responseJson.version === '1' && _.get(responseJson, ['all-config-resources', 'jarConfig.label']) === 'Classpath configuration'
+  return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function getConnectorAllDispose (responseJson, responseHeaders) {
   // TODO generic-jdbc-connector
@@ -62,8 +63,9 @@ function getLinkByConnectorNameDispose (responseJson, responseHeaders) {
 function getLinkByLinkNameDispose (responseJson, responseHeaders) {
   return {isRight: true, data: responseJson, headers: responseHeaders}
 }
-function createLinkDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+function createLinkDispose (responseJson, responseHeaders, linkName) {
+  const isOk = responseJson === {name: linkName, 'validation-result': [{}]}
+  return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function updateLinkConfigDispose (responseJson, responseHeaders) {
   return {isRight: true, data: responseJson, headers: responseHeaders}
@@ -159,7 +161,7 @@ export async function isHasoopRequestRight (methodName, res, ...params) {
     case hasoopMethodTypes.getLinkByLinkName:
       return getLinkByLinkNameDispose(responseJson, responseHeaders)
     case hasoopMethodTypes.createLink:
-      return createLinkDispose(responseJson, responseHeaders)
+      return createLinkDispose(responseJson, responseHeaders, ...params)
     case hasoopMethodTypes.updateLinkConfig:
       return updateLinkConfigDispose(responseJson, responseHeaders)
     case hasoopMethodTypes.updateLinkEnable:
