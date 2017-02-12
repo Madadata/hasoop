@@ -55,8 +55,10 @@ function getConnectorByConnectorNameDispose (responseJson, responseHeaders, conn
   const isOk = _.get(responseJson, 'connectors[0].name') === connectorName
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
-function getLinkAllDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+function getLinkAllDispose (responseJson, responseHeaders, linkName) {
+  const linkNames = _.map(_.map(responseJson.links, linkObject => splitLinkConfig({links: [linkObject]})), 'name')
+  const isOk = linkName in linkNames
+  return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function getLinkByConnectorNameDispose (responseJson, responseHeaders, linkName) {
   const linkNames = _.map(_.map(responseJson.links, linkObject => splitLinkConfig({links: [linkObject]})), 'name')
@@ -132,7 +134,8 @@ function deleteJobDispose (responseJson, responseHeaders) {
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function deleteJobAllDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+  const isOk = responseJson === {}
+  return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function startJobDispose (responseJson, responseHeaders, jobName) {
   const submissionConfig = splitSubmissionConfig(responseJson)
