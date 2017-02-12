@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import keymirror from 'keymirror'
-import { splitLinkConfig } from './utils'
+import { version, splitLinkConfig, splitJobConfig, splitSubmissionConfig } from './index'
 
 export const hasoopMethodTypes = keymirror({
   // version
@@ -39,16 +39,16 @@ export const hasoopMethodTypes = keymirror({
 })
 
 function getVersionDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+  const isOk = _.get(responseJson, 'api-versions[0]') === version
+  return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function getDriverDispose (responseJson, responseHeaders) {
   const isOk = responseJson.version === '1' && _.get(responseJson, ['all-config-resources', 'jarConfig.label']) === 'Classpath configuration'
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function getConnectorAllDispose (responseJson, responseHeaders) {
-  // TODO generic-jdbc-connector
-  // const connectorNames = _.map(json.connectors, 'name')
-  const isOk = responseJson.connectors.length === 7
+  const connectorNames = _.map(responseJson.connectors, 'name')
+  const isOk = responseJson.connectors.length === 7 && 'generic-jdbc-connector' in connectorNames
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function getConnectorByConnectorNameDispose (responseJson, responseHeaders, connectorName) {
@@ -59,15 +59,14 @@ function getLinkAllDispose (responseJson, responseHeaders) {
   return {isRight: true, data: responseJson, headers: responseHeaders}
 }
 function getLinkByConnectorNameDispose (responseJson, responseHeaders, linkName) {
-// TODO linkName in array
-  // const linkNames = _.map(_.map(responseJson.links, linkObject => splitLinkConfig({links: [linkObject]})), 'name')
-  const isOk = true
+  const linkNames = _.map(_.map(responseJson.links, linkObject => splitLinkConfig({links: [linkObject]})), 'name')
+  const isOk = linkName in linkNames
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function getLinkByLinkNameDispose (responseJson, responseHeaders, linkName) {
   const linkConfig = splitLinkConfig(responseJson)
-  // TODO have key 'id', 'enabled', 'connectorName'
-  const isOk = linkConfig.name === linkName
+  const linkConfigKeys = _.keys(linkConfig)
+  const isOk = linkConfig.name === linkName && 'id' in linkConfigKeys && 'enabled' in linkConfigKeys && 'connectorName' in linkConfigKeys
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function createLinkDispose (responseJson, responseHeaders, linkName) {
@@ -79,57 +78,85 @@ function updateLinkConfigDispose (responseJson, responseHeaders) {
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function updateLinkEnableDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+  const isOk = responseJson === {}
+  return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function updateLinkDisableDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+  const isOk = responseJson === {}
+  return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function deleteLinkDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+  const isOk = responseJson === {}
+  return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
-function deleteLinkAllDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+function deleteLinkAllDispose (responseJson, responseHeaders, linkName) {
+  const linkNames = _.map(_.map(responseJson.links, linkObject => splitLinkConfig({links: [linkObject]})), 'name')
+  const isOk = linkName in linkNames
+  return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
-function getJobAllDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+function getJobAllDispose (responseJson, responseHeaders, jobName) {
+  const jobNames = _.map(_.map(responseJson.jobs, jobObject => splitJobConfig({jobs: [jobObject]})), 'topName')
+  const isOk = jobName in jobNames
+  return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
-function getJobByJobNameDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+function getJobByJobNameDispose (responseJson, responseHeaders, jobName) {
+  const jobConfig = splitJobConfig(responseJson)
+  const jobConfigKeys = _.keys(jobConfig)
+  const isOK = jobConfig.topName === jobName && 'topId' in jobConfigKeys && 'topName' in jobConfigKeys && 'topEnabled' in jobConfigKeys && 'topFromLinkName' in jobConfigKeys && 'topToLinkName' in jobConfigKeys
+  return {isRight: isOK, data: responseJson, headers: responseHeaders}
 }
-function getJobByConnectorNameDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+function getJobByConnectorNameDispose (responseJson, responseHeaders, jobName) {
+  const jobNames = _.map(_.map(responseJson.jobs, jobObject => splitJobConfig({jobs: [jobObject]})), 'topName')
+  const isOk = jobName in jobNames
+  return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
-function createJobDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+function createJobDispose (responseJson, responseHeaders, jobName) {
+  const isOk = responseJson === { name: jobName, 'validation-result': [ {}, {}, {} ] }
+  return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function updateJobConfigDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+  const isOk = responseJson === {'validation-result': [{}, {}, {}]}
+  return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function updateJobEnableDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+  const isOk = responseJson === {}
+
+  return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function updateJobDisableDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+  const isOk = responseJson === {}
+  return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function deleteJobDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+  const isOk = responseJson === {}
+  return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function deleteJobAllDispose (responseJson, responseHeaders) {
   return {isRight: true, data: responseJson, headers: responseHeaders}
 }
-function startJobDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+function startJobDispose (responseJson, responseHeaders, jobName) {
+  const submissionConfig = splitSubmissionConfig(responseJson)
+
+  const isOk = submissionConfig.topConfig.jobName === jobName && submissionConfig.topConfig.status in ['BOOTING', 'RUNNING', 'SUCCEEDED'] && submissionConfig.fromSchemaConfig.columns.length > 0
+
+  return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
-function stopJobDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+function stopJobDispose (responseJson, responseHeaders, jobName) {
+  const submissionConfig = splitSubmissionConfig(responseJson)
+  const isOk = submissionConfig.topConfig.jobName === jobName && submissionConfig.topConfig.status === 'FAILED' && submissionConfig.topConfig.errorDetails === 'Application killed by user.'
+  return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
-function jobStatusDispose (responseJson, responseHeaders) {
-  return {isRight: true, data: responseJson, headers: responseHeaders}
+function jobStatusDispose (responseJson, responseHeaders, jobName) {
+  const submissionConfig = splitSubmissionConfig(responseJson)
+  const isOk = submissionConfig.topConfig.jobName === jobName && submissionConfig.topConfig.status in ['BOOTING', 'FAILURE_ON_SUBMIT', 'RUNNING', 'SUCCEEDED', 'FAILED', 'NEVER_EXECUTED', 'UNKNOWN']
+  return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function getSubmissionAllDispose (responseJson, responseHeaders) {
+  // TODO
   return {isRight: true, data: responseJson, headers: responseHeaders}
 }
 function getSubmissionByJobNameDispose (responseJson, responseHeaders) {
+  // TODO
   return {isRight: true, data: responseJson, headers: responseHeaders}
 }
 
