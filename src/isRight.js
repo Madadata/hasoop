@@ -182,7 +182,7 @@ export const getResponseHeaders = res => ({
   sqoopInternalErrorMessage: res.headers.get('sqoop-internal-error-message') || null
 })
 
-export async function isHasoopRequestRight (methodName, res, ...params) {
+export async function hasoopRequestDispose (methodName, res, ...params) {
   if (!Object.keys(hasoopMethodTypes).includes(methodName)) {
     throw new Error(`hasoop method ${methodName} is not supported`)
   }
