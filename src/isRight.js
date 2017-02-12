@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import keymirror from 'keymirror'
-import { version, splitLinkConfig, splitJobConfig, splitSubmissionConfig } from './index'
+import { splitLinkConfig, splitJobConfig, splitSubmissionConfig } from './utils'
 
 export const hasoopMethodTypes = keymirror({
   // version
@@ -39,7 +39,7 @@ export const hasoopMethodTypes = keymirror({
 })
 
 function getVersionDispose (responseJson, responseHeaders) {
-  const isOk = _.get(responseJson, 'api-versions[0]') === version
+  const isOk = _.get(responseJson, 'api-versions[0]') === 'v1'
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function getDriverDispose (responseJson, responseHeaders) {
@@ -163,9 +163,9 @@ function getSubmissionByJobNameDispose (responseJson, responseHeaders) {
   return {isRight: true, data: responseJson, headers: responseHeaders}
 }
 
-const isRightFromHeaders = res => res.headers.get('sqoop-error-code') === '1000' && res.headers.get('sqoop-error-message') === 'OK'
+export const isRightFromHeaders = res => res.headers.get('sqoop-error-code') === '1000' && res.headers.get('sqoop-error-message') === 'OK'
 
-const getResponseHeaders = res => [{
+export const getResponseHeaders = res => [{
   sqoopErrorCode: res.headers.get('sqoop-error-code'),
   sqoopErrorMessage: res.headers.get('sqoop-error-message'),
   sqoopInternalErrorCode: res.headers.get('sqoop-internal-error-code') || null,

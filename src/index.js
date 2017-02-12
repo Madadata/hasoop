@@ -8,6 +8,7 @@ import { setCreateLinkRequestBody, setUpdateLinkRequestBody } from './setLinkOpt
 import { sendGetRequest, sendPostRequest, sendPutRequest, sendDeleteRequest } from './sendRequest'
 import { sqoopAction, hasoopMethod } from './constant'
 export * from './constant'
+export * from './isRight'
 export * from './utils'
 
 export const version = 'v1'
