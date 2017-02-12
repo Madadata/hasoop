@@ -54,7 +54,8 @@ function getConnectorAllDispose (responseJson, responseHeaders) {
 }
 function getConnectorByConnectorNameDispose (responseJson, responseHeaders, connectorName) {
   const isOk = _.get(responseJson, 'connectors[0].name') === connectorName
-  return {isRight: isOk, data: responseJson, headers: responseHeaders}
+  const data = responseJson.connectors[0]
+  return {isRight: isOk, data, headers: responseHeaders}
 }
 function getLinkAllDispose (responseJson, responseHeaders, linkName) {
   const linkNames = _.map(_.map(responseJson.links, linkObject => splitLinkConfig({links: [linkObject]})), 'name')
