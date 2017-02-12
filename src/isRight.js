@@ -58,93 +58,91 @@ function getConnectorByConnectorNameDispose (responseJson, responseHeaders, conn
   return {isRight: isOk, data, headers: responseHeaders}
 }
 function getLinkAllDispose (responseJson, responseHeaders, linkName) {
-  const linkNames = _.map(_.map(responseJson.links, linkObject => splitLinkConfig({links: [linkObject]})), 'name')
-  const isOk = linkName in linkNames
-  return {isRight: isOk, data: responseJson, headers: responseHeaders}
+  const data = responseJson.links
+  return {isRight: true, data, headers: responseHeaders}
 }
-function getLinkByConnectorNameDispose (responseJson, responseHeaders, linkName) {
-  const linkNames = _.map(_.map(responseJson.links, linkObject => splitLinkConfig({links: [linkObject]})), 'name')
-  const isOk = linkName in linkNames
-  return {isRight: isOk, data: responseJson, headers: responseHeaders}
+function getLinkByConnectorNameDispose (responseJson, responseHeaders) {
+  const data = _.map(responseJson.links, linkObject => splitLinkConfig({links: [linkObject]}))
+  const isOk = true
+  return {isRight: isOk, data, headers: responseHeaders}
 }
 function getLinkByLinkNameDispose (responseJson, responseHeaders, linkName) {
   const linkConfig = splitLinkConfig(responseJson)
   const linkConfigKeys = _.keys(linkConfig)
-  const isOk = linkConfig.name === linkName && 'id' in linkConfigKeys && 'enabled' in linkConfigKeys && 'connectorName' in linkConfigKeys
-  return {isRight: isOk, data: responseJson, headers: responseHeaders}
+  const isOk = linkConfig.name === linkName && _.includes(linkConfigKeys, 'id') && _.includes(linkConfigKeys, 'enabled') && _.includes(linkConfigKeys, 'connectorName')
+  return {isRight: isOk, data: linkConfig, headers: responseHeaders}
 }
 function createLinkDispose (responseJson, responseHeaders, linkName) {
-  const isOk = responseJson === {name: linkName, 'validation-result': [{}]}
+  const isOk = _.isEqual(responseJson, {name: linkName, 'validation-result': [{}]})
   const data = responseJson.name
   return {isRight: isOk, data, headers: responseHeaders}
 }
 function updateLinkConfigDispose (responseJson, responseHeaders) {
-  const isOk = responseJson === { 'validation-result': [ {} ] }
-  return {isRight: isOk, data: responseJson, headers: responseHeaders}
+  const isOk = _.isEqual(responseJson, {'validation-result': [{}]})
+  const data = {}
+  return {isRight: isOk, data, headers: responseHeaders}
 }
 function updateLinkEnableDispose (responseJson, responseHeaders) {
-  const isOk = responseJson === {}
+  const isOk = _.isEqual(responseJson, {})
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function updateLinkDisableDispose (responseJson, responseHeaders) {
-  const isOk = responseJson === {}
+  const isOk = _.isEqual(responseJson, {})
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function deleteLinkDispose (responseJson, responseHeaders) {
-  const isOk = responseJson === {}
+  const isOk = _.isEqual(responseJson, {})
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function deleteLinkAllDispose (responseJson, responseHeaders, linkName) {
   const linkNames = _.map(_.map(responseJson.links, linkObject => splitLinkConfig({links: [linkObject]})), 'name')
-  const isOk = linkName in linkNames
+  const isOk = _.includes(linkNames, linkName)
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function getJobAllDispose (responseJson, responseHeaders, jobName) {
   const jobNames = _.map(_.map(responseJson.jobs, jobObject => splitJobConfig({jobs: [jobObject]})), 'topName')
-  const isOk = jobName in jobNames
+  const isOk = _.includes(jobNames, jobName)
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function getJobByJobNameDispose (responseJson, responseHeaders, jobName) {
   const jobConfig = splitJobConfig(responseJson)
   const jobConfigKeys = _.keys(jobConfig)
-  const isOK = jobConfig.topName === jobName && 'topId' in jobConfigKeys && 'topName' in jobConfigKeys && 'topEnabled' in jobConfigKeys && 'topFromLinkName' in jobConfigKeys && 'topToLinkName' in jobConfigKeys
+  const isOK = jobConfig.topName === jobName && _.includes(jobConfigKeys, 'topName') && _.includes(jobConfigKeys, 'topEnabled') && _.includes(jobConfigKeys, 'topFromLinkName') && _.includes(jobConfigKeys, 'topToLinkName')
   return {isRight: isOK, data: responseJson, headers: responseHeaders}
 }
 function getJobByConnectorNameDispose (responseJson, responseHeaders, jobName) {
   const jobNames = _.map(_.map(responseJson.jobs, jobObject => splitJobConfig({jobs: [jobObject]})), 'topName')
-  const isOk = jobName in jobNames
+  const isOk = _.includes(jobNames, jobName)
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function createJobDispose (responseJson, responseHeaders, jobName) {
-  const isOk = responseJson === { name: jobName, 'validation-result': [ {}, {}, {} ] }
-  return {isRight: isOk, data: responseJson, headers: responseHeaders}
+  const isOk = _.isEqual(responseJson, { name: jobName, 'validation-result': [ {}, {}, {} ] })
+  const data = responseJson.name
+  return {isRight: isOk, data: data, headers: responseHeaders}
 }
 function updateJobConfigDispose (responseJson, responseHeaders) {
-  const isOk = responseJson === {'validation-result': [{}, {}, {}]}
+  const isOk = _.isEqual(responseJson, {'validation-result': [{}, {}, {}]})
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function updateJobEnableDispose (responseJson, responseHeaders) {
-  const isOk = responseJson === {}
-
+  const isOk = _.isEqual(responseJson, {})
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function updateJobDisableDispose (responseJson, responseHeaders) {
-  const isOk = responseJson === {}
+  const isOk = _.isEqual(responseJson, {})
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function deleteJobDispose (responseJson, responseHeaders) {
-  const isOk = responseJson === {}
+  const isOk = _.isEqual(responseJson, {})
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function deleteJobAllDispose (responseJson, responseHeaders) {
-  const isOk = responseJson === {}
+  const isOk = _.isEqual(responseJson, {})
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function startJobDispose (responseJson, responseHeaders, jobName) {
   const submissionConfig = splitSubmissionConfig(responseJson)
-
-  const isOk = submissionConfig.topConfig.jobName === jobName && submissionConfig.topConfig.status in ['BOOTING', 'RUNNING', 'SUCCEEDED'] && submissionConfig.fromSchemaConfig.columns.length > 0
-
+  const isOk = submissionConfig.topConfig.jobName === jobName && _.includes(['BOOTING', 'RUNNING', 'SUCCEEDED'], submissionConfig.topConfig.status) && submissionConfig.fromSchemaConfig.columns.length > 0
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function stopJobDispose (responseJson, responseHeaders, jobName) {
@@ -154,7 +152,7 @@ function stopJobDispose (responseJson, responseHeaders, jobName) {
 }
 function jobStatusDispose (responseJson, responseHeaders, jobName) {
   const submissionConfig = splitSubmissionConfig(responseJson)
-  const isOk = submissionConfig.topConfig.jobName === jobName && submissionConfig.topConfig.status in ['BOOTING', 'FAILURE_ON_SUBMIT', 'RUNNING', 'SUCCEEDED', 'FAILED', 'NEVER_EXECUTED', 'UNKNOWN']
+  const isOk = submissionConfig.topConfig.jobName === jobName && _.includes(['BOOTING', 'FAILURE_ON_SUBMIT', 'RUNNING', 'SUCCEEDED', 'FAILED', 'NEVER_EXECUTED', 'UNKNOWN'], submissionConfig.topConfig.status)
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function getSubmissionAllDispose (responseJson, responseHeaders) {
