@@ -1,54 +1,18 @@
 import _ from 'lodash'
-import keymirror from 'keymirror'
+import { simpleVersion, version, sqoopConnectorCount, hasoopMethodTypes } from './constant'
 import { splitLinkConfig, splitJobConfig, splitSubmissionConfig } from './utils'
 
-export const hasoopMethodTypes = keymirror({
-  // version
-  getVersion: null,
-  // driver
-  getDriver: null,
-  // connector
-  getConnectorAll: null,
-  getConnectorByConnectorName: null,
-  // link
-  getLinkAll: null,
-  getLinkByConnectorName: null,
-  getLinkByLinkName: null,
-  createLink: null,
-  updateLinkConfig: null,
-  updateLinkEnable: null,
-  updateLinkDisable: null,
-  deleteLink: null,
-  deleteLinkAll: null,
-  // job
-  getJobAll: null,
-  getJobByJobName: null,
-  getJobByConnectorName: null,
-  createJob: null,
-  updateJobConfig: null,
-  updateJobEnable: null,
-  updateJobDisable: null,
-  deleteJob: null,
-  deleteJobAll: null,
-  // submission
-  startJob: null,
-  stopJob: null,
-  jobStatus: null,
-  getSubmissionAll: null,
-  getSubmissionByJobNam: null
-})
-
 function getVersionDispose (responseJson, responseHeaders) {
-  const isOk = _.get(responseJson, 'api-versions[0]') === 'v1'
+  const isOk = _.get(responseJson, 'api-versions[0]') === version
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function getDriverDispose (responseJson, responseHeaders) {
-  const isOk = responseJson.version === '1' && _.get(responseJson, ['all-config-resources', 'jarConfig.label']) === 'Classpath configuration'
+  const isOk = responseJson.version === simpleVersion && _.get(responseJson, ['all-config-resources', 'jarConfig.label']) === 'Classpath configuration'
   return {isRight: isOk, data: responseJson, headers: responseHeaders}
 }
 function getConnectorAllDispose (responseJson, responseHeaders) {
   const connectorNames = _.map(responseJson.connectors, 'name')
-  const isOk = responseJson.connectors.length === 7 && _.includes(connectorNames, 'generic-jdbc-connector')
+  const isOk = responseJson.connectors.length === sqoopConnectorCount && _.includes(connectorNames, 'generic-jdbc-connector')
   const data = isOk ? responseJson.connectors : responseJson
   return {isRight: isOk, data, headers: responseHeaders}
 }
