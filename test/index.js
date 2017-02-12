@@ -1,17 +1,18 @@
 /* eslint-env mocha */
 
-import Hasoop, { version, linkType, expectSqoopHeaders } from '../src/index'
+import Hasoop, { linkType } from '../src/index'
+export * from '../src/index'
 
-const sqoopHost = process.env.SQOOP_HOST
+export const sqoopHost = process.env.SQOOP_HOST
 
-const sqoopClient = new Hasoop({
+export const sqoopClient = new Hasoop({
   'userName': 'Developer',
   'host': 'localhost',
   'port': 12000,
   'webapp': 'sqoop'
 })
 
-function generateMysqlConfig (linkName) {
+export function generateMysqlConfig (linkName) {
   return {
     'linkName': linkName,
     'linkType': linkType.mysql,
@@ -22,7 +23,7 @@ function generateMysqlConfig (linkName) {
   }
 }
 
-function generateHdfsConfig (linkName) {
+export function generateHdfsConfig (linkName) {
   return {
     'linkName': linkName,
     'linkType': linkType.hdfs,
@@ -30,7 +31,7 @@ function generateHdfsConfig (linkName) {
   }
 }
 
-function generateFromMysqlToHdfsConfig (jobName, fromLinkName, toLinkName) {
+export function generateFromMysqlToHdfsConfig (jobName, fromLinkName, toLinkName) {
   return {
     'jobName': jobName,
     'fromLinkName': fromLinkName,
@@ -45,13 +46,4 @@ function generateFromMysqlToHdfsConfig (jobName, fromLinkName, toLinkName) {
       'outputDirectory': `hdfs://${sqoopHost}:9000/data`
     }
   }
-}
-
-export {
-  sqoopClient,
-  version,
-  expectSqoopHeaders,
-  generateMysqlConfig,
-  generateHdfsConfig,
-  generateFromMysqlToHdfsConfig
 }

@@ -48,8 +48,9 @@ function getDriverDispose (responseJson, responseHeaders) {
 }
 function getConnectorAllDispose (responseJson, responseHeaders) {
   const connectorNames = _.map(responseJson.connectors, 'name')
-  const isOk = responseJson.connectors.length === 7 && 'generic-jdbc-connector' in connectorNames
-  return {isRight: isOk, data: responseJson, headers: responseHeaders}
+  const isOk = responseJson.connectors.length === 7 && _.includes(connectorNames, 'generic-jdbc-connector')
+  const data = responseJson.connectors
+  return {isRight: isOk, data, headers: responseHeaders}
 }
 function getConnectorByConnectorNameDispose (responseJson, responseHeaders, connectorName) {
   const isOk = _.get(responseJson, 'connectors[0].name') === connectorName
@@ -165,21 +166,19 @@ function getSubmissionByJobNameDispose (responseJson, responseHeaders) {
 
 export const isRightFromHeaders = res => res.headers.get('sqoop-error-code') === '1000' && res.headers.get('sqoop-error-message') === 'OK'
 
-export const getResponseHeaders = res => [{
+export const getResponseHeaders = res => ({
   sqoopErrorCode: res.headers.get('sqoop-error-code'),
   sqoopErrorMessage: res.headers.get('sqoop-error-message'),
   sqoopInternalErrorCode: res.headers.get('sqoop-internal-error-code') || null,
   sqoopInternalErrorMessage: res.headers.get('sqoop-internal-error-message') || null
-}]
+})
 
 export async function isHasoopRequestRight (methodName, res, ...params) {
   if (!Object.keys(hasoopMethodTypes).includes(methodName)) {
     throw new Error(`hasoop method ${methodName} is not supported`)
   }
-
   const responseJson = await res.json()
   const responseHeaders = getResponseHeaders(res)
-
   if (!isRightFromHeaders(res)) {
     return {isRight: false, data: responseJson, headers: responseHeaders}
   }
