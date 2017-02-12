@@ -67,3 +67,14 @@ export function splitJobConfig (jobInfo) {
   }, (value, key) => _.set(jobConfig, _.camelCase(key), _.isString(value) ? decodeURIComponent(value) : value))
   return jobConfig
 }
+
+export function splitSubmissionConfig (submissionInfo) {
+  const topConfig = _.transform({
+    ...splitTopConfig(_.get(submissionInfo, 'submissions[0]'))
+  }, (result, value, key) => _.set(result, _.camelCase(key), _.isString(value) ? decodeURIComponent(value) : value), {})
+  return {
+    topConfig,
+    fromSchemaConfig: _.get(submissionInfo, 'submissions[0].from-schema') || {},
+    toSchemaConfig: _.get(submissionInfo, 'submissions[0].to-schema') || {}
+  }
+}

@@ -149,20 +149,20 @@ function deleteJobAllDispose (responseJson, responseHeaders) {
 function startJobDispose (responseJson, responseHeaders, jobName) {
   const submissionConfig = splitSubmissionConfig(responseJson)
   const isOk = submissionConfig.topConfig.jobName === jobName && _.includes(['BOOTING', 'RUNNING', 'SUCCEEDED'], submissionConfig.topConfig.status) && submissionConfig.fromSchemaConfig.columns.length > 0
-  // TODO
-  return {isRight: isOk, data: responseJson, headers: responseHeaders}
+  const data = isOk ? submissionConfig : responseJson
+  return {isRight: isOk, data, headers: responseHeaders}
 }
 function stopJobDispose (responseJson, responseHeaders, jobName) {
   const submissionConfig = splitSubmissionConfig(responseJson)
   const isOk = submissionConfig.topConfig.jobName === jobName && submissionConfig.topConfig.status === 'FAILED' && submissionConfig.topConfig.errorDetails === 'Application killed by user.'
-  // TODO
-  return {isRight: isOk, data: responseJson, headers: responseHeaders}
+  const data = isOk ? submissionConfig : responseJson
+  return {isRight: isOk, data, headers: responseHeaders}
 }
 function jobStatusDispose (responseJson, responseHeaders, jobName) {
   const submissionConfig = splitSubmissionConfig(responseJson)
   const isOk = submissionConfig.topConfig.jobName === jobName && _.includes(['BOOTING', 'FAILURE_ON_SUBMIT', 'RUNNING', 'SUCCEEDED', 'FAILED', 'NEVER_EXECUTED', 'UNKNOWN'], submissionConfig.topConfig.status)
-  // TODO
-  return {isRight: isOk, data: responseJson, headers: responseHeaders}
+  const data = isOk ? submissionConfig : responseJson
+  return {isRight: isOk, data, headers: responseHeaders}
 }
 function getSubmissionAllDispose (responseJson, responseHeaders) {
   // TODO
