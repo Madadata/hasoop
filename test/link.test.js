@@ -4,7 +4,7 @@ import _ from 'lodash'
 import faker from 'faker'
 import { expect } from 'chai'
 
-import { sqoopClient, generateMysqlConfig, generateHdfsConfig, expectSqoopHeaders } from './index'
+import { sqoopClient, generateMysqlConfig, generateHdfsConfig, expectSqoopHeaders, isHasoopRequestRight } from './index'
 
 suite('link', () => {
   let firstMysqlLinkName
@@ -20,10 +20,11 @@ suite('link', () => {
   test('createLinkForMysql', async () => {
     const config = generateMysqlConfig(firstMysqlLinkName)
     const res = await sqoopClient.createLink(config)
-    const json = await res.json()
-    expectSqoopHeaders(res)
-    expect(json.name).to.equal(firstMysqlLinkName)
-    expect(_.get(json, 'validation-result[0]')).to.be.empty
+    console.log(await isHasoopRequestRight('createLink', res))
+    // const json = await res.json()
+    // expectSqoopHeaders(res)
+    // expect(json.name).to.equal(firstMysqlLinkName)
+    // expect(_.get(json, 'validation-result[0]')).to.be.empty
   })
 
   test('createLinkForHdfs', async () => {

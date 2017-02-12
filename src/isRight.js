@@ -75,7 +75,8 @@ function getLinkByLinkNameDispose (responseJson, responseHeaders, linkName) {
 }
 function createLinkDispose (responseJson, responseHeaders, linkName) {
   const isOk = responseJson === {name: linkName, 'validation-result': [{}]}
-  return {isRight: isOk, data: responseJson, headers: responseHeaders}
+  const data = responseJson.name
+  return {isRight: isOk, data, headers: responseHeaders}
 }
 function updateLinkConfigDispose (responseJson, responseHeaders) {
   const isOk = responseJson === { 'validation-result': [ {} ] }
