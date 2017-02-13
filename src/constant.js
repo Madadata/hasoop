@@ -79,5 +79,5 @@ export const hasoopMethodTypes = keyMirror({
   stopJob: null,
   jobStatus: null,
   getSubmissionAll: null,
-  getSubmissionByJobNam: null
+  getSubmissionByJobName: null
 })
