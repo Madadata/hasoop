@@ -2,7 +2,7 @@ import _ from 'lodash'
 import { simpleVersion, version, sqoopConnectorCount, hasoopMethodTypes, jobStatusTypes } from './constant'
 import { splitLinkConfig, splitJobConfig, splitSubmissionConfig } from './utils'
 
-const equalEmptyObject = responseJson => _.isEqual(responseJson, {})
+const returnEmptyObject = responseJson => _.isEqual(responseJson, {})
 
 const defaultEmptyData = (isRight, responseJson) => isRight ? {} : responseJson
 
@@ -19,10 +19,10 @@ const isRightGenList = {
   },
   [hasoopMethodTypes.createLink]: (responseJson, linkName) => _.isEqual(responseJson, {name: linkName, 'validation-result': [{}]}),
   [hasoopMethodTypes.updateLinkConfig]: (responseJson) => _.isEqual(responseJson, {'validation-result': [{}]}),
-  [hasoopMethodTypes.updateLinkEnable]: equalEmptyObject,
-  [hasoopMethodTypes.updateLinkDisable]: equalEmptyObject,
-  [hasoopMethodTypes.deleteLink]: equalEmptyObject,
-  [hasoopMethodTypes.deleteLinkAll]: equalEmptyObject,
+  [hasoopMethodTypes.updateLinkEnable]: returnEmptyObject,
+  [hasoopMethodTypes.updateLinkDisable]: returnEmptyObject,
+  [hasoopMethodTypes.deleteLink]: returnEmptyObject,
+  [hasoopMethodTypes.deleteLinkAll]: returnEmptyObject,
   [hasoopMethodTypes.getJobAll]: (responseJson) => _.map(responseJson.jobs, jobObject => splitJobConfig({jobs: [jobObject]})),
   [hasoopMethodTypes.getJobByJobName]: (responseJson, jobName) => {
     const jobConfig = splitJobConfig(responseJson)
@@ -31,10 +31,10 @@ const isRightGenList = {
   [hasoopMethodTypes.getJobByConnectorName]: (responseJson) => true,
   [hasoopMethodTypes.createJob]: (responseJson, jobName) => _.isEqual(responseJson, { name: jobName, 'validation-result': [ {}, {}, {} ] }),
   [hasoopMethodTypes.updateJobConfig]: (responseJson) => _.isEqual(responseJson, {'validation-result': [{}, {}, {}]}),
-  [hasoopMethodTypes.updateJobEnable]: equalEmptyObject,
-  [hasoopMethodTypes.updateJobDisable]: equalEmptyObject,
-  [hasoopMethodTypes.deleteJob]: equalEmptyObject,
-  [hasoopMethodTypes.deleteJobAll]: equalEmptyObject,
+  [hasoopMethodTypes.updateJobEnable]: returnEmptyObject,
+  [hasoopMethodTypes.updateJobDisable]: returnEmptyObject,
+  [hasoopMethodTypes.deleteJob]: returnEmptyObject,
+  [hasoopMethodTypes.deleteJobAll]: returnEmptyObject,
   [hasoopMethodTypes.startJob]: (responseJson, jobName) => {
     const submissionConfig = splitSubmissionConfig(responseJson)
     return submissionConfig.topConfig.jobName === jobName && _.includes(jobStatusTypes.startJobSucceedStatus, submissionConfig.topConfig.status) && submissionConfig.fromSchemaConfig.columns.length > 0
