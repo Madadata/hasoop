@@ -39,14 +39,22 @@ export const sqoopAction = keyMirror({
   disable: null
 })
 
+export const simpleVersion = '1'
+export const version = 'v1'
+export const sqoopConnectorCount = 7
+
 /**
  * type of all hasoop method
  */
-export const hasoopMethod = keyMirror({
+export const hasoopMethodTypes = keyMirror({
+   // version
   getVersion: null,
+   // driver
   getDriver: null,
+   // connector
   getConnectorAll: null,
   getConnectorByConnectorName: null,
+   // link
   getLinkAll: null,
   getLinkByConnectorName: null,
   getLinkByLinkName: null,
@@ -56,6 +64,7 @@ export const hasoopMethod = keyMirror({
   updateLinkDisable: null,
   deleteLink: null,
   deleteLinkAll: null,
+   // job
   getJobAll: null,
   getJobByJobName: null,
   getJobByConnectorName: null,
@@ -65,9 +74,15 @@ export const hasoopMethod = keyMirror({
   updateJobDisable: null,
   deleteJob: null,
   deleteJobAll: null,
+   // submission
   startJob: null,
   stopJob: null,
   jobStatus: null,
   getSubmissionAll: null,
   getSubmissionByJobName: null
 })
+
+export const jobStatusTypes = {
+  allJobStatus: ['BOOTING', 'FAILURE_ON_SUBMIT', 'RUNNING', 'SUCCEEDED', 'FAILED', 'NEVER_EXECUTED', 'UNKNOWN'],
+  startJobSucceedStatus: ['BOOTING', 'RUNNING', 'SUCCEEDED']
+}
