@@ -81,3 +81,8 @@ export const hasoopMethodTypes = keyMirror({
   getSubmissionAll: null,
   getSubmissionByJobName: null
 })
+
+export const jobStatusTypes = {
+  allJobStatus: ['BOOTING', 'FAILURE_ON_SUBMIT', 'RUNNING', 'SUCCEEDED', 'FAILED', 'NEVER_EXECUTED', 'UNKNOWN'],
+  startJobSucceedStatus: ['BOOTING', 'RUNNING', 'SUCCEEDED']
+}

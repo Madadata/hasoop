@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { simpleVersion, version, sqoopConnectorCount, hasoopMethodTypes } from './constant'
+import { simpleVersion, version, sqoopConnectorCount, hasoopMethodTypes, jobStatusTypes } from './constant'
 import { splitLinkConfig, splitJobConfig, splitSubmissionConfig } from './utils'
 
 const equalEmptyObject = responseJson => _.isEqual(responseJson, {})
@@ -19,10 +19,10 @@ const isRightGenList = {
   },
   [hasoopMethodTypes.createLink]: (responseJson, linkName) => _.isEqual(responseJson, {name: linkName, 'validation-result': [{}]}),
   [hasoopMethodTypes.updateLinkConfig]: (responseJson) => _.isEqual(responseJson, {'validation-result': [{}]}),
-  [hasoopMethodTypes.updateLinkEnable]: (responseJson) => equalEmptyObject(responseJson),
-  [hasoopMethodTypes.updateLinkDisable]: (responseJson) => equalEmptyObject(responseJson),
-  [hasoopMethodTypes.deleteLink]: (responseJson) => equalEmptyObject(responseJson),
-  [hasoopMethodTypes.deleteLinkAll]: (responseJson) => equalEmptyObject(responseJson),
+  [hasoopMethodTypes.updateLinkEnable]: equalEmptyObject,
+  [hasoopMethodTypes.updateLinkDisable]: equalEmptyObject,
+  [hasoopMethodTypes.deleteLink]: equalEmptyObject,
+  [hasoopMethodTypes.deleteLinkAll]: equalEmptyObject,
   [hasoopMethodTypes.getJobAll]: (responseJson) => _.map(responseJson.jobs, jobObject => splitJobConfig({jobs: [jobObject]})),
   [hasoopMethodTypes.getJobByJobName]: (responseJson, jobName) => {
     const jobConfig = splitJobConfig(responseJson)
@@ -31,13 +31,13 @@ const isRightGenList = {
   [hasoopMethodTypes.getJobByConnectorName]: (responseJson) => true,
   [hasoopMethodTypes.createJob]: (responseJson, jobName) => _.isEqual(responseJson, { name: jobName, 'validation-result': [ {}, {}, {} ] }),
   [hasoopMethodTypes.updateJobConfig]: (responseJson) => _.isEqual(responseJson, {'validation-result': [{}, {}, {}]}),
-  [hasoopMethodTypes.updateJobEnable]: (responseJson) => equalEmptyObject(responseJson),
-  [hasoopMethodTypes.updateJobDisable]: (responseJson) => equalEmptyObject(responseJson),
-  [hasoopMethodTypes.deleteJob]: (responseJson) => equalEmptyObject(responseJson),
-  [hasoopMethodTypes.deleteJobAll]: (responseJson) => equalEmptyObject(responseJson),
+  [hasoopMethodTypes.updateJobEnable]: equalEmptyObject,
+  [hasoopMethodTypes.updateJobDisable]: equalEmptyObject,
+  [hasoopMethodTypes.deleteJob]: equalEmptyObject,
+  [hasoopMethodTypes.deleteJobAll]: equalEmptyObject,
   [hasoopMethodTypes.startJob]: (responseJson, jobName) => {
     const submissionConfig = splitSubmissionConfig(responseJson)
-    return submissionConfig.topConfig.jobName === jobName && _.includes(['BOOTING', 'RUNNING', 'SUCCEEDED'], submissionConfig.topConfig.status) && submissionConfig.fromSchemaConfig.columns.length > 0
+    return submissionConfig.topConfig.jobName === jobName && _.includes(jobStatusTypes.startJobSucceedStatus, submissionConfig.topConfig.status) && submissionConfig.fromSchemaConfig.columns.length > 0
   },
   [hasoopMethodTypes.stopJob]: (responseJson, jobName) => {
     const submissionConfig = splitSubmissionConfig(responseJson)
@@ -45,7 +45,7 @@ const isRightGenList = {
   },
   [hasoopMethodTypes.jobStatus]: (responseJson, jobName) => {
     const submissionConfig = splitSubmissionConfig(responseJson)
-    return submissionConfig.topConfig.jobName === jobName && _.includes(['BOOTING', 'FAILURE_ON_SUBMIT', 'RUNNING', 'SUCCEEDED', 'FAILED', 'NEVER_EXECUTED', 'UNKNOWN'], submissionConfig.topConfig.status)
+    return submissionConfig.topConfig.jobName === jobName && _.includes(jobStatusTypes.allJobStatus, submissionConfig.topConfig.status)
   },
   [hasoopMethodTypes.getSubmissionAll]: (responseJson) => true,
   [hasoopMethodTypes.getSubmissionByJobName]: (responseJson) => true
@@ -60,20 +60,20 @@ const dataGenList = {
   [hasoopMethodTypes.getLinkByConnectorName]: (isRight, responseJson) => _.map(responseJson.links, linkObject => splitLinkConfig({links: [linkObject]})),
   [hasoopMethodTypes.getLinkByLinkName]: (isRight, responseJson) => isRight ? splitLinkConfig(responseJson) : responseJson,
   [hasoopMethodTypes.createLink]: (isRight, responseJson) => isRight ? responseJson.name : responseJson,
-  [hasoopMethodTypes.updateLinkConfig]: (isRight, responseJson) => defaultEmptyData(isRight, responseJson),
-  [hasoopMethodTypes.updateLinkEnable]: (isRight, responseJson) => defaultEmptyData(isRight, responseJson),
-  [hasoopMethodTypes.updateLinkDisable]: (isRight, responseJson) => defaultEmptyData(isRight, responseJson),
-  [hasoopMethodTypes.deleteLink]: (isRight, responseJson) => defaultEmptyData(isRight, responseJson),
-  [hasoopMethodTypes.deleteLinkAll]: (isRight, responseJson) => defaultEmptyData(isRight, responseJson),
+  [hasoopMethodTypes.updateLinkConfig]: defaultEmptyData,
+  [hasoopMethodTypes.updateLinkEnable]: defaultEmptyData,
+  [hasoopMethodTypes.updateLinkDisable]: defaultEmptyData,
+  [hasoopMethodTypes.deleteLink]: defaultEmptyData,
+  [hasoopMethodTypes.deleteLinkAll]: defaultEmptyData,
   [hasoopMethodTypes.getJobAll]: (isRight, responseJson) => _.map(responseJson.jobs, jobObject => splitJobConfig({jobs: [jobObject]})),
   [hasoopMethodTypes.getJobByJobName]: (isRight, responseJson) => isRight ? splitJobConfig(responseJson) : responseJson,
   [hasoopMethodTypes.getJobByConnectorName]: (isRight, responseJson) => _.map(responseJson.jobs, jobObject => splitJobConfig({jobs: [jobObject]})),
   [hasoopMethodTypes.createJob]: (isRight, responseJson) => isRight ? responseJson.name : responseJson,
-  [hasoopMethodTypes.updateJobConfig]: (isRight, responseJson) => defaultEmptyData(isRight, responseJson),
-  [hasoopMethodTypes.updateJobEnable]: (isRight, responseJson) => defaultEmptyData(isRight, responseJson),
-  [hasoopMethodTypes.updateJobDisable]: (isRight, responseJson) => defaultEmptyData(isRight, responseJson),
-  [hasoopMethodTypes.deleteJob]: (isRight, responseJson) => defaultEmptyData(isRight, responseJson),
-  [hasoopMethodTypes.deleteJobAll]: (isRight, responseJson) => defaultEmptyData(isRight, responseJson),
+  [hasoopMethodTypes.updateJobConfig]: defaultEmptyData,
+  [hasoopMethodTypes.updateJobEnable]: defaultEmptyData,
+  [hasoopMethodTypes.updateJobDisable]: defaultEmptyData,
+  [hasoopMethodTypes.deleteJob]: defaultEmptyData,
+  [hasoopMethodTypes.deleteJobAll]: defaultEmptyData,
   [hasoopMethodTypes.startJob]: (isRight, responseJson) => isRight ? splitSubmissionConfig(responseJson) : responseJson,
   [hasoopMethodTypes.stopJob]: (isRight, responseJson) => isRight ? splitSubmissionConfig(responseJson) : responseJson,
   [hasoopMethodTypes.jobStatus]: (isRight, responseJson) => isRight ? splitSubmissionConfig(responseJson) : responseJson,
