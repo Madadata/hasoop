@@ -4,9 +4,9 @@ import { splitLinkConfig, splitJobConfig, splitSubmissionConfig } from './utils'
 
 const returnEmptyObject = responseJson => _.isEqual(responseJson, {})
 
-const defaultEmptyData = (isRight, responseJson) => isRight ? {} : responseJson
+const defaultEmptyData = (success, responseJson) => success ? {} : responseJson
 
-const isRightGenList = {
+const successGenList = {
   [hasoopMethodTypes.getVersion]: (responseJson) => _.get(responseJson, 'api-versions[0]') === version,
   [hasoopMethodTypes.getDriver]: (responseJson) => responseJson.version === simpleVersion && _.get(responseJson, ['all-config-resources', 'jarConfig.label']) === 'Classpath configuration',
   [hasoopMethodTypes.getConnectorAll]: (responseJson) => responseJson.connectors.length === sqoopConnectorCount && _.includes(_.map(responseJson.connectors, 'name'), 'generic-jdbc-connector'),
@@ -52,36 +52,36 @@ const isRightGenList = {
 }
 
 const dataGenList = {
-  [hasoopMethodTypes.getVersion]: (isRight, responseJson) => responseJson,
-  [hasoopMethodTypes.getDriver]: (isRight, responseJson) => responseJson,
-  [hasoopMethodTypes.getConnectorAll]: (isRight, responseJson) => isRight ? responseJson.connectors : responseJson,
-  [hasoopMethodTypes.getConnectorByConnectorName]: (isRight, responseJson) => isRight ? responseJson.connectors[0] : responseJson,
-  [hasoopMethodTypes.getLinkAll]: (isRight, responseJson) => responseJson.links,
-  [hasoopMethodTypes.getLinkByConnectorName]: (isRight, responseJson) => _.map(responseJson.links, linkObject => splitLinkConfig({links: [linkObject]})),
-  [hasoopMethodTypes.getLinkByLinkName]: (isRight, responseJson) => isRight ? splitLinkConfig(responseJson) : responseJson,
-  [hasoopMethodTypes.createLink]: (isRight, responseJson) => isRight ? responseJson.name : responseJson,
+  [hasoopMethodTypes.getVersion]: (success, responseJson) => responseJson,
+  [hasoopMethodTypes.getDriver]: (success, responseJson) => responseJson,
+  [hasoopMethodTypes.getConnectorAll]: (success, responseJson) => success ? responseJson.connectors : responseJson,
+  [hasoopMethodTypes.getConnectorByConnectorName]: (success, responseJson) => success ? responseJson.connectors[0] : responseJson,
+  [hasoopMethodTypes.getLinkAll]: (success, responseJson) => responseJson.links,
+  [hasoopMethodTypes.getLinkByConnectorName]: (success, responseJson) => _.map(responseJson.links, linkObject => splitLinkConfig({links: [linkObject]})),
+  [hasoopMethodTypes.getLinkByLinkName]: (success, responseJson) => success ? splitLinkConfig(responseJson) : responseJson,
+  [hasoopMethodTypes.createLink]: (success, responseJson) => success ? responseJson.name : responseJson,
   [hasoopMethodTypes.updateLinkConfig]: defaultEmptyData,
   [hasoopMethodTypes.updateLinkEnable]: defaultEmptyData,
   [hasoopMethodTypes.updateLinkDisable]: defaultEmptyData,
   [hasoopMethodTypes.deleteLink]: defaultEmptyData,
   [hasoopMethodTypes.deleteLinkAll]: defaultEmptyData,
-  [hasoopMethodTypes.getJobAll]: (isRight, responseJson) => _.map(responseJson.jobs, jobObject => splitJobConfig({jobs: [jobObject]})),
-  [hasoopMethodTypes.getJobByJobName]: (isRight, responseJson) => isRight ? splitJobConfig(responseJson) : responseJson,
-  [hasoopMethodTypes.getJobByConnectorName]: (isRight, responseJson) => _.map(responseJson.jobs, jobObject => splitJobConfig({jobs: [jobObject]})),
-  [hasoopMethodTypes.createJob]: (isRight, responseJson) => isRight ? responseJson.name : responseJson,
+  [hasoopMethodTypes.getJobAll]: (success, responseJson) => _.map(responseJson.jobs, jobObject => splitJobConfig({jobs: [jobObject]})),
+  [hasoopMethodTypes.getJobByJobName]: (success, responseJson) => success ? splitJobConfig(responseJson) : responseJson,
+  [hasoopMethodTypes.getJobByConnectorName]: (success, responseJson) => _.map(responseJson.jobs, jobObject => splitJobConfig({jobs: [jobObject]})),
+  [hasoopMethodTypes.createJob]: (success, responseJson) => success ? responseJson.name : responseJson,
   [hasoopMethodTypes.updateJobConfig]: defaultEmptyData,
   [hasoopMethodTypes.updateJobEnable]: defaultEmptyData,
   [hasoopMethodTypes.updateJobDisable]: defaultEmptyData,
   [hasoopMethodTypes.deleteJob]: defaultEmptyData,
   [hasoopMethodTypes.deleteJobAll]: defaultEmptyData,
-  [hasoopMethodTypes.startJob]: (isRight, responseJson) => isRight ? splitSubmissionConfig(responseJson) : responseJson,
-  [hasoopMethodTypes.stopJob]: (isRight, responseJson) => isRight ? splitSubmissionConfig(responseJson) : responseJson,
-  [hasoopMethodTypes.jobStatus]: (isRight, responseJson) => isRight ? splitSubmissionConfig(responseJson) : responseJson,
-  [hasoopMethodTypes.getSubmissionAll]: (isRight, responseJson) => responseJson,
-  [hasoopMethodTypes.getSubmissionByJobName]: (isRight, responseJson) => responseJson
+  [hasoopMethodTypes.startJob]: (success, responseJson) => success ? splitSubmissionConfig(responseJson) : responseJson,
+  [hasoopMethodTypes.stopJob]: (success, responseJson) => success ? splitSubmissionConfig(responseJson) : responseJson,
+  [hasoopMethodTypes.jobStatus]: (success, responseJson) => success ? splitSubmissionConfig(responseJson) : responseJson,
+  [hasoopMethodTypes.getSubmissionAll]: (success, responseJson) => responseJson,
+  [hasoopMethodTypes.getSubmissionByJobName]: (success, responseJson) => responseJson
 }
 
-export const isRightFromHeaders = res => res.headers.get('sqoop-error-code') === '1000' && res.headers.get('sqoop-error-message') === 'OK'
+export const successFromHeaders = res => res.headers.get('sqoop-error-code') === '1000' && res.headers.get('sqoop-error-message') === 'OK'
 
 export const getResponseHeaders = res => ({
   sqoopErrorCode: res.headers.get('sqoop-error-code'),
@@ -96,20 +96,20 @@ export async function hasoopRequestDispose (methodName, res, ...params) {
   }
   const responseJson = await res.json()
   const responseHeaders = getResponseHeaders(res)
-  if (!isRightFromHeaders(res)) {
-    return {isRight: false, data: responseJson, headers: responseHeaders}
+  if (!successFromHeaders(res)) {
+    return {success: false, data: responseJson, headers: responseHeaders}
   }
 
-  const disposeMethodGen = (isRightGen, dataGen) => {
+  const disposeMethodGen = (successGen, dataGen) => {
     (responseJson, headers, ...otherParams) => {
-      const isRight = isRightGen(responseJson, ...otherParams)
-      const data = dataGen(isRight, responseJson, ...otherParams)
-      return { isRight, data, headers }
+      const success = successGen(responseJson, ...otherParams)
+      const data = dataGen(success, responseJson, ...otherParams)
+      return { success, data, headers }
     }
   }
 
-  const isRightGen = isRightGenList[methodName]
+  const successGen = successGenList[methodName]
   const dataGen = dataGenList[methodName]
-  const disposeMethod = disposeMethodGen(isRightGen, dataGen)
+  const disposeMethod = disposeMethodGen(successGen, dataGen)
   return disposeMethod(responseJson, responseHeaders, ...params)
 }
