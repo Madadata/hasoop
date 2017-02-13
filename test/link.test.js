@@ -1,14 +1,12 @@
 /* eslint-env mocha */
 
-import _ from 'lodash'
 import faker from 'faker'
 import { expect } from 'chai'
 import {
   sqoopClient,
   generateMysqlConfig,
   generateHdfsConfig,
-  expectSqoopHeaders,
-  splitLinkConfig
+  hasoopRequestDispose
 } from './index'
 
 suite('link', () => {
@@ -24,142 +22,65 @@ suite('link', () => {
 
   test('createLinkForMysql', async () => {
     const config = generateMysqlConfig(firstMysqlLinkName)
-    const json = await sqoopClient.createLink(config)
-      .then(res => {
-        expectSqoopHeaders(res)
-        return res.json()
-      })
-    expect(json).to.deep.equal({'name': firstMysqlLinkName, 'validation-result': [{}]})
+    const res = await sqoopClient.createLink(config)
+    const data = await hasoopRequestDispose('createLink', res, firstMysqlLinkName)
+    expect(data.success).to.be.true
   })
 
   test('createLinkForHdfs', async () => {
     const config = generateHdfsConfig(firstHdfsLinkName)
-    const json = await sqoopClient.createLink(config)
-      .then(res => {
-        expectSqoopHeaders(res)
-        return res.json()
-      })
-    expect(json).to.deep.equal({'name': firstHdfsLinkName, 'validation-result': [{}]})
+    const res = await sqoopClient.createLink(config)
+    const data = await hasoopRequestDispose('createLink', res, firstHdfsLinkName)
+    expect(data.success).to.be.true
   })
 
   test('getMyqlLinkByLinkName', async () => {
-    const getLinkResJson = await sqoopClient.getLinkByLinkName(firstMysqlLinkName)
-      .then(getLinkRes => {
-        expectSqoopHeaders(getLinkRes)
-        return getLinkRes.json()
-      })
-    const linkConfig = splitLinkConfig(getLinkResJson)
-    expect(linkConfig.name).to.equal(firstMysqlLinkName)
-    expect(linkConfig).to.have.all.keys(
-      'id', 'enabled', 'updateUser', 'name',
-      'connectorName', 'creationDate', 'updateDate', 'creationUser',
-      'jdbcDriver', 'connectionString', 'username', 'password', 'fetchSize',
-      'jdbcProperties', 'identifierEnclose'
-    )
+    const res = await sqoopClient.getLinkByLinkName(firstMysqlLinkName)
+    const data = await hasoopRequestDispose('getLinkByLinkName', res, firstMysqlLinkName)
+    expect(data.success).to.be.true
   })
 
   test('getHdfsLinkByLinkName', async () => {
-    const getLinkResJson = await sqoopClient.getLinkByLinkName(firstHdfsLinkName)
-      .then(getLinkRes => {
-        expectSqoopHeaders(getLinkRes)
-        return getLinkRes.json()
-      })
-    const linkConfig = splitLinkConfig(getLinkResJson)
-    expect(linkConfig.name).to.equal(firstHdfsLinkName)
-    expect(linkConfig).to.have.all.keys(
-      'id', 'enabled', 'updateUser', 'name', 'connectorName', 'creationDate',
-      'updateDate', 'creationUser', 'uri', 'confDir', 'configOverrides'
-    )
+    const res = await sqoopClient.getLinkByLinkName(firstHdfsLinkName)
+    const data = await hasoopRequestDispose('getLinkByLinkName', res, firstHdfsLinkName)
+    expect(data.success).to.be.true
   })
 
   test('updateLinkForMysql', async () => {
     const config = generateMysqlConfig(secondMysqlLinkName)
-    const updateResJson = await sqoopClient.updateLinkConfig(firstMysqlLinkName, config)
-      .then(updateRes => {
-        expectSqoopHeaders(updateRes)
-        return updateRes.json()
-      })
-    expect(updateResJson).to.deep.equal({ 'validation-result': [ {} ] })
-    const getLinkResJson = await sqoopClient.getLinkByLinkName(secondMysqlLinkName)
-      .then(getLinkRes => {
-        expectSqoopHeaders(getLinkRes)
-        return getLinkRes.json()
-      })
-    const linkConfig = splitLinkConfig(getLinkResJson)
-    expect(linkConfig.name).to.equal(secondMysqlLinkName)
+    const res = await sqoopClient.updateLinkConfig(firstMysqlLinkName, config)
+    const data = await hasoopRequestDispose('updateLinkConfig', res)
+    expect(data.success).to.be.true
   })
 
   test('getLinkByConnectorName', async () => {
     const connectorName = 'generic-jdbc-connector'
-    const json = await sqoopClient.getLinkByConnectorName(connectorName)
-      .then(res => {
-        expectSqoopHeaders(res)
-        return res.json()
-      })
-    const linkNames = _.map(_.map(json.links, (linkObject) => {
-      return splitLinkConfig({links: [linkObject]})
-    }), 'name')
-    expect(secondMysqlLinkName).to.be.oneOf(linkNames)
+    const res = await sqoopClient.getLinkByConnectorName(connectorName)
+    const data = await hasoopRequestDispose('getLinkByConnectorName', res, connectorName)
+    expect(data.success).to.be.true
   })
 
   test('updateLinkDisable', async () => {
-    const updateLinkDisableJson = await sqoopClient.updateLinkDisable(secondMysqlLinkName)
-      .then(res => {
-        expectSqoopHeaders(res)
-        return res.json()
-      })
-    expect(updateLinkDisableJson).to.be.empty
-    const getLinkByLinkNameJson = await sqoopClient.getLinkByLinkName(secondMysqlLinkName)
-      .then(res => {
-        expectSqoopHeaders(res)
-        return res.json()
-      })
-    const linkConfig = splitLinkConfig(getLinkByLinkNameJson)
-    expect(linkConfig.name).to.equal(secondMysqlLinkName)
-    expect(linkConfig.enabled).to.be.false
+    const res = await sqoopClient.updateLinkDisable(secondMysqlLinkName)
+    const data = await hasoopRequestDispose('updateLinkDisable', res, secondMysqlLinkName)
+    expect(data.success).to.be.true
   })
 
   test('updateLinkEnable', async () => {
-    const updateLinkEnableJson = await sqoopClient.updateLinkEnable(secondMysqlLinkName)
-      .then(res => {
-        expectSqoopHeaders(res)
-        return res.json()
-      })
-    expect(updateLinkEnableJson).to.be.empty
-    const getLinkByLinkNameJson = await sqoopClient.getLinkByLinkName(secondMysqlLinkName)
-      .then(res => {
-        expectSqoopHeaders(res)
-        return res.json()
-      })
-    const linkConfig = splitLinkConfig(getLinkByLinkNameJson)
-    expect(linkConfig.name).to.equal(secondMysqlLinkName)
-    expect(linkConfig.enabled).to.be.true
+    const res = await sqoopClient.updateLinkEnable(secondMysqlLinkName)
+    const data = await hasoopRequestDispose('updateLinkEnable', res, secondMysqlLinkName)
+    expect(data.success).to.be.true
   })
 
   test('getLinkAll', async () => {
-    const getLinkAllResJson = await sqoopClient.getLinkAll()
-      .then(getLinkAllRes => {
-        expectSqoopHeaders(getLinkAllRes)
-        return getLinkAllRes.json()
-      })
-    const linkNames = _.map(_.map(getLinkAllResJson.links, (linkObject) => {
-      return splitLinkConfig({links: [linkObject]})
-    }), 'name')
-    expect(firstHdfsLinkName).to.be.oneOf(linkNames)
-    expect(secondMysqlLinkName).to.be.oneOf(linkNames)
+    const res = await sqoopClient.getLinkAll()
+    const data = await hasoopRequestDispose('getLinkAll', res)
+    expect(data.success).to.be.true
   })
 
   test('deleteLink', async () => {
-    const deleteLinkResJson = await sqoopClient.deleteLink(firstHdfsLinkName)
-      .then(deleteLinkRes => {
-        expectSqoopHeaders(deleteLinkRes)
-        return deleteLinkRes.json()
-      })
-    expect(deleteLinkResJson).to.be.empty
-    const getLinkByLinkNameRes = await sqoopClient.getLinkByLinkName(firstHdfsLinkName)
-    expect(getLinkByLinkNameRes.headers.get('sqoop-error-code')).to.equal('2000')
-    expect(getLinkByLinkNameRes.headers.get('sqoop-error-message')).to.equal('ERROR')
-    expect(getLinkByLinkNameRes.headers.get('sqoop-internal-error-code')).to.equal('SERVER_0006')
-    expect(getLinkByLinkNameRes.headers.get('sqoop-internal-error-message')).to.equal(`SERVER_0006:Entity requested doesn't exist - Invalid link name: ${firstHdfsLinkName} doesn't exist`)
+    const res = await sqoopClient.deleteLink(firstHdfsLinkName)
+    const data = await hasoopRequestDispose('deleteLink', res, firstHdfsLinkName)
+    expect(data.success).to.be.true
   })
 })

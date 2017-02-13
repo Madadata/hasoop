@@ -23,7 +23,7 @@ const successGenList = {
   [hasoopMethodTypes.updateLinkDisable]: returnEmptyObject,
   [hasoopMethodTypes.deleteLink]: returnEmptyObject,
   [hasoopMethodTypes.deleteLinkAll]: returnEmptyObject,
-  [hasoopMethodTypes.getJobAll]: (responseJson) => _.map(responseJson.jobs, jobObject => splitJobConfig({jobs: [jobObject]})),
+  [hasoopMethodTypes.getJobAll]: (responseJson) => true,
   [hasoopMethodTypes.getJobByJobName]: (responseJson, jobName) => {
     const jobConfig = splitJobConfig(responseJson)
     return jobConfig.topName === jobName && _.difference(['topName', 'topEnabled', 'topFromLinkName', 'topToLinkName'], _.keys(jobConfig)).length === 0
@@ -94,18 +94,17 @@ export async function hasoopRequestDispose (methodName, res, ...params) {
   if (!Object.keys(hasoopMethodTypes).includes(methodName)) {
     throw new Error(`hasoop method ${methodName} is not exist`)
   }
+
   const responseJson = await res.json()
   const responseHeaders = getResponseHeaders(res)
   if (!successFromHeaders(res)) {
     return {success: false, data: responseJson, headers: responseHeaders}
   }
 
-  const disposeMethodGen = (successGen, dataGen) => {
-    (responseJson, headers, ...otherParams) => {
-      const success = successGen(responseJson, ...otherParams)
-      const data = dataGen(success, responseJson, ...otherParams)
-      return { success, data, headers }
-    }
+  const disposeMethodGen = (successGen, dataGen) => (responseJson, headers, ...otherParams) => {
+    const success = successGen(responseJson, ...otherParams)
+    const data = dataGen(success, responseJson, ...otherParams)
+    return { success, data, headers }
   }
 
   const successGen = successGenList[methodName]
