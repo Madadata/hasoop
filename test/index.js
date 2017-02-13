@@ -31,7 +31,7 @@ export function generateHdfsConfig (linkName) {
   }
 }
 
-export function generateFromMysqlToHdfsConfig (jobName, fromLinkName, toLinkName) {
+export function generateFromMysqlToHdfsCreateConfig (jobName, fromLinkName, toLinkName) {
   return {
     'jobName': jobName,
     'fromLinkName': fromLinkName,
@@ -44,6 +44,16 @@ export function generateFromMysqlToHdfsConfig (jobName, fromLinkName, toLinkName
 
       // for hdfs
       'outputDirectory': `hdfs://${sqoopHost}:9000/data`
+    }
+  }
+}
+
+export function generateFromMysqlToHdfsUpdateConfig (jobName, fromLinkName, toLinkName) {
+  return {
+    'jobConfig': {
+      // for mysql
+      'schemaName': 'harry',
+      'tableName': 'mysql'
     }
   }
 }
