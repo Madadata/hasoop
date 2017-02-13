@@ -92,7 +92,7 @@ export const getResponseHeaders = res => ({
 
 export async function hasoopRequestDispose (methodName, res, ...params) {
   if (!Object.keys(hasoopMethodTypes).includes(methodName)) {
-    throw new Error(`hasoop method ${methodName} is not supported`)
+    throw new Error(`hasoop method ${methodName} is not exist`)
   }
   const responseJson = await res.json()
   const responseHeaders = getResponseHeaders(res)
