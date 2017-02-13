@@ -85,60 +85,32 @@ suite('job', () => {
 
   // next 5 test is ok for ec2, so remove `skip`.
   test('FromMysqlToHdfsJobStatus When not start', async () => {
-    // const jobStatusResJson = await sqoopClient.jobStatus(thirdJobName)
-    //   .then(jobStatusRes => {
-    //     expectSqoopHeaders(jobStatusRes)
-    //     return jobStatusRes.json()
-    //   })
-    // const submissionConfig = splitSubmissionConfig(jobStatusResJson)
-    // expect(submissionConfig.topConfig.jobName).to.equal(thirdJobName)
-    // expect(submissionConfig.topConfig.status).to.equal('NEVER_EXECUTED')
+    // const res = await sqoopClient.jobStatus(thirdJobName)
+    // const data = await hasoopRequestDispose('jobStatus', res, thirdJobName)
+    // expect(data.success).to.be.true
   })
 
   test('startFromMysqlToHdfsJob', async () => {
-    // const startJobResJson = await sqoopClient.startJob(thirdJobName)
-    //   .then(startJobRes => {
-    //     expectSqoopHeaders(startJobRes)
-    //     return startJobRes.json()
-    //   })
-    // const submissionConfig = splitSubmissionConfig(startJobResJson)
-    // expect(submissionConfig.topConfig.jobName).to.equal(thirdJobName)
-    // expect(submissionConfig.topConfig.status).to.be.oneOf(['BOOTING', 'RUNNING', 'SUCCEEDED'])
-    // expect(submissionConfig.fromSchemaConfig.columns).to.have.length.of.at.least(1)
+    // const res = await sqoopClient.startJob(thirdJobName)
+    // const data = await hasoopRequestDispose('startJob', res, thirdJobName)
+    // expect(data.success).to.be.true
   })
 
   test('FromMysqlToHdfsJobStatus When start', async () => {
-    // const jobStatusResJson = await sqoopClient.jobStatus(thirdJobName)
-    //   .then(jobStatusRes => {
-    //     expectSqoopHeaders(jobStatusRes)
-    //     return jobStatusRes.json()
-    //   })
-    // const submissionConfig = splitSubmissionConfig(jobStatusResJson)
-    // expect(submissionConfig.topConfig.jobName).to.equal(thirdJobName)
-    // expect(submissionConfig.topConfig.status).to.be.oneOf(['BOOTING', 'RUNNING', 'SUCCEEDED'])
+    // const res = await sqoopClient.jobStatus(thirdJobName)
+    // const data = await hasoopRequestDispose('jobStatus', res, thirdJobName)
+    // expect(data.success).to.be.true
   })
 
   test('stopFromMysqlToHdfsJob', async () => {
-    // const stopJobResJson = await sqoopClient.stopJob(thirdJobName)
-    //   .then(stopJobRes => {
-    //     expectSqoopHeaders(stopJobRes)
-    //     return stopJobRes.json()
-    //   })
-    // const submissionConfig = splitSubmissionConfig(stopJobResJson)
-    // expect(submissionConfig.topConfig.jobName).to.equal(thirdJobName)
-    // expect(submissionConfig.topConfig.status).to.equal('FAILED')
-    // expect(submissionConfig.topConfig.errorDetails).to.equal('Application killed by user.')
+    // const res = await sqoopClient.stopJob(thirdJobName)
+    // const data = await hasoopRequestDispose('stopJob', res, thirdJobName)
+    // expect(data.success).to.be.true
   })
 
   test('FromMysqlToHdfsJobStatus When stop', async () => {
-    // const jobStatusResJson = await sqoopClient.jobStatus(thirdJobName)
-    //   .then(jobStatusRes => {
-    //     expectSqoopHeaders(jobStatusRes)
-    //     return jobStatusRes.json()
-    //   })
-    // const submissionConfig = splitSubmissionConfig(jobStatusResJson)
-    // expect(submissionConfig.topConfig.jobName).to.equal(thirdJobName)
-    // expect(submissionConfig.topConfig.status).to.equal('FAILED')
-    // expect(submissionConfig.topConfig.errorDetails).to.equal('Application killed by user.')
+    // const res = await sqoopClient.jobStatus(thirdJobName)
+    // const data = await hasoopRequestDispose('jobStatus', res, thirdJobName)
+    // expect(data.success).to.be.true
   })
 })
