@@ -56,10 +56,7 @@ const dataGenList = {
   [hasoopMethodTypes.getConnectorByConnectorName]: (isRight, responseJson) => isRight ? responseJson.connectors[0] : responseJson,
   [hasoopMethodTypes.getLinkAll]: (isRight, responseJson) => responseJson.links,
   [hasoopMethodTypes.getLinkByConnectorName]: (isRight, responseJson) => _.map(responseJson.links, linkObject => splitLinkConfig({links: [linkObject]})),
-  [hasoopMethodTypes.getLinkByLinkName]: (isRight, responseJson) => {
-    const linkConfig = splitLinkConfig(responseJson)
-    return isRight ? linkConfig : responseJson
-  },
+  [hasoopMethodTypes.getLinkByLinkName]: (isRight, responseJson) => isRight ? splitLinkConfig(responseJson) : responseJson,
   [hasoopMethodTypes.createLink]: (isRight, responseJson) => isRight ? responseJson.name : responseJson,
   [hasoopMethodTypes.updateLinkConfig]: (isRight, responseJson) => isRight ? {} : responseJson,
   [hasoopMethodTypes.updateLinkEnable]: (isRight, responseJson) => isRight ? {} : responseJson,
@@ -67,10 +64,7 @@ const dataGenList = {
   [hasoopMethodTypes.deleteLink]: (isRight, responseJson) => isRight ? {} : responseJson,
   [hasoopMethodTypes.deleteLinkAll]: (isRight, responseJson) => isRight ? {} : responseJson,
   [hasoopMethodTypes.getJobAll]: (isRight, responseJson) => _.map(responseJson.jobs, jobObject => splitJobConfig({jobs: [jobObject]})),
-  [hasoopMethodTypes.getJobByJobName]: (isRight, responseJson) => {
-    const jobConfig = splitJobConfig(responseJson)
-    return isRight ? jobConfig : responseJson
-  },
+  [hasoopMethodTypes.getJobByJobName]: (isRight, responseJson) => isRight ? splitJobConfig(responseJson) : responseJson,
   [hasoopMethodTypes.getJobByConnectorName]: (isRight, responseJson) => _.map(responseJson.jobs, jobObject => splitJobConfig({jobs: [jobObject]})),
   [hasoopMethodTypes.createJob]: (isRight, responseJson) => isRight ? responseJson.name : responseJson,
   [hasoopMethodTypes.updateJobConfig]: (isRight, responseJson) => isRight ? {} : responseJson,
