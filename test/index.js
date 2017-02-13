@@ -1,24 +1,18 @@
 /* eslint-env mocha */
 
-import Hasoop, {
-  version,
-  linkType,
-  expectSqoopHeaders,
-  splitLinkConfig,
-  splitJobConfig,
-  splitSubmissionConfig
-} from '../src/index'
+import Hasoop, { linkType } from '../src/index'
+export * from '../src/index'
 
-const sqoopHost = process.env.SQOOP_HOST
+export const sqoopHost = process.env.SQOOP_HOST
 
-const sqoopClient = new Hasoop({
+export const sqoopClient = new Hasoop({
   'userName': 'Developer',
   'host': 'localhost',
   'port': 12000,
   'webapp': 'sqoop'
 })
 
-function generateMysqlConfig (linkName) {
+export function generateMysqlConfig (linkName) {
   return {
     'linkName': linkName,
     'linkType': linkType.mysql,
@@ -29,7 +23,7 @@ function generateMysqlConfig (linkName) {
   }
 }
 
-function generateHdfsConfig (linkName) {
+export function generateHdfsConfig (linkName) {
   return {
     'linkName': linkName,
     'linkType': linkType.hdfs,
@@ -37,7 +31,7 @@ function generateHdfsConfig (linkName) {
   }
 }
 
-function generateFromMysqlToHdfsCreateConfig (jobName, fromLinkName, toLinkName) {
+export function generateFromMysqlToHdfsCreateConfig (jobName, fromLinkName, toLinkName) {
   return {
     'jobName': jobName,
     'fromLinkName': fromLinkName,
@@ -54,7 +48,7 @@ function generateFromMysqlToHdfsCreateConfig (jobName, fromLinkName, toLinkName)
   }
 }
 
-function generateFromMysqlToHdfsUpdateConfig (jobName, fromLinkName, toLinkName) {
+export function generateFromMysqlToHdfsUpdateConfig (jobName, fromLinkName, toLinkName) {
   return {
     'jobConfig': {
       // for mysql
@@ -62,17 +56,4 @@ function generateFromMysqlToHdfsUpdateConfig (jobName, fromLinkName, toLinkName)
       'tableName': 'mysql'
     }
   }
-}
-
-export {
-  sqoopClient,
-  version,
-  expectSqoopHeaders,
-  generateMysqlConfig,
-  generateHdfsConfig,
-  splitLinkConfig,
-  splitJobConfig,
-  splitSubmissionConfig,
-  generateFromMysqlToHdfsCreateConfig,
-  generateFromMysqlToHdfsUpdateConfig
 }

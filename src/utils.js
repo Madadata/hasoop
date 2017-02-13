@@ -71,7 +71,7 @@ export function splitSubmissionConfig (submissionInfo) {
   }, (result, value, key) => _.set(result, _.camelCase(key), _.isString(value) ? decodeURIComponent(value) : value), {})
   return {
     topConfig,
-    fromSchemaConfig: _.get(submissionInfo, 'submissions[0].from-schema'),
-    toSchemaConfig: _.get(submissionInfo, 'submissions[0].to-schema')
+    fromSchemaConfig: _.get(submissionInfo, 'submissions[0].from-schema', {}),
+    toSchemaConfig: _.get(submissionInfo, 'submissions[0].to-schema', {})
   }
 }
