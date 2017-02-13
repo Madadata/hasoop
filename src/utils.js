@@ -29,7 +29,7 @@ const keyCamelCaseValueDecode = data => _(data)
  */
 function splitInputsConfig (configs) {
   const configListObject = _(configs)
-    .map(configInput => configInput.inputs)
+    .map('inputs')
     .flatten()
     .map(({name, value = null}) => {
       const nameSplit = name.split('.')
