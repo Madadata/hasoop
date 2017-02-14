@@ -31,11 +31,11 @@ export default class Hasoop {
 
   /**
    * use some param to create a sqoop rest api url.
-   *
-   * @param basicPath
-   * @param queryObject
-   * @param otherPath
-   * @returns {*}
+   * @param {Array} pathAndQuery - path and query
+   * @param {string} pathAndQuery[0] - basicPath
+   * @param {Object} pathAndQuery[1] - queryObject
+   * @param {Array<string>} otherPath - other paths
+   * @returns {urlObject} - formatted url object
    */
   formatUrl ([basicPath, queryObject = {}], ...otherPath) {
     _.set(queryObject, ['user.name'], this.userName)
