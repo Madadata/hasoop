@@ -141,7 +141,7 @@ function setHdfsJobConfig (linkConfig, jobConfig) {
         'sensitive': false,
         'overrides': '',
         'type': 'ENUM',
-        'value': 'TEXT_FILE' // TODO
+        'value': 'PARQUET_FILE' // TODO
       }, {
         'editable': 'ANY',
         'validators': [],
