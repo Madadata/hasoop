@@ -188,7 +188,7 @@ function setHdfsJobConfig (linkConfig, jobConfig) {
 /**
  * @ignore
  */
-function setJobConfig (jobConfig) {
+function setJobConfig () {
   return {
     'configs': [{
       'validators': [],
@@ -250,14 +250,7 @@ export function setCreateJobRequestBody (jobName, jobConfig, fromLinkInfo, toLin
       'to-connector-name': toLinkInfo.connectorName,
       'to-config-values': setHdfsJobConfig(toLinkInfo, jobConfig),
       'from-config-values': setMysqlJobConfig(fromLinkInfo, jobConfig),
-      'driver-config-values': setJobConfig(jobConfig)
+      'driver-config-values': setJobConfig()
     }]
   }
-}
-
-/**
- * @ignore
- */
-export function setUpdateJobRequestBody (jobName, jobConfig, fromLinkInfo, toLinkInfo, jobId) {
-  return setCreateJobRequestBody(jobName, jobConfig, fromLinkInfo, toLinkInfo, jobId)
 }
