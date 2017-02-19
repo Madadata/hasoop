@@ -5,8 +5,7 @@ import { expect } from 'chai'
 import {
   sqoopClient,
   generateMysqlConfig,
-  generateHdfsConfig,
-  hasoopRequestDispose
+  generateHdfsConfig
 } from './index'
 
 suite('link', () => {
@@ -22,65 +21,55 @@ suite('link', () => {
 
   test('createLinkForMysql', async () => {
     const config = generateMysqlConfig(firstMysqlLinkName)
-    const res = await sqoopClient.createLink(config)
-    const data = await hasoopRequestDispose('createLink', res, firstMysqlLinkName)
+    const data = await sqoopClient.createLink(config)
     expect(data.success).to.be.true
   })
 
   test('createLinkForHdfs', async () => {
     const config = generateHdfsConfig(firstHdfsLinkName)
-    const res = await sqoopClient.createLink(config)
-    const data = await hasoopRequestDispose('createLink', res, firstHdfsLinkName)
+    const data = await sqoopClient.createLink(config)
     expect(data.success).to.be.true
   })
 
   test('getMyqlLinkByLinkName', async () => {
-    const res = await sqoopClient.getLinkByLinkName(firstMysqlLinkName)
-    const data = await hasoopRequestDispose('getLinkByLinkName', res, firstMysqlLinkName)
+    const data = await sqoopClient.getLinkByLinkName(firstMysqlLinkName)
     expect(data.success).to.be.true
   })
 
   test('getHdfsLinkByLinkName', async () => {
-    const res = await sqoopClient.getLinkByLinkName(firstHdfsLinkName)
-    const data = await hasoopRequestDispose('getLinkByLinkName', res, firstHdfsLinkName)
+    const data = await sqoopClient.getLinkByLinkName(firstHdfsLinkName)
     expect(data.success).to.be.true
   })
 
   test('updateLinkForMysql', async () => {
     const config = generateMysqlConfig(secondMysqlLinkName)
-    const res = await sqoopClient.updateLinkConfig(firstMysqlLinkName, config)
-    const data = await hasoopRequestDispose('updateLinkConfig', res)
+    const data = await sqoopClient.updateLinkConfig(firstMysqlLinkName, config)
     expect(data.success).to.be.true
   })
 
   test('getLinkByConnectorName', async () => {
     const connectorName = 'generic-jdbc-connector'
-    const res = await sqoopClient.getLinkByConnectorName(connectorName)
-    const data = await hasoopRequestDispose('getLinkByConnectorName', res, connectorName)
+    const data = await sqoopClient.getLinkByConnectorName(connectorName)
     expect(data.success).to.be.true
   })
 
   test('updateLinkDisable', async () => {
-    const res = await sqoopClient.updateLinkDisable(secondMysqlLinkName)
-    const data = await hasoopRequestDispose('updateLinkDisable', res, secondMysqlLinkName)
+    const data = await sqoopClient.updateLinkDisable(secondMysqlLinkName)
     expect(data.success).to.be.true
   })
 
   test('updateLinkEnable', async () => {
-    const res = await sqoopClient.updateLinkEnable(secondMysqlLinkName)
-    const data = await hasoopRequestDispose('updateLinkEnable', res, secondMysqlLinkName)
+    const data = await sqoopClient.updateLinkEnable(secondMysqlLinkName)
     expect(data.success).to.be.true
   })
 
   test('getLinkAll', async () => {
-    const res = await sqoopClient.getLinkAll()
-    const data = await hasoopRequestDispose('getLinkAll', res)
+    const data = await sqoopClient.getLinkAll()
     expect(data.success).to.be.true
   })
 
   test('deleteLink', async () => {
-    const res = await sqoopClient.deleteLink(firstHdfsLinkName)
-    const data = await hasoopRequestDispose('deleteLink', res, firstHdfsLinkName)
+    const data = await sqoopClient.deleteLink(firstHdfsLinkName)
     expect(data.success).to.be.true
   })
 })

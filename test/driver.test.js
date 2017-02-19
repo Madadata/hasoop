@@ -2,14 +2,12 @@
 
 import { expect } from 'chai'
 import {
-  sqoopClient,
-  hasoopRequestDispose
- } from './index'
+  sqoopClient
+} from './index'
 
 suite('driver', () => {
   test('getDriver', async () => {
-    const res = await sqoopClient.getDriver()
-    const data = await hasoopRequestDispose('getDriver', res)
+    const data = await sqoopClient.getDriver()
     expect(data.success).to.be.true
   })
 })

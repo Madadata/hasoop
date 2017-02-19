@@ -69,7 +69,6 @@ export const hasoopMethodTypes = keyMirror({
   getJobByJobName: null,
   getJobByConnectorName: null,
   createJob: null,
-  updateJobConfig: null,
   updateJobEnable: null,
   updateJobDisable: null,
   deleteJob: null,
