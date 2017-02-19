@@ -1,6 +1,16 @@
 import _ from 'lodash'
-import { simpleVersion, version, sqoopConnectorCount, hasoopMethodTypes, jobStatusTypes } from './constant'
-import { splitLinkConfig, splitJobConfig, splitSubmissionConfig } from './utils'
+import {
+  simpleVersion,
+  version,
+  sqoopConnectorCount,
+  hasoopMethodTypes,
+  jobStatusTypes
+} from './constant'
+import {
+  splitLinkConfig,
+  splitJobConfig,
+  splitSubmissionConfig
+} from './utils'
 
 const returnEmptyObject = responseJson => _.isEqual(responseJson, {})
 
@@ -17,7 +27,10 @@ const successGenList = {
     const linkConfig = splitLinkConfig(responseJson)
     return linkConfig.name === linkName && _.difference(['id', 'enabled', 'connectorName'], _.keys(linkConfig)).length === 0
   },
-  [hasoopMethodTypes.createLink]: (responseJson, linkName) => _.isEqual(responseJson, {name: linkName, 'validation-result': [{}]}),
+  [hasoopMethodTypes.createLink]: (responseJson, linkName) => _.isEqual(responseJson, {
+    name: linkName,
+    'validation-result': [{}]
+  }),
   [hasoopMethodTypes.updateLinkConfig]: (responseJson) => _.isEqual(responseJson, {'validation-result': [{}]}),
   [hasoopMethodTypes.updateLinkEnable]: returnEmptyObject,
   [hasoopMethodTypes.updateLinkDisable]: returnEmptyObject,
@@ -29,8 +42,10 @@ const successGenList = {
     return jobConfig.topName === jobName && _.difference(['topName', 'topEnabled', 'topFromLinkName', 'topToLinkName'], _.keys(jobConfig)).length === 0
   },
   [hasoopMethodTypes.getJobByConnectorName]: (responseJson) => true,
-  [hasoopMethodTypes.createJob]: (responseJson, jobName) => _.isEqual(responseJson, { name: jobName, 'validation-result': [ {}, {}, {} ] }),
-  [hasoopMethodTypes.updateJobConfig]: (responseJson) => _.isEqual(responseJson, {'validation-result': [{}, {}, {}]}),
+  [hasoopMethodTypes.createJob]: (responseJson, jobName) => _.isEqual(responseJson, {
+    name: jobName,
+    'validation-result': [{}, {}, {}]
+  }),
   [hasoopMethodTypes.updateJobEnable]: returnEmptyObject,
   [hasoopMethodTypes.updateJobDisable]: returnEmptyObject,
   [hasoopMethodTypes.deleteJob]: returnEmptyObject,
@@ -69,7 +84,6 @@ const dataGenList = {
   [hasoopMethodTypes.getJobByJobName]: (success, responseJson) => success ? splitJobConfig(responseJson) : responseJson,
   [hasoopMethodTypes.getJobByConnectorName]: (success, responseJson) => _.map(responseJson.jobs, jobObject => splitJobConfig({jobs: [jobObject]})),
   [hasoopMethodTypes.createJob]: (success, responseJson) => success ? responseJson.name : responseJson,
-  [hasoopMethodTypes.updateJobConfig]: defaultEmptyData,
   [hasoopMethodTypes.updateJobEnable]: defaultEmptyData,
   [hasoopMethodTypes.updateJobDisable]: defaultEmptyData,
   [hasoopMethodTypes.deleteJob]: defaultEmptyData,
@@ -104,7 +118,7 @@ export async function hasoopRequestDispose (methodName, res, ...params) {
   const disposeMethodGen = (successGen, dataGen) => (responseJson, headers, ...otherParams) => {
     const success = successGen(responseJson, ...otherParams)
     const data = dataGen(success, responseJson, ...otherParams)
-    return { success, data, headers }
+    return {success, data, headers}
   }
 
   const successGen = successGenList[methodName]
