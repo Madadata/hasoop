@@ -6,9 +6,7 @@ import {
   sqoopClient,
   generateMysqlConfig,
   generateHdfsConfig,
-  generateFromMysqlToHdfsCreateConfig,
-  generateFromMysqlToHdfsUpdateConfig,
-  hasoopRequestDispose
+  generateFromMysqlToHdfsCreateConfig
 } from './index'
 
 suite('job', () => {
@@ -35,82 +33,63 @@ suite('job', () => {
 
   test('createJobFromMysqlToHdfsJob', async () => {
     const config = generateFromMysqlToHdfsCreateConfig(firstJobName, firstMysqlLinkName, firstHdfsLinkName)
-    const res = await sqoopClient.createJob(config)
-    const data = await hasoopRequestDispose('createJob', res, firstJobName)
+    const data = await sqoopClient.createJob(config)
     expect(data.success).to.be.true
   })
 
   test('getFromMysqlToHdfsJobByJobName', async () => {
-    const res = await sqoopClient.getJobByJobName(firstJobName)
-    const data = await hasoopRequestDispose('getJobByJobName', res, firstJobName)
+    const data = await sqoopClient.getJobByJobName(firstJobName)
     expect(data.success).to.be.true
   })
 
   test('getJobByConnectorName', async () => {
-    const res = await sqoopClient.getJobByConnectorName('hdfs-connector')
-    const data = await hasoopRequestDispose('getJobByConnectorName', res)
-    expect(data.success).to.be.true
-  })
-
-  test('updateJobFromMysqlToJob', async () => {
-    const config = generateFromMysqlToHdfsUpdateConfig()
-    const res = await sqoopClient.updateJobConfig(firstJobName, config)
-    const data = await hasoopRequestDispose('updateJobConfig', res)
+    const data = await sqoopClient.getJobByConnectorName('hdfs-connector')
     expect(data.success).to.be.true
   })
 
   test('getJobAll', async () => {
-    const res = await sqoopClient.getJobAll()
-    const data = await hasoopRequestDispose('getJobAll', res)
+    const data = await sqoopClient.getJobAll()
     expect(data.success).to.be.true
   })
 
   test('updateJobDisable', async () => {
-    const res = await sqoopClient.updateJobDisable(firstJobName)
-    const data = await hasoopRequestDispose('updateJobDisable', res, firstJobName)
+    const data = await sqoopClient.updateJobDisable(firstJobName)
     expect(data.success).to.be.true
   })
 
   test('updateJobEnable', async () => {
-    const res = await sqoopClient.updateJobEnable(firstJobName)
-    const data = await hasoopRequestDispose('updateJobEnable', res, firstJobName)
+    const data = await sqoopClient.updateJobEnable(firstJobName)
     expect(data.success).to.be.true
   })
 
   test('deleteJob', async () => {
-    const res = await sqoopClient.deleteJob(firstJobName)
-    const data = await hasoopRequestDispose('deleteJob', res, firstJobName)
+    const data = await sqoopClient.deleteJob(firstJobName)
     expect(data.success).to.be.true
   })
 
   // next 5 test is ok for ec2, so remove `skip`.
   test('FromMysqlToHdfsJobStatus When not start', async () => {
-    // const res = await sqoopClient.jobStatus(thirdJobName)
-    // const data = await hasoopRequestDispose('jobStatus', res, thirdJobName)
+    // const data = await sqoopClient.jobStatus(thirdJobName)
     // expect(data.success).to.be.true
   })
 
   test('startFromMysqlToHdfsJob', async () => {
-    // const res = await sqoopClient.startJob(thirdJobName)
-    // const data = await hasoopRequestDispose('startJob', res, thirdJobName)
+    // const data = await sqoopClient.startJob(thirdJobName)
     // expect(data.success).to.be.true
   })
 
   test('FromMysqlToHdfsJobStatus When start', async () => {
-    // const res = await sqoopClient.jobStatus(thirdJobName)
-    // const data = await hasoopRequestDispose('jobStatus', res, thirdJobName)
+    // const data = await sqoopClient.jobStatus(thirdJobName)
     // expect(data.success).to.be.true
   })
 
   test('stopFromMysqlToHdfsJob', async () => {
-    // const res = await sqoopClient.stopJob(thirdJobName)
-    // const data = await hasoopRequestDispose('stopJob', res, thirdJobName)
+    // const data = await sqoopClient.stopJob(thirdJobName)
     // expect(data.success).to.be.true
   })
 
   test('FromMysqlToHdfsJobStatus When stop', async () => {
-    // const res = await sqoopClient.jobStatus(thirdJobName)
-    // const data = await hasoopRequestDispose('jobStatus', res, thirdJobName)
+    // const data = await sqoopClient.jobStatus(thirdJobName)
     // expect(data.success).to.be.true
   })
 })

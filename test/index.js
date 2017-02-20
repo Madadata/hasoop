@@ -40,8 +40,6 @@ export function generateFromMysqlToHdfsCreateConfig (jobName, fromLinkName, toLi
       // for mysql
       'schemaName': 'harry',
       'tableName': 'characters',
-      // 'partitionColumn':'id' TODO
-
       // for hdfs
       'outputDirectory': `hdfs://${sqoopHost}:9000/data`
     }

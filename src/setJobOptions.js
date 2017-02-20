@@ -2,9 +2,6 @@
  * Created by Chyroc on 17/1/15.
  */
 
-// import { connectorType } from './index'
-import { splitLinkConfig } from './utils'
-
 /**
  * @ignore
  */
@@ -191,7 +188,7 @@ function setHdfsJobConfig (linkConfig, jobConfig) {
 /**
  * @ignore
  */
-function setJobConfig (jobConfig) {
+function setJobConfig () {
   return {
     'configs': [{
       'validators': [],
@@ -238,8 +235,6 @@ function setJobConfig (jobConfig) {
  * @ignore
  */
 export function setCreateJobRequestBody (jobName, jobConfig, fromLinkInfo, toLinkInfo, jobId = -1) {
-  const fromLinkConfig = splitLinkConfig(fromLinkInfo)
-  const toLinkConfig = splitLinkConfig(toLinkInfo)
   return {
     'jobs': [{
       'id': jobId,
@@ -249,20 +244,13 @@ export function setCreateJobRequestBody (jobName, jobConfig, fromLinkInfo, toLin
       'update-user': null,
       'update-date': Date.now(),
       'enabled': true,
-      'from-link-name': fromLinkConfig.name,
-      'from-connector-name': fromLinkConfig.connectorName,
-      'to-link-name': toLinkConfig.name,
-      'to-connector-name': toLinkConfig.connectorName,
-      'to-config-values': setHdfsJobConfig(toLinkConfig, jobConfig),
-      'from-config-values': setMysqlJobConfig(fromLinkConfig, jobConfig),
-      'driver-config-values': setJobConfig(jobConfig)
+      'from-link-name': fromLinkInfo.name,
+      'from-connector-name': fromLinkInfo.connectorName,
+      'to-link-name': fromLinkInfo.name,
+      'to-connector-name': toLinkInfo.connectorName,
+      'to-config-values': setHdfsJobConfig(toLinkInfo, jobConfig),
+      'from-config-values': setMysqlJobConfig(fromLinkInfo, jobConfig),
+      'driver-config-values': setJobConfig()
     }]
   }
-}
-
-/**
- * @ignore
- */
-export function setUpdateJobRequestBody (jobName, jobConfig, fromLinkInfo, toLinkInfo, jobId) {
-  return setCreateJobRequestBody(jobName, jobConfig, fromLinkInfo, toLinkInfo, jobId)
 }
