@@ -246,7 +246,7 @@ export function setCreateJobRequestBody (jobName, jobConfig, fromLinkInfo, toLin
       'enabled': true,
       'from-link-name': fromLinkInfo.name,
       'from-connector-name': fromLinkInfo.connectorName,
-      'to-link-name': fromLinkInfo.name,
+      'to-link-name': toLinkInfo.name,
       'to-connector-name': toLinkInfo.connectorName,
       'to-config-values': setHdfsJobConfig(toLinkInfo, jobConfig),
       'from-config-values': setMysqlJobConfig(fromLinkInfo, jobConfig),
