@@ -253,8 +253,8 @@ export default class Hasoop {
    * @returns {*}
    */
   async createJob (config) {
-    const fromLinkInfo = await this.getLinkByLinkName(config['fromLinkName'])
-    const toLinkInfo = await this.getLinkByLinkName(config['toLinkName'])
+    const fromLinkInfo = await this.getLinkByLinkName(config.fromLinkName)
+    const toLinkInfo = await this.getLinkByLinkName(config.toLinkName)
     const body = setCreateJobRequestBody(config.jobName, config.jobConfig, fromLinkInfo.data, toLinkInfo.data)
     const url = this.formatUrl([jobUri])
     return sendPostRequest(url, JSON.stringify(body))
