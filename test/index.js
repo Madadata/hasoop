@@ -14,7 +14,7 @@ export const sqoopClient = new Hasoop({
 
 export function generateMysqlConfig (linkName) {
   return {
-    linkName: linkName,
+    linkName,
     linkType: linkType.mysql,
     host: 'mysql',
     databaseName: 'harry',
@@ -25,7 +25,7 @@ export function generateMysqlConfig (linkName) {
 
 export function generateHdfsConfig (linkName) {
   return {
-    linkName: linkName,
+    linkName,
     linkType: linkType.hdfs,
     uri: `hdfs://${sqoopHost}:9000`
   }
@@ -33,9 +33,9 @@ export function generateHdfsConfig (linkName) {
 
 export function generateFromMysqlToHdfsCreateConfig (jobName, fromLinkName, toLinkName) {
   return {
-    jobName: jobName,
-    fromLinkName: fromLinkName,
-    toLinkName: toLinkName,
+    jobName,
+    fromLinkName,
+    toLinkName,
     jobConfig: {
       // for mysql
       schemaName: 'harry',
