@@ -2,6 +2,9 @@
  * Created by Chyroc on 17/1/15.
  */
 
+import _ from 'lodash'
+import { outputFormat } from './constant'
+
 /**
  * @ignore
  */
@@ -109,6 +112,10 @@ function setMysqlJobConfig (linkConfig, jobConfig) {
  * @ignore
  */
 function setHdfsJobConfig (linkConfig, jobConfig) {
+  const outputFileFormat = jobConfig.outputFormat || 'PARQUET_FILE'
+  if (!_.includes(_.keys(outputFormat), outputFileFormat)) {
+    throw new Error(`outputFormat outputFormat is not supported`)
+  }
   return {
     'configs': [{
       'validators': [],
@@ -138,7 +145,7 @@ function setHdfsJobConfig (linkConfig, jobConfig) {
         'sensitive': false,
         'overrides': '',
         'type': 'ENUM',
-        'value': jobConfig.outputFormat || 'PARQUET_FILE'
+        'value': outputFileFormat
       }, {
         'editable': 'ANY',
         'validators': [],

@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 
-import Hasoop, { linkType } from '../src/index'
+import Hasoop, { linkType, outputFormat } from '../src/index'
 export * from '../src/index'
 
 export const sqoopHost = process.env.SQOOP_HOST
@@ -42,7 +42,7 @@ export function generateFromMysqlToHdfsCreateConfig (jobName, fromLinkName, toLi
       tableName: 'characters',
       // for hdfs
       outputDirectory: `hdfs://${sqoopHost}:9000/data`,
-      outputFormat: 'PARQUET_FILE'
+      outputFormat: outputFormat.PARQUET_FILE
     }
   }
 }
