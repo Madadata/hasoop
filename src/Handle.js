@@ -104,7 +104,7 @@ export const getResponseHeaders = res => ({
   sqoopInternalErrorMessage: res.headers.get('sqoop-internal-error-message') || null
 })
 
-export async function hasoopRequestDispose (methodName, res, ...params) {
+export async function hasoopRequestHandle (methodName, res, ...params) {
   if (!Object.keys(hasoopMethodTypes).includes(methodName)) {
     throw new Error(`hasoop method ${methodName} is not exist`)
   }
@@ -115,7 +115,7 @@ export async function hasoopRequestDispose (methodName, res, ...params) {
     return {success: false, data: responseJson, headers: responseHeaders}
   }
 
-  const disposeMethodGen = (successGen, dataGen) => (responseJson, headers, ...otherParams) => {
+  const handleMethodGen = (successGen, dataGen) => (responseJson, headers, ...otherParams) => {
     const success = successGen(responseJson, ...otherParams)
     const data = dataGen(success, responseJson, ...otherParams)
     return {success, data, headers}
@@ -123,6 +123,6 @@ export async function hasoopRequestDispose (methodName, res, ...params) {
 
   const successGen = successGenList[methodName]
   const dataGen = dataGenList[methodName]
-  const disposeMethod = disposeMethodGen(successGen, dataGen)
-  return disposeMethod(responseJson, responseHeaders, ...params)
+  const handleMethod = handleMethodGen(successGen, dataGen)
+  return handleMethod(responseJson, responseHeaders, ...params)
 }
