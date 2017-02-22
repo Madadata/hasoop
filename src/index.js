@@ -18,9 +18,9 @@ import {
   version,
   sqoopAction
 } from './constant'
-import { hasoopRequestDispose } from './dispose'
+import { handleHasoopRequest } from './handle'
 export * from './constant'
-export * from './dispose'
+export * from './handle'
 export * from './utils'
 
 const versionUri = 'version'
@@ -74,7 +74,7 @@ export default class Hasoop {
   async getVersion () {
     const url = this.formatUrl([versionUri])
     return sendGetRequest(url)
-      .then(res => hasoopRequestDispose('getVersion', res))
+      .then(res => handleHasoopRequest('getVersion', res))
   }
 
   /**
@@ -85,7 +85,7 @@ export default class Hasoop {
   async getDriver () {
     const url = this.formatUrl([driverUri], sqoopAction.all)
     return sendGetRequest(url)
-      .then(res => hasoopRequestDispose('getDriver', res))
+      .then(res => handleHasoopRequest('getDriver', res))
   }
 
   /**
@@ -96,7 +96,7 @@ export default class Hasoop {
   getConnectorAll () {
     const url = this.formatUrl([connectorUri], sqoopAction.all)
     return sendGetRequest(url)
-      .then(res => hasoopRequestDispose('getConnectorAll', res))
+      .then(res => handleHasoopRequest('getConnectorAll', res))
   }
 
   /**
@@ -108,7 +108,7 @@ export default class Hasoop {
   getConnectorByConnectorName (connectorName) {
     const url = this.formatUrl([connectorUri], connectorName)
     return sendGetRequest(url)
-      .then(res => hasoopRequestDispose('getConnectorByConnectorName', res, connectorName))
+      .then(res => handleHasoopRequest('getConnectorByConnectorName', res, connectorName))
   }
 
   /**
@@ -119,7 +119,7 @@ export default class Hasoop {
   getLinkAll () {
     const url = this.formatUrl([linkUri], sqoopAction.all)
     return sendGetRequest(url)
-      .then(res => hasoopRequestDispose('getLinkAll', res))
+      .then(res => handleHasoopRequest('getLinkAll', res))
   }
 
   /**
@@ -131,7 +131,7 @@ export default class Hasoop {
   getLinkByConnectorName (connectorName) {
     const url = this.formatUrl([linkUri, {[sqoopAction.cname]: connectorName}], sqoopAction.all)
     return sendGetRequest(url)
-      .then(res => hasoopRequestDispose('getLinkByConnectorName', res))
+      .then(res => handleHasoopRequest('getLinkByConnectorName', res))
   }
 
   /**
@@ -143,7 +143,7 @@ export default class Hasoop {
   getLinkByLinkName (linkName) {
     const url = this.formatUrl([linkUri], linkName)
     return sendGetRequest(url)
-      .then(res => hasoopRequestDispose('getLinkByLinkName', res, linkName))
+      .then(res => handleHasoopRequest('getLinkByLinkName', res, linkName))
   }
 
   /**
@@ -156,7 +156,7 @@ export default class Hasoop {
     const body = setCreateLinkRequestBody(config)
     const url = this.formatUrl([linkUri])
     return sendPostRequest(url, JSON.stringify(body))
-      .then(res => hasoopRequestDispose('createLink', res, config.linkName))
+      .then(res => handleHasoopRequest('createLink', res, config.linkName))
   }
 
   /**
@@ -170,7 +170,7 @@ export default class Hasoop {
     const body = setUpdateLinkRequestBody(config)
     const url = this.formatUrl([linkUri], oldLinkName)
     return sendPutRequest(url, JSON.stringify(body))
-      .then(res => hasoopRequestDispose('updateLinkConfig', res))
+      .then(res => handleHasoopRequest('updateLinkConfig', res))
   }
 
   /**
@@ -182,7 +182,7 @@ export default class Hasoop {
   updateLinkEnable (linkName) {
     const url = this.formatUrl([linkUri], linkName, sqoopAction.enable)
     return sendPutRequest(url)
-      .then(res => hasoopRequestDispose('updateLinkEnable', res))
+      .then(res => handleHasoopRequest('updateLinkEnable', res))
   }
 
   /**
@@ -194,7 +194,7 @@ export default class Hasoop {
   updateLinkDisable (linkName) {
     const url = this.formatUrl([linkUri], linkName, sqoopAction.disable)
     return sendPutRequest(url)
-      .then(res => hasoopRequestDispose('updateLinkDisable', res))
+      .then(res => handleHasoopRequest('updateLinkDisable', res))
   }
 
   /**
@@ -206,7 +206,7 @@ export default class Hasoop {
   deleteLink (linkName) {
     const url = this.formatUrl([linkUri], linkName)
     return sendDeleteRequest(url)
-      .then(res => hasoopRequestDispose('deleteLink', res))
+      .then(res => handleHasoopRequest('deleteLink', res))
   }
 
   /**
@@ -217,7 +217,7 @@ export default class Hasoop {
   getJobAll () {
     const url = this.formatUrl([jobUri], sqoopAction.all)
     return sendGetRequest(url)
-      .then(res => hasoopRequestDispose('getJobAll', res))
+      .then(res => handleHasoopRequest('getJobAll', res))
   }
 
   /**
@@ -229,7 +229,7 @@ export default class Hasoop {
   getJobByJobName (JobName) {
     const url = this.formatUrl([jobUri], JobName)
     return sendGetRequest(url)
-      .then(res => hasoopRequestDispose('getJobByJobName', res, JobName))
+      .then(res => handleHasoopRequest('getJobByJobName', res, JobName))
   }
 
   /**
@@ -243,7 +243,7 @@ export default class Hasoop {
       sqoopAction.all
     )
     return sendGetRequest(url)
-      .then(res => hasoopRequestDispose('getJobByConnectorName', res))
+      .then(res => handleHasoopRequest('getJobByConnectorName', res))
   }
 
   /**
@@ -258,7 +258,7 @@ export default class Hasoop {
     const body = setCreateJobRequestBody(config.jobName, config.jobConfig, fromLinkInfo.data, toLinkInfo.data)
     const url = this.formatUrl([jobUri])
     return sendPostRequest(url, JSON.stringify(body))
-      .then(res => hasoopRequestDispose('createJob', res, config.jobName))
+      .then(res => handleHasoopRequest('createJob', res, config.jobName))
   }
 
   /**
@@ -270,7 +270,7 @@ export default class Hasoop {
   updateJobEnable (jobName) {
     const url = this.formatUrl([jobUri], jobName, sqoopAction.enable)
     return sendPutRequest(url)
-      .then(res => hasoopRequestDispose('updateJobEnable', res, jobName))
+      .then(res => handleHasoopRequest('updateJobEnable', res, jobName))
   }
 
   /**
@@ -282,7 +282,7 @@ export default class Hasoop {
   updateJobDisable (jobName) {
     const url = this.formatUrl([jobUri], jobName, sqoopAction.disable)
     return sendPutRequest(url)
-      .then(res => hasoopRequestDispose('updateJobDisable', res, jobName))
+      .then(res => handleHasoopRequest('updateJobDisable', res, jobName))
   }
 
   /**
@@ -294,7 +294,7 @@ export default class Hasoop {
   deleteJob (jobName) {
     const url = this.formatUrl([jobUri], jobName)
     return sendDeleteRequest(url)
-      .then(res => hasoopRequestDispose('deleteJob', res, jobName))
+      .then(res => handleHasoopRequest('deleteJob', res, jobName))
   }
 
   /**
@@ -306,7 +306,7 @@ export default class Hasoop {
   startJob (jobName) {
     const url = this.formatUrl([jobUri], jobName, sqoopAction.start)
     return sendPutRequest(url)
-      .then(res => hasoopRequestDispose('startJob', res, jobName))
+      .then(res => handleHasoopRequest('startJob', res, jobName))
   }
 
   /**
@@ -318,7 +318,7 @@ export default class Hasoop {
   stopJob (jobName) {
     const url = this.formatUrl([jobUri], jobName, sqoopAction.stop)
     return sendPutRequest(url)
-      .then(res => hasoopRequestDispose('stopJob', res, jobName))
+      .then(res => handleHasoopRequest('stopJob', res, jobName))
   }
 
   /**
@@ -330,7 +330,7 @@ export default class Hasoop {
   jobStatus (jobName) {
     const url = this.formatUrl([jobUri], jobName, sqoopAction.status)
     return sendGetRequest(url)
-      .then(res => hasoopRequestDispose('jobStatus', res, jobName))
+      .then(res => handleHasoopRequest('jobStatus', res, jobName))
   }
 
   /**
@@ -341,7 +341,7 @@ export default class Hasoop {
   getSubmissionAll () {
     const url = this.formatUrl([submissionsUri], sqoopAction.all)
     return sendGetRequest(url)
-      .then(res => hasoopRequestDispose('getSubmissionAll', res))
+      .then(res => handleHasoopRequest('getSubmissionAll', res))
   }
 
   /**
@@ -353,6 +353,6 @@ export default class Hasoop {
   getSubmissionByJobName (jobName) {
     const url = this.formatUrl([submissionsUri, {[sqoopAction.jname]: jobName}], sqoopAction.all)
     return sendGetRequest(url)
-      .then(res => hasoopRequestDispose('getSubmissionByJobName', res))
+      .then(res => handleHasoopRequest('getSubmissionByJobName', res))
   }
 }
