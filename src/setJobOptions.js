@@ -5,7 +5,7 @@
 /**
  * @ignore
  */
-function setMysqlJobConfig (linkConfig, jobConfig) {
+function setJdbcJobConfig (linkConfig, jobConfig) {
   return {
     'configs': [{
       'validators': [],
@@ -249,7 +249,7 @@ export function setCreateJobRequestBody (jobName, jobConfig, fromLinkInfo, toLin
       'to-link-name': toLinkInfo.name,
       'to-connector-name': toLinkInfo.connectorName,
       'to-config-values': setHdfsJobConfig(toLinkInfo, jobConfig),
-      'from-config-values': setMysqlJobConfig(fromLinkInfo, jobConfig),
+      'from-config-values': setJdbcJobConfig(fromLinkInfo, jobConfig),
       'driver-config-values': setJobConfig()
     }]
   }

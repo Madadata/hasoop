@@ -20,7 +20,8 @@ export const genericType = keyMirror({
  */
 export const linkType = keyMirror({
   mysql: null,
-  hdfs: null
+  hdfs: null,
+  postgresql: null
 })
 
 /**
@@ -47,14 +48,14 @@ export const sqoopConnectorCount = 7
  * type of all hasoop method
  */
 export const hasoopMethodTypes = keyMirror({
-   // version
+  // version
   getVersion: null,
-   // driver
+  // driver
   getDriver: null,
-   // connector
+  // connector
   getConnectorAll: null,
   getConnectorByConnectorName: null,
-   // link
+  // link
   getLinkAll: null,
   getLinkByConnectorName: null,
   getLinkByLinkName: null,
@@ -64,7 +65,7 @@ export const hasoopMethodTypes = keyMirror({
   updateLinkDisable: null,
   deleteLink: null,
   deleteLinkAll: null,
-   // job
+  // job
   getJobAll: null,
   getJobByJobName: null,
   getJobByConnectorName: null,
@@ -73,7 +74,7 @@ export const hasoopMethodTypes = keyMirror({
   updateJobDisable: null,
   deleteJob: null,
   deleteJobAll: null,
-   // submission
+  // submission
   startJob: null,
   stopJob: null,
   jobStatus: null,
