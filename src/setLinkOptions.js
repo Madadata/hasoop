@@ -197,7 +197,7 @@ function setCreateJdbcLinkRequestBody (jdbcLinkProtocol, linkConfig) {
       jdbcDriver = 'org.postgresql.Driver'
       break
     default:
-      throw new Error(`linkType must be ${_.join(_.keys(linkType))}`)
+      throw new Error(`linkType must be ${_.join(_.keys(linkType), ', ')}`)
   }
   const connectionString = `jdbc:${jdbcLinkProtocol}://${linkConfig.host}:${port}/${linkConfig.databaseName}`
   const mainBody = setCreateLinkRequestMainBody(linkConfig.linkName, connectorName)
@@ -228,7 +228,7 @@ export function setCreateLinkRequestBody (linkConfig) {
   } else if (linkConfig.linkType === linkType.hdfs) {
     return setCreateHdfsLinkRequestBody(linkConfig)
   } else {
-    throw new Error(`linkType must be ${_.join(_.keys(linkType))}`)
+    throw new Error(`linkType must be ${_.join(_.keys(linkType), ', ')}`)
   }
 }
 
