@@ -179,16 +179,30 @@ function setCreateLinkRequestHdfsBody (linkConfig) {
 /**
  * @ignore
  */
-function setCreateMysqlLinkRequestBody (linkConfig) {
+function setCreateJdbcLinkRequestBody (jdbcLinkProtocol, linkConfig) {
   const fetchSize = linkConfig.fetchSize || 1000
-  const identifierEnclose = linkConfig.identifierEnclose || '`'
-  const port = linkConfig.port || 3306
   const connectorName = 'generic-jdbc-connector'
-  const jdbcDriver = 'com.mysql.jdbc.Driver'
-  const connectionString = `jdbc:mysql://${linkConfig.host}:${port}/${linkConfig.databaseName}`
+  let identifierEnclose
+  let port
+  let jdbcDriver
+  switch (jdbcLinkProtocol) {
+    case linkType.mysql:
+      identifierEnclose = linkConfig.identifierEnclose || '`'
+      port = linkConfig.port || 3306
+      jdbcDriver = 'com.mysql.jdbc.Driver'
+      break
+    case linkType.postgresql:
+      identifierEnclose = linkConfig.identifierEnclose || '"'
+      port = linkConfig.port || 5432
+      jdbcDriver = 'org.postgresql.Driver'
+      break
+    default:
+      throw new Error(`linkType must be ${_.join(_.keys(linkType), ', ')}`)
+  }
+  const connectionString = `jdbc:${jdbcLinkProtocol}://${linkConfig.host}:${port}/${linkConfig.databaseName}`
   const mainBody = setCreateLinkRequestMainBody(linkConfig.linkName, connectorName)
   const mysqlBody = setCreateLinkRequestMysqlBody(jdbcDriver, connectionString, fetchSize, identifierEnclose, linkConfig)
-  return {'links': [{...mainBody, ...mysqlBody}]}
+  return { 'links': [{ ...mainBody, ...mysqlBody }] }
 }
 
 /**
@@ -198,7 +212,7 @@ function setCreateHdfsLinkRequestBody (linkConfig) {
   const connectorName = 'hdfs-connector'
   const mainBody = setCreateLinkRequestMainBody(linkConfig.linkName, connectorName)
   const hdfsBody = setCreateLinkRequestHdfsBody(linkConfig)
-  const createHdfsLinkBody = {'links': [{...mainBody, ...hdfsBody}]}
+  const createHdfsLinkBody = { 'links': [{ ...mainBody, ...hdfsBody }] }
   if (linkConfig.hadoopConfDir) {
     _.set(createHdfsLinkBody, 'links[0].link-config-values.configs[0].inputs[1].value', encodeURIComponent(linkConfig.hadoopConfDir))
   }
@@ -209,12 +223,12 @@ function setCreateHdfsLinkRequestBody (linkConfig) {
  * @ignore
  */
 export function setCreateLinkRequestBody (linkConfig) {
-  if (linkConfig.linkType === linkType.mysql) {
-    return setCreateMysqlLinkRequestBody(linkConfig)
+  if (linkConfig.linkType === linkType.mysql || linkConfig.linkType === linkType.postgresql) {
+    return setCreateJdbcLinkRequestBody(linkConfig.linkType, linkConfig)
   } else if (linkConfig.linkType === linkType.hdfs) {
     return setCreateHdfsLinkRequestBody(linkConfig)
   } else {
-    throw new Error('linkType must be mysql or hdfs')
+    throw new Error(`linkType must be ${_.join(_.keys(linkType), ', ')}`)
   }
 }
 

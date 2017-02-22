@@ -20,7 +20,8 @@ export const genericType = keyMirror({
  */
 export const linkType = keyMirror({
   mysql: null,
-  hdfs: null
+  hdfs: null,
+  postgresql: null
 })
 
 /**
