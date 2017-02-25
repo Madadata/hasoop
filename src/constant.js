@@ -86,3 +86,9 @@ export const jobStatusTypes = {
   allJobStatus: ['BOOTING', 'FAILURE_ON_SUBMIT', 'RUNNING', 'SUCCEEDED', 'FAILED', 'NEVER_EXECUTED', 'UNKNOWN'],
   startJobSucceedStatus: ['BOOTING', 'RUNNING', 'SUCCEEDED']
 }
+
+export const outputFormat = keyMirror({
+  TEXT_FILE: null,
+  SEQUENCE_FILE: null,
+  PARQUET_FILE: null
+})
